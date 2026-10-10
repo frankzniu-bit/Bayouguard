@@ -22,6 +22,7 @@ import InspectorPanel from './InspectorPanel';
 import MapRail from './MapRail';
 import RiskBoard from './RiskBoard';
 import Tour from './Tour';
+import StaleBanner from './StaleBanner';
 import MapIntro from './MapIntro';
 import { DEFAULT_LAYERS, type MapLayers } from './LayerControl';
 import { useTheme } from '@/lib/useTheme';
@@ -188,8 +189,9 @@ export default function HomeExperience({
         className="chrome chrome-top"
       />
 
-      {/* Search status, just under the bar */}
-      <div className="pointer-events-none absolute inset-x-0 top-[116px] z-[60] flex justify-center px-4 md:top-[68px]">
+      {/* Search status and data warnings, just under the bar */}
+      <div className="pointer-events-none absolute inset-x-0 top-[116px] z-[60] flex flex-col items-center gap-2 px-4 md:top-[68px]">
+        <StaleBanner gauges={view.gauges} />
         {loading && (
           <span
             role="status"

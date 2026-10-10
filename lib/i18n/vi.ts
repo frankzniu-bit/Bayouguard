@@ -140,6 +140,8 @@ export const vi: Record<MsgKey, string> = {
   'stat.cadence.detail': 'USGS · FWS Quận Harris',
 
   // Data status
+  'stale.minutes': 'Số đo có thể bị chậm — cập nhật lần cuối {minutes} phút trước.',
+  'stale.hours': 'Số đo có thể bị chậm — cập nhật lần cuối khoảng {hours} giờ trước.',
   'status.live': 'Trực tiếp',
   'status.partial': 'Một phần',
   'status.demo': 'Dữ liệu mẫu',

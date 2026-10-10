@@ -7,7 +7,15 @@
  * the Addicks/Barker dams. The levels, trends and tiers are invented: a wet
  * afternoon with mostly calm water, a few gauges rising, one over its banks. */
 
-import { tierForBuffer, type BackendGauge } from './contract';
+import {
+  tierForBuffer,
+  type BackendGauge,
+  type CommunityReport,
+  type Forecast,
+  type Reservoir,
+  type RoadCollection,
+  type Shelter,
+} from './contract';
 
 // Ids well above any real HCFWS site id, so live extras never attach to them.
 export const DEMO_ID_BASE = 900_000;
@@ -63,3 +71,72 @@ export const DEMO_GAUGES: readonly DemoGauge[] = SITES.map(
     trend,
   }),
 );
+
+/* ── Planned-endpoint fixtures ────────────────────────────────────────────
+ * Real places, invented statuses. Every screen that shows these says
+ * "sample" next to them — a real shelter must never look open when nobody
+ * has said it is. */
+
+const NOW = () => new Date().toISOString();
+
+export function demoShelters(): Shelter[] {
+  const updatedAt = NOW();
+  return [
+    { id: 'grb', name: 'George R. Brown Convention Center', address: '1001 Avenida de las Americas, Houston, TX 77010', lat: 29.752, lng: -95.3585, status: 'open', petFriendly: true, accessible: true, capacity: 10000, occupancy: 3120, updatedAt },
+    { id: 'nrg', name: 'NRG Center', address: '1 NRG Pkwy, Houston, TX 77054', lat: 29.6847, lng: -95.4107, status: 'full', petFriendly: false, accessible: true, capacity: 5000, occupancy: 5000, updatedAt },
+    { id: 'alief', name: 'Alief Neighborhood Center', address: '11903 Bellaire Blvd, Houston, TX 77072', lat: 29.7066, lng: -95.5773, status: 'open', petFriendly: true, accessible: true, capacity: 400, occupancy: 135, updatedAt },
+    { id: 'tracy-gee', name: 'Tracy Gee Community Center', address: '3599 Westcenter Dr, Houston, TX 77042', lat: 29.7349, lng: -95.5487, status: 'closed', petFriendly: false, accessible: true, updatedAt },
+    { id: 'campbell', name: 'M.O. Campbell Educational Center', address: '1865 Aldine Bender Rd, Houston, TX 77032', lat: 29.9363, lng: -95.3452, status: 'open', petFriendly: false, accessible: true, capacity: 1500, occupancy: 610, updatedAt },
+    { id: 'lakewood', name: 'Lakewood Church', address: '3700 Southwest Fwy, Houston, TX 77027', lat: 29.7309, lng: -95.4346, status: 'closed', petFriendly: false, accessible: true, updatedAt },
+  ];
+}
+
+export function demoRoads(): RoadCollection {
+  const updatedAt = NOW();
+  const seg = (name: string, status: 'closed' | 'flooded', coordinates: Array<[number, number]>) => ({
+    type: 'Feature' as const,
+    geometry: { type: 'LineString' as const, coordinates },
+    properties: { name, status, updatedAt },
+  });
+  return {
+    type: 'FeatureCollection',
+    features: [
+      seg('Memorial Dr at Shepherd Dr', 'flooded', [[-95.4108, 29.7627], [-95.4082, 29.763]]),
+      seg('I-610 West Loop at Bellaire Blvd', 'closed', [[-95.4596, 29.7062], [-95.4594, 29.7104]]),
+      seg('US-59 at Spur 527', 'closed', [[-95.3925, 29.7396], [-95.3893, 29.742]]),
+      seg('Allen Pkwy at Taft St', 'flooded', [[-95.3925, 29.7616], [-95.3884, 29.7608]]),
+    ],
+  };
+}
+
+export function demoReservoirs(): Reservoir[] {
+  const updatedAt = NOW();
+  return [
+    { name: 'Addicks', poolElevationFt: 79.2, outflowCfs: 0, percentCapacity: 6, trend: 'steady', updatedAt },
+    { name: 'Barker', poolElevationFt: 77.8, outflowCfs: 0, percentCapacity: 4, trend: 'steady', updatedAt },
+  ];
+}
+
+export function demoReports(): CommunityReport[] {
+  const now = Date.now();
+  const iso = (ms: number) => new Date(ms).toISOString();
+  return [
+    { id: 'demo-1', lat: 29.6905, lng: -95.4612, severity: 'water_on_road', note: 'Curb-deep at the intersection', createdAt: iso(now - 25 * 60_000), expiresAt: iso(now + 155 * 60_000) },
+    { id: 'demo-2', lat: 29.7712, lng: -95.4021, severity: 'impassable', createdAt: iso(now - 50 * 60_000), expiresAt: iso(now + 130 * 60_000) },
+  ];
+}
+
+/* Hourly scores for the next six hours, drifting from the current score in
+ * the direction the outlook points. Only ever labelled as a demo. */
+export function demoForecast(score: number, level: 'CLEAR' | 'WATCH' | 'WARNING'): Forecast {
+  const step = level === 'WARNING' ? 5 : level === 'WATCH' ? 2.5 : -0.5;
+  const start = new Date();
+  start.setMinutes(0, 0, 0);
+  const hours: string[] = [];
+  const scores: number[] = [];
+  for (let i = 0; i <= 6; i++) {
+    hours.push(new Date(start.getTime() + i * 3600_000).toISOString());
+    scores.push(Math.max(0, Math.min(100, Math.round(score + step * i))));
+  }
+  return { hours, scores };
+}

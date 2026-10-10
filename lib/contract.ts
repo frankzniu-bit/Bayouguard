@@ -88,3 +88,130 @@ export function isBackendGauge(v: unknown): v is BackendGauge {
     typeof g.risk_tier === 'string'
   );
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * PLANNED — not built on the backend yet. The frontend already calls each
+ * one through a Next route in app/api/ and falls back (see lib/endpoints.ts)
+ * until it ships; when it does, the feature goes live with no frontend
+ * change. A 404 here never affects the data-status pill.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+// PLANNED — GET /forecast?lat&lng&hours=6
+export interface Forecast {
+  hours: string[]; // ISO hour timestamps, first is now
+  scores: number[]; // risk score 0-100 per hour
+}
+
+// PLANNED — GET /shelters
+export interface Shelter {
+  id: string;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  status: 'open' | 'full' | 'closed';
+  petFriendly: boolean;
+  accessible: boolean;
+  capacity?: number;
+  occupancy?: number;
+  updatedAt: string;
+}
+
+// PLANNED — GET /reservoirs (Addicks and Barker)
+export interface Reservoir {
+  name: string;
+  poolElevationFt: number;
+  outflowCfs: number | null;
+  percentCapacity: number | null;
+  trend: 'rising' | 'falling' | 'steady';
+  updatedAt: string;
+}
+
+// PLANNED — GET /roads: GeoJSON of closed or flooded road segments
+export interface RoadFeature {
+  type: 'Feature';
+  geometry: { type: 'LineString'; coordinates: Array<[number, number]> };
+  properties: { name: string; status: 'closed' | 'flooded'; updatedAt: string };
+}
+export interface RoadCollection {
+  type: 'FeatureCollection';
+  features: RoadFeature[];
+}
+
+// PLANNED — GET /flood-history?zip
+export interface FloodHistory {
+  zip: string;
+  claimsSince2015: number;
+  events: string[]; // named storms with claims in this ZIP, oldest first
+}
+
+// PLANNED — POST /subscribe
+export interface SubscribeRequest {
+  phone?: string;
+  email?: string;
+  addresses: string[];
+  threshold: 'HIGH' | 'CRITICAL';
+  lang: 'en' | 'es' | 'vi';
+  allClear?: boolean;
+}
+
+// PLANNED — POST /reports and GET /reports
+export type ReportSeverity = 'water_on_road' | 'passable' | 'impassable';
+export interface CommunityReport {
+  id?: string;
+  lat: number;
+  lng: number;
+  severity: ReportSeverity;
+  note?: string;
+  createdAt: string;
+  expiresAt: string;
+}
+
+// PLANNED — GET /health
+export interface Health {
+  status: string;
+  lastGaugeRefresh?: string;
+  modelLoaded?: boolean;
+  modelVersion?: string;
+}
+
+const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+const isStr = (v: unknown): v is string => typeof v === 'string';
+
+export function isForecast(v: unknown): v is Forecast {
+  const f = v as Forecast;
+  return !!f && Array.isArray(f.hours) && Array.isArray(f.scores) && f.scores.length > 0 && f.scores.every(isNum);
+}
+
+export function isShelterList(v: unknown): v is Shelter[] {
+  return (
+    Array.isArray(v) &&
+    v.every(
+      (s: Shelter) =>
+        s && isStr(s.id) && isStr(s.name) && isNum(s.lat) && isNum(s.lng) &&
+        (s.status === 'open' || s.status === 'full' || s.status === 'closed'),
+    )
+  );
+}
+
+export function isReservoirList(v: unknown): v is Reservoir[] {
+  return Array.isArray(v) && v.length > 0 && v.every((r: Reservoir) => r && isStr(r.name) && isNum(r.poolElevationFt));
+}
+
+export function isRoadCollection(v: unknown): v is RoadCollection {
+  const c = v as RoadCollection;
+  return !!c && c.type === 'FeatureCollection' && Array.isArray(c.features);
+}
+
+export function isFloodHistory(v: unknown): v is FloodHistory {
+  const h = v as FloodHistory;
+  return !!h && isStr(h.zip) && isNum(h.claimsSince2015) && Array.isArray(h.events);
+}
+
+export function isReportList(v: unknown): v is CommunityReport[] {
+  return Array.isArray(v) && v.every((r: CommunityReport) => r && isNum(r.lat) && isNum(r.lng) && isStr(r.severity));
+}
+
+export function isHealth(v: unknown): v is Health {
+  return !!v && isStr((v as Health).status);
+}

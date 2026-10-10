@@ -137,6 +137,8 @@ export const en = {
   'stat.cadence.detail': 'USGS · Harris County FWS',
 
   // Data status
+  'stale.minutes': 'Gauge readings may be delayed — last update {minutes} min ago.',
+  'stale.hours': 'Gauge readings may be delayed — last update about {hours} h ago.',
   'status.live': 'Live',
   'status.partial': 'Partial data',
   'status.demo': 'Demo data',

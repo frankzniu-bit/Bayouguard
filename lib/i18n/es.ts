@@ -139,6 +139,8 @@ export const es: Record<MsgKey, string> = {
   'stat.cadence.detail': 'USGS · FWS del Condado de Harris',
 
   // Data status
+  'stale.minutes': 'Las lecturas podrían estar atrasadas: la última actualización fue hace {minutes} min.',
+  'stale.hours': 'Las lecturas podrían estar atrasadas: la última actualización fue hace unas {hours} h.',
   'status.live': 'En vivo',
   'status.partial': 'Datos parciales',
   'status.demo': 'Datos de muestra',

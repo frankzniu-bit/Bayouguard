@@ -66,7 +66,7 @@ export default function HomeExperience({
   initialAddress?: string;
   initialCoords?: { lat: number; lng: number };
 }) {
-  const { t } = useI18n();
+  const { t, time } = useI18n();
   const { view, loading, wake, notice, search } = useFloodData(initial, initialAddress, initialCoords);
   const [mode, setMode] = useState<ViewMode>('map');
   const { mode: theme, toggle: toggleTheme, setMode: setTheme } = useTheme();
@@ -364,7 +364,16 @@ export default function HomeExperience({
 
       {/* Search status, data warnings and the welcome card, under the bar */}
       <div className="pointer-events-none absolute inset-x-0 top-[116px] z-[60] mx-auto flex max-w-md flex-col items-center gap-2 px-3 md:top-[68px]">
-        <StaleBanner gauges={view.gauges} />
+        {view.offline ? (
+          <p
+            role="status"
+            className="pointer-events-auto rounded-lg border border-ob-border bg-ob-surface px-3 py-1.5 text-[12px] font-medium text-ob-text"
+          >
+            {t('offline.banner', { time: time(view.fetchedAt) })}
+          </p>
+        ) : (
+          <StaleBanner gauges={view.gauges} />
+        )}
         {loading && (
           <span
             role="status"

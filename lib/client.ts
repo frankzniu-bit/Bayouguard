@@ -30,7 +30,8 @@ export async function fetchFloodView(
     signal: AbortSignal.timeout(budgetMs + SERVER_OVERHEAD_MS),
   });
   if (!res.ok) throw new Error(`Flood lookup failed: ${res.status}`);
-  return (await res.json()) as FloodView;
+  const view = (await res.json()) as FloodView;
+  return res.headers.get('X-BayouGuard-Offline') ? { ...view, offline: true, backendTimedOut: false } : view;
 }
 
 /* Keep asking until the backend answers or the deadline passes. Each round

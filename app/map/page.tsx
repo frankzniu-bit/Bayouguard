@@ -2,9 +2,18 @@ import type { Metadata } from 'next';
 import HomeExperience from '@/components/HomeExperience';
 import { demoView, getFloodView } from '@/lib/api';
 
-export const metadata: Metadata = {
-  title: 'Map — BayouGuard',
-};
+export function generateMetadata({ searchParams }: { searchParams: { address?: string } }): Metadata {
+  const address = searchParams.address?.trim().slice(0, 120);
+  if (!address) return { title: 'Map — BayouGuard' };
+  const title = `Flood risk at ${address} — BayouGuard`;
+  const image = `/api/og?address=${encodeURIComponent(address)}`;
+  return {
+    title,
+    description: 'Live Harris County gauges, an ML flood-risk score, and whether it’s safe to drive.',
+    openGraph: { title, images: [{ url: image, width: 1200, height: 630 }] },
+    twitter: { card: 'summary_large_image', title, images: [image] },
+  };
+}
 
 // A sleeping Render backend takes ~1 min to wake. The server render never
 // waits more than this; the client fetches the live view after hydration.

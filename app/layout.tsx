@@ -3,6 +3,7 @@ import { DM_Serif_Display, Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { LanguageProvider } from '@/lib/i18n';
 import MotionRoot from '@/components/MotionRoot';
+import ServiceWorker from '@/components/ServiceWorker';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -25,7 +26,15 @@ const jbMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_ENV === 'preview' && process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'https://bayouguard.vercel.app'),
+  ),
   title: 'BayouGuard — Texas floodwater, mapped',
+  openGraph: { images: [{ url: '/api/og', width: 1200, height: 630 }] },
+  appleWebApp: { capable: true, title: 'BayouGuard', statusBarStyle: 'default' },
   description:
     'Live water levels from every river and bayou gauge in Texas, and what they mean for your address. Built for the Congressional App Challenge 2026.',
 };
@@ -53,6 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="h-full font-sans bg-ob-bg text-ob-text antialiased">
         <LanguageProvider>
           <MotionRoot>{children}</MotionRoot>
+          <ServiceWorker />
         </LanguageProvider>
       </body>
     </html>

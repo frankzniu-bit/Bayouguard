@@ -330,6 +330,7 @@ export const es: Record<MsgKey, string> = {
   'about.role.carlos': "Investigación comunitaria y pruebas",
   'about.school': "Escuela: {school}",
   'about.cac': "Creado para el Congressional App Challenge 2026, Distrito 7 de Texas.",
+  'offline.banner': "Sin conexión: se muestra la lectura de las {time}.",
   // Data status
   'stale.minutes': 'Las lecturas podrían estar atrasadas: la última actualización fue hace {minutes} min.',
   'stale.hours': 'Las lecturas podrían estar atrasadas: la última actualización fue hace unas {hours} h.',

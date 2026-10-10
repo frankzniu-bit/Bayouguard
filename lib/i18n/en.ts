@@ -328,6 +328,7 @@ export const en = {
   'about.role.carlos': "Community research and testing",
   'about.school': "School: {school}",
   'about.cac': "Built for the 2026 Congressional App Challenge, Texas’s 7th District.",
+  'offline.banner': "Offline — showing the reading from {time}.",
   // Data status
   'stale.minutes': 'Gauge readings may be delayed — last update {minutes} min ago.',
   'stale.hours': 'Gauge readings may be delayed — last update about {hours} h ago.',

@@ -113,4 +113,6 @@ export interface FloodView {
   /** The address is outside the Houston service area. */
   outOfArea?: boolean;
   fetchedAt: string;
+  /** Served by the service worker from the last good answer while offline. */
+  offline?: boolean;
 }

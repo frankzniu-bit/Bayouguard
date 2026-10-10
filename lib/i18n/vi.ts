@@ -331,6 +331,7 @@ export const vi: Record<MsgKey, string> = {
   'about.role.carlos': "Nghiên cứu cộng đồng và kiểm thử",
   'about.school': "Trường: {school}",
   'about.cac': "Thực hiện cho Congressional App Challenge 2026, Quận 7 của Texas.",
+  'offline.banner': "Đang ngoại tuyến — hiển thị số đo lúc {time}.",
   // Data status
   'stale.minutes': 'Số đo có thể bị chậm — cập nhật lần cuối {minutes} phút trước.',
   'stale.hours': 'Số đo có thể bị chậm — cập nhật lần cuối khoảng {hours} giờ trước.',

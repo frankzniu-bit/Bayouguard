@@ -243,17 +243,25 @@ function ReadyProbe({ onReady }: { onReady?: (map: L.Map) => void }) {
   return null;
 }
 
+/* Fly to the searched address so the pin lands in the part of the map the
+ * inspector doesn't cover (`inset` = px hidden on the right and bottom). */
 function Recenter({
   center,
   zoomToCenter,
+  inset,
 }: {
   center: [number, number] | null;
   zoomToCenter: boolean;
+  inset: { right: number; bottom: number };
 }) {
   const map = useMap();
+  const lat = center?.[0];
+  const lng = center?.[1];
   useEffect(() => {
-    if (center && zoomToCenter) map.flyTo(center, ADDRESS_ZOOM, { duration: 1.1 });
-  }, [center, zoomToCenter, map]);
+    if (lat == null || lng == null || !zoomToCenter) return;
+    const target = map.project([lat, lng], ADDRESS_ZOOM).add([inset.right / 2, inset.bottom / 2]);
+    map.flyTo(map.unproject(target, ADDRESS_ZOOM), ADDRESS_ZOOM, { duration: 1.1 });
+  }, [lat, lng, zoomToCenter, inset.right, inset.bottom, map]);
   return null;
 }
 
@@ -298,6 +306,7 @@ export default function FloodMap({
   onReady,
   overlays = {},
   onMap,
+  inset = { right: 0, bottom: 0 },
 }: {
   center: { lat: number; lng: number } | null;
   gauges: GaugePoint[];
@@ -316,6 +325,8 @@ export default function FloodMap({
   overlays?: MapOverlays;
   /** The Leaflet map, once created (for the map-centre report location). */
   onMap?: (map: L.Map) => void;
+  /** Pixels covered by the inspector, so the address pin isn't hidden under it. */
+  inset?: { right: number; bottom: number };
 }) {
   const { t } = useI18n();
   const yourAddress = t('map.yourAddress');
@@ -540,6 +551,7 @@ export default function FloodMap({
       <Recenter
         center={center ? [center.lat, center.lng] : null}
         zoomToCenter={zoomToCenter}
+        inset={inset}
       />
     </MapContainer>
   );

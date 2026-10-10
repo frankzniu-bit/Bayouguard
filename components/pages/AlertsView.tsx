@@ -220,7 +220,7 @@ export default function AlertsView({ initialAddress }: { initialAddress?: string
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="h-12 rounded-lg bg-ob-accent text-[16px] font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+          className="h-12 rounded-lg bg-ob-accent text-[16px] font-semibold text-ob-onaccent transition hover:brightness-110 disabled:opacity-60"
         >
           {status === 'sending' ? t('alerts.sending') : t('alerts.submit')}
         </button>

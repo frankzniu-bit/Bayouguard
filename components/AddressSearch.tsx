@@ -229,14 +229,14 @@ export default function AddressSearch({
             title={saved === value && value ? t('search.saved') : t('search.save')}
             aria-label={t('search.save')}
             aria-pressed={Boolean(saved && saved === value)}
-            className="hidden h-9 w-9 items-center justify-center rounded-full text-ob-muted transition hover:bg-ob-bg2 hover:text-ob-accent sm:flex"
+            className="hidden h-9 w-9 items-center justify-center rounded-full text-ob-muted transition hover:bg-ob-bg hover:text-ob-accent sm:flex"
           >
             {saved === value && value ? '★' : '☆'}
           </button>
           <button
             type="submit"
             aria-busy={busy}
-            className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-ob-accent px-4 text-[13px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97]"
+            className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-ob-accent px-4 text-[13px] font-semibold text-ob-onaccent transition hover:brightness-110 active:scale-[0.97]"
           >
             {busy && <span aria-hidden className="spin h-3 w-3 rounded-full border-2 border-white border-t-transparent" />}
             {busy && waking ? t('status.waking') : t('search.submit')}
@@ -263,7 +263,7 @@ export default function AddressSearch({
                 onMouseEnter={() => setActive(i)}
                 onClick={() => pick(s)}
                 className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition ${
-                  i === active ? 'bg-ob-accent/10 text-ob-accent' : 'text-ob-muted hover:bg-ob-bg2'
+                  i === active ? 'bg-ob-accent/10 text-ob-accent' : 'text-ob-muted hover:bg-ob-bg'
                 }`}
               >
                 <span className="text-ob-muted" aria-hidden>

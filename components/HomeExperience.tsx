@@ -15,7 +15,7 @@ import type L from 'leaflet';
 import dynamic from 'next/dynamic';
 import { AnimatePresence, motion } from 'framer-motion';
 import TopBar, { type ViewMode } from './TopBar';
-import WatershedGraph, { type GraphSelection } from './WatershedGraph';
+import type { GraphSelection } from './WatershedGraph';
 import AddressSearch from './AddressSearch';
 import TexasLocator from './TexasLocator';
 import InspectorPanel from './InspectorPanel';
@@ -30,6 +30,7 @@ import BottomTabs from './nav/BottomTabs';
 import ReportForm from './ReportForm';
 import WelcomeCard, { LocateIcon } from './WelcomeCard';
 import LayerControl, { DEFAULT_LAYERS, type MapLayers } from './LayerControl';
+import Skeleton from './Skeleton';
 import { useTheme } from '@/lib/useTheme';
 import { useFloodData } from '@/lib/useFloodData';
 import { useEndpoint } from '@/lib/useEndpoint';
@@ -44,6 +45,12 @@ import { readHandoff, type Handoff } from '@/lib/dotField';
 const FloodMap = dynamic(() => import('./FloodMap'), {
   ssr: false,
   loading: () => <div className="h-full w-full bg-ob-bg2" />,
+});
+
+// The graph canvas is only needed when someone switches to it.
+const WatershedGraph = dynamic(() => import('./WatershedGraph'), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-ob-bg" />,
 });
 
 /* checking — deciding (first client frame) whether we came from the landing
@@ -94,6 +101,7 @@ export default function HomeExperience({
   const [locating, setLocating] = useState(false);
   const [localNotice, setLocalNotice] = useState<LocalNotice>(null);
   const [localReports, setLocalReports] = useState<CommunityReport[]>([]);
+  const [pendingAddress, setPendingAddress] = useState(false);
 
   // Before paint, so the landing's last frame is covered from the first frame.
   // Once only: reading consumes the hand-off, and React's dev double-run of
@@ -179,7 +187,9 @@ export default function HomeExperience({
   ) => {
     lastSearch.current = { address, coords };
     setLocalNotice(null);
+    if (submitted) setPendingAddress(true);
     const next = await search(address, coords);
+    setPendingAddress(false);
     remember(next);
     if (submitted && next?.center) {
       setSearched(true);
@@ -257,6 +267,18 @@ export default function HomeExperience({
   // An address selection needs a scored snapshot to show.
   const shown = selection?.kind === 'address' && !view.snapshot ? null : selection;
   const showWelcome = intro === 'done' && !view.address && !loading && !shown;
+  const vh = typeof window === 'undefined' ? 800 : window.innerHeight;
+  const inspectorInset = useMemo(
+    () =>
+      shown?.kind === 'address' || selection?.kind === 'address' || searched
+        ? isWide
+          ? { right: 396, bottom: 0 }
+          : { right: 0, bottom: Math.round(vh * 0.35) }
+        : { right: 0, bottom: 0 },
+    // Re-centre only when the layout mode flips, not on every selection change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isWide, searched],
+  );
 
   const noticeKey: MsgKey | null =
     localNotice === 'locationDenied'
@@ -277,6 +299,7 @@ export default function HomeExperience({
                     ? 'wake.failed'
                     : null;
   const canRetry = !localNotice && (notice === 'unreachable' || wake === 'failed');
+  const overlayFailed = [shelters, roads, reports, reservoirs].filter((o) => o.error);
 
   const inspector = shown && (
     <InspectorPanel
@@ -326,6 +349,7 @@ export default function HomeExperience({
             onReady={intro === 'playing' ? setLiveMap : undefined}
             overlays={overlays}
             onMap={onMap}
+            inset={inspectorInset}
           />
         ) : (
           <WatershedGraph
@@ -363,7 +387,10 @@ export default function HomeExperience({
       />
 
       {/* Search status, data warnings and the welcome card, under the bar */}
-      <div className="pointer-events-none absolute inset-x-0 top-[116px] z-[60] mx-auto flex max-w-md flex-col items-center gap-2 px-3 md:top-[68px]">
+      <div
+        className="pointer-events-none absolute inset-x-0 z-[60] mx-auto flex max-w-md flex-col items-center gap-2 px-3"
+        style={{ top: 'calc(var(--topbar-h, 116px) - 4px)' }}
+      >
         {view.offline ? (
           <p
             role="status"
@@ -404,6 +431,21 @@ export default function HomeExperience({
                 ×
               </button>
             )}
+          </span>
+        )}
+        {overlayFailed.length > 0 && (
+          <span
+            role="alert"
+            className="ob-panel ob-float pointer-events-auto inline-flex max-w-md items-center gap-3 rounded-xl px-3 py-2 text-[13px] text-ob-text"
+          >
+            {t('layers.error')}
+            <button
+              type="button"
+              onClick={() => overlayFailed.forEach((o) => o.retry())}
+              className="shrink-0 font-semibold text-ob-accent hover:underline"
+            >
+              {t('action.retry')}
+            </button>
           </span>
         )}
         {showWelcome && (
@@ -501,7 +543,10 @@ export default function HomeExperience({
       )}
 
       {/* Desktop tools + hint (bottom centre) */}
-      <div className="chrome chrome-bottom chrome-d3 pointer-events-none absolute inset-x-0 bottom-4 z-30 hidden flex-col items-center gap-2 px-4 lg:flex">
+      <div
+        className="chrome chrome-bottom chrome-d3 pointer-events-none absolute bottom-4 z-30 hidden flex-col items-center gap-2 px-4 lg:flex"
+        style={{ left: 264, right: shown ? 400 : 16 }}
+      >
         {reportOpen && isDesktop && (
           <div className="ob-panel ob-float pointer-events-auto w-[360px] rounded-xl p-4">{reportForm}</div>
         )}
@@ -524,6 +569,18 @@ export default function HomeExperience({
       </div>
 
       {/* Inspector: right column from md up, a bottom sheet on phones */}
+      {pendingAddress && !shown && isWide && intro === 'done' && (
+        <aside
+          aria-hidden
+          className="ob-panel ob-float absolute right-4 top-[76px] z-[80] flex w-[380px] flex-col gap-3 rounded-xl p-5"
+        >
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-6 w-64" />
+          <Skeleton className="h-28 w-full" />
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-24 w-full" />
+        </aside>
+      )}
       <AnimatePresence>
         {shown && intro === 'done' && isWide && (
           <motion.aside
@@ -533,7 +590,8 @@ export default function HomeExperience({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 24 }}
             transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute bottom-[calc(56px+env(safe-area-inset-bottom)+16px)] right-4 top-[76px] z-[80] w-[380px] lg:bottom-4"
+            className="absolute bottom-[calc(56px+env(safe-area-inset-bottom)+16px)] right-4 z-[80] w-[380px] lg:bottom-4"
+            style={{ top: 'calc(var(--topbar-h, 68px) + 4px)' }}
           >
             {inspector}
           </motion.aside>

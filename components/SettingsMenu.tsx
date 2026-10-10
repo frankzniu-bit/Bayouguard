@@ -69,7 +69,7 @@ export default function SettingsMenu({
                 lang={l}
                 onClick={() => setLang(l)}
                 className={`flex h-11 items-center rounded-lg px-3 text-left text-[14px] transition-colors ${
-                  lang === l ? 'bg-ob-accent text-white' : 'text-ob-text hover:bg-ob-bg'
+                  lang === l ? 'bg-ob-accent text-ob-onaccent' : 'text-ob-text hover:bg-ob-bg'
                 }`}
               >
                 {LANG_NAME[l]}
@@ -86,7 +86,7 @@ export default function SettingsMenu({
                 aria-checked={theme === m}
                 onClick={() => onTheme(m)}
                 className={`h-11 rounded-lg text-[14px] transition-colors ${
-                  theme === m ? 'bg-ob-accent text-white' : 'border border-ob-border text-ob-text hover:bg-ob-bg'
+                  theme === m ? 'bg-ob-accent text-ob-onaccent' : 'border border-ob-border text-ob-text hover:bg-ob-bg'
                 }`}
               >
                 {t(m === 'light' ? 'top.light' : 'top.dark')}

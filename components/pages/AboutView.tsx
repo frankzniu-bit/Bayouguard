@@ -55,7 +55,7 @@ export default function AboutView() {
   return (
     <PageShell>
       {harvey && (
-        <p role="note" className="mt-2 rounded-lg bg-ob-accent px-4 py-3 text-[15px] font-medium text-white">
+        <p role="note" className="mt-2 rounded-lg bg-ob-accent px-4 py-3 text-[15px] font-medium text-ob-onaccent">
           {t('about.harvey', { years: year - 2017 })}
         </p>
       )}

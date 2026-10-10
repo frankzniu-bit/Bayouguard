@@ -33,7 +33,7 @@ export default function RiskArc({ risk }: { risk: RiskSnapshot }) {
               strokeLinecap="round"
               initial={{ pathLength: 0 }}
               animate={{ pathLength: Math.max(0.02, risk.score / 100) }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               style={{ stroke: TIER_COLOR[risk.tier], transition: 'stroke 600ms ease-out' }}
             />
           </svg>

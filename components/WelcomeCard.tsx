@@ -44,7 +44,7 @@ export default function WelcomeCard({
         type="button"
         onClick={onLocate}
         disabled={locating}
-        className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-ob-accent text-[14px] font-semibold text-white transition hover:brightness-110 disabled:opacity-70"
+        className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-ob-accent text-[14px] font-semibold text-ob-onaccent transition hover:brightness-110 disabled:opacity-70"
       >
         <LocateIcon />
         {locating ? t('locate.finding') : t('locate.useMine')}

@@ -124,13 +124,6 @@ export const TIER_PULSE: Record<Tier, number> = {
   CRITICAL: 1.0,
 };
 
-export const TIER_LABEL: Record<Tier, string> = {
-  LOW: 'Low',
-  MEDIUM: 'Medium',
-  HIGH: 'High',
-  CRITICAL: 'Critical',
-};
-
 // Visual ordering for sorting / severity comparisons.
 export const TIER_RANK: Record<Tier, number> = {
   LOW: 0,

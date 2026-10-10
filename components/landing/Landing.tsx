@@ -137,7 +137,7 @@ export default function Landing({ data }: { data: LandingData }) {
           <figure
             key={s.label}
             className={`stat-float leave-out ob-float pointer-events-none absolute hidden w-[176px] rounded-xl bg-ob-surface px-4 py-3 lg:block ${CARD_SPOTS[i]}`}
-            style={{ animationDelay: `${420 + i * 90}ms, ${i * -1.7}s` }}
+            style={{ animationDelay: `${420 + i * 90}ms` }}
           >
             <span className="block text-[22px] font-bold leading-none tracking-[-0.02em] text-ob-accent/80 tabular">
               <CountUp value={s.value} delayMs={520 + i * 90} />
@@ -161,7 +161,7 @@ export default function Landing({ data }: { data: LandingData }) {
         <Link
           href="/map"
           onClick={enter}
-          className="mt-3 flex h-12 w-full items-center justify-center rounded-xl bg-ob-accent text-[15px] font-semibold text-white transition-transform duration-150 hover:brightness-110 active:scale-[0.98]"
+          className="mt-3 flex h-12 w-full items-center justify-center rounded-xl bg-ob-accent text-[15px] font-semibold text-ob-onaccent transition-transform duration-150 hover:brightness-110 active:scale-[0.98]"
         >
           {t('land.enter')}
         </Link>

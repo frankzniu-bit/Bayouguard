@@ -153,7 +153,7 @@ export default function Tour({ ready = true }: { ready?: boolean }) {
             type="button"
             autoFocus
             onClick={() => (last ? finish() : setI(i + 1))}
-            className="h-9 rounded-full bg-ob-accent px-4 text-[13px] font-semibold text-white hover:brightness-110"
+            className="h-9 rounded-full bg-ob-accent px-4 text-[13px] font-semibold text-ob-onaccent hover:brightness-110"
           >
             {last ? t('tour.done') : t('tour.next')}
           </button>

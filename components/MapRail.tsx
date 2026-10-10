@@ -67,7 +67,7 @@ export default function MapRail({
                   aria-checked={on}
                   onClick={() => onToggleTier(tier)}
                   title={t(`tierHint.${tier}`)}
-                  className={`group w-full rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-ob-bg2 ${on ? '' : 'opacity-45'}`}
+                  className={`group w-full rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-ob-bg ${on ? '' : 'opacity-45'}`}
                 >
                   <span className="flex items-center gap-2 text-[13px]">
                     <span className="h-2.5 w-2.5 rounded-[3px]" style={{ backgroundColor: TIER_COLOR[tier] }} />

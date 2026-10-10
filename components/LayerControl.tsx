@@ -61,7 +61,7 @@ export default function LayerControl({
                 aria-checked={on}
                 title={hint}
                 onClick={() => onChange({ ...layers, [key]: !on })}
-                className="group flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition hover:bg-ob-bg2"
+                className="group flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition hover:bg-ob-bg"
               >
                 <span
                   className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition ${
@@ -71,11 +71,11 @@ export default function LayerControl({
                   }`}
                 >
                   {on && (
-                    <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden>
+                    <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden className="text-ob-onaccent">
                       <path
                         d="M1.5 5.5l2.2 2.2L8.5 2.6"
                         fill="none"
-                        stroke="#ffffff"
+                        stroke="currentColor"
                         strokeWidth="1.8"
                         strokeLinecap="round"
                         strokeLinejoin="round"

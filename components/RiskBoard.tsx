@@ -41,7 +41,7 @@ export default function RiskBoard({
                 <button
                   type="button"
                   onClick={() => onPick(g)}
-                  className="group -mx-2 flex w-[calc(100%+16px)] flex-col gap-1.5 rounded-xl px-2 py-2 text-left transition-colors hover:bg-ob-bg2"
+                  className="group -mx-2 flex w-[calc(100%+16px)] flex-col gap-1.5 rounded-xl px-2 py-2 text-left transition-colors hover:bg-ob-bg"
                   aria-label={t('board.rowLabel', { name: g.name, tier: t(`tier.${g.tier}`), ft: num(g.buffer, 1) })}
                 >
                   <span className="flex items-center gap-2 text-[13px]">

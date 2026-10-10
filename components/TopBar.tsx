@@ -7,7 +7,7 @@
  * the bottom tab bar. */
 
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import type { Mode } from '@/lib/theme';
 import type { DataSource } from '@/lib/types';
 import { LANGS, useI18n } from '@/lib/i18n';
@@ -47,8 +47,21 @@ export default function TopBar({
   className = '',
 }: Props) {
   const { lang, setLang, t } = useI18n();
+  // Publish the bar's real height: it wraps to more rows in longer languages,
+  // and the floating panels below must start under it.
+  const bar = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = bar.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() =>
+      document.documentElement.style.setProperty('--topbar-h', `${Math.round(el.getBoundingClientRect().height)}px`),
+    );
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   return (
     <header
+      ref={bar}
       className={`${floating ? 'pointer-events-none absolute inset-x-0 top-0' : 'sticky top-0 bg-ob-bg/95'} z-[70] ${className}`}
     >
       {/* One search instance: its own row on phones, inline from md up. */}
@@ -56,10 +69,11 @@ export default function TopBar({
         <Link
           href="/"
           aria-label={t('brand.home')}
-          className="ob-panel ob-float pointer-events-auto flex h-11 shrink-0 items-center gap-2 rounded-full px-2.5 text-ob-accent sm:pr-4"
+          className={`ob-panel ob-float pointer-events-auto flex h-11 shrink-0 items-center gap-2 rounded-full px-2.5 text-ob-accent ${search ? '2xl:pr-4' : 'sm:pr-4'}`}
         >
           <BrandMark className="h-6 w-6" />
-          <span className="hidden font-display text-[19px] text-ob-text sm:inline">BayouGuard</span>
+          {/* On the map the search needs the room; the wordmark waits for very wide screens. */}
+          <span className={`hidden font-display text-[19px] text-ob-text ${search ? '2xl:inline' : 'sm:inline'}`}>BayouGuard</span>
         </Link>
 
         <NavLinks className="pointer-events-auto hidden shrink-0 lg:block" />
@@ -85,11 +99,13 @@ export default function TopBar({
                   type="button"
                   onClick={() => onMode(m)}
                   aria-pressed={mode === m}
-                  className={`h-9 whitespace-nowrap rounded-full px-3 text-[13px] font-semibold transition-colors ${
-                    mode === m ? 'bg-ob-accent text-white' : 'text-ob-muted hover:text-ob-text'
+                  aria-label={t(m === 'map' ? 'top.map' : 'top.graph')}
+                  className={`flex h-9 min-w-[40px] items-center justify-center whitespace-nowrap rounded-full px-2.5 text-[13px] font-semibold transition-colors xl:px-3 ${
+                    mode === m ? 'bg-ob-accent text-ob-onaccent' : 'text-ob-muted hover:text-ob-text'
                   }`}
                 >
-                  {t(m === 'map' ? 'top.map' : 'top.graph')}
+                  <span className="xl:hidden">{m === 'map' ? <MapIcon /> : <GraphIcon />}</span>
+                  <span className="hidden xl:inline">{t(m === 'map' ? 'top.map' : 'top.graph')}</span>
                 </button>
               ))}
             </div>
@@ -115,7 +131,7 @@ export default function TopBar({
                 aria-label={LANG_NAME[l]}
                 lang={l}
                 className={`h-9 min-w-[36px] rounded-full px-2.5 text-[12px] font-semibold transition-colors ${
-                  lang === l ? 'bg-ob-accent text-white' : 'text-ob-muted hover:text-ob-text'
+                  lang === l ? 'bg-ob-accent text-ob-onaccent' : 'text-ob-muted hover:text-ob-text'
                 }`}
               >
                 {l.toUpperCase()}
@@ -127,6 +143,25 @@ export default function TopBar({
         </div>
       </div>
     </header>
+  );
+}
+
+function MapIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4zM9 4v13M15 6.5v13" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function GraphIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="6" cy="7" r="2.5" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="18" cy="6" r="2.5" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="12" cy="18" r="2.5" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M8.3 8.2 10.8 16M15.9 7.6 13.2 16M8.5 6.8l7-.6" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
   );
 }
 

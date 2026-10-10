@@ -102,7 +102,7 @@ export default function ReportForm({
         <button
           type="submit"
           disabled={!severity || sending}
-          className="h-11 flex-1 rounded-lg bg-ob-accent text-[14px] font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-11 flex-1 rounded-lg bg-ob-accent text-[14px] font-semibold text-ob-onaccent transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {sending ? t('report.sending') : t('report.submit')}
         </button>

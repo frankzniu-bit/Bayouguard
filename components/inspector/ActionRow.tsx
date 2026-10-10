@@ -58,7 +58,7 @@ export default function ActionRow({
       </div>
       <Link
         href={`/alerts?address=${encodeURIComponent(address)}`}
-        className="mt-2 flex h-11 w-full items-center justify-center rounded-lg bg-ob-accent px-3 text-[14px] font-semibold text-white transition hover:brightness-110"
+        className="mt-2 flex h-11 w-full items-center justify-center rounded-lg bg-ob-accent px-3 text-[14px] font-semibold text-ob-onaccent transition hover:brightness-110"
       >
         {t('action.alerts')}
       </Link>

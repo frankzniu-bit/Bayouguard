@@ -543,7 +543,7 @@ export default function WatershedGraph({
               <button
                 type="button"
                 onClick={onSwitchToMap}
-                className="mt-4 h-11 rounded-lg bg-ob-accent px-4 text-[14px] font-semibold text-white"
+                className="mt-4 h-11 rounded-lg bg-ob-accent px-4 text-[14px] font-semibold text-ob-onaccent"
               >
                 {t('graph.empty.action')}
               </button>

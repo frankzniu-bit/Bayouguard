@@ -73,7 +73,7 @@ export default function MapLegend({
           </li>
           {layers.shelters && (
             <li className="flex items-center gap-2">
-              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-ob-accent text-[9px] text-white" aria-hidden>
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-ob-accent text-[9px] text-ob-onaccent" aria-hidden>
                 ▲
               </span>
               <span>

@@ -97,7 +97,7 @@ export function OutlookCard({ outlook }: { outlook: Outlook }) {
         </span>
       </div>
       <p className="mt-1 text-[13px] leading-relaxed text-ob-text">{outlookDetail(outlook, t, num)}</p>
-      <p className="mt-1.5 text-[12px] text-ob-muted">{t('outlook.note')}</p>
+      <p className="mt-1.5 text-[12px] text-ob-text">{t('outlook.note')}</p>
     </div>
   );
 }

@@ -122,7 +122,7 @@ export default function SheltersView() {
           aria-pressed={filters.size === 0}
           onClick={() => setFilters(new Set())}
           className={`h-11 rounded-full border px-4 text-[14px] font-semibold transition-colors ${
-            filters.size === 0 ? 'border-ob-accent bg-ob-accent text-white' : 'border-ob-border bg-ob-surface text-ob-accent hover:bg-ob-bg'
+            filters.size === 0 ? 'border-ob-accent bg-ob-accent text-ob-onaccent' : 'border-ob-border bg-ob-surface text-ob-accent hover:bg-ob-bg'
           }`}
         >
           {t('shelters.filter.all')}
@@ -134,7 +134,7 @@ export default function SheltersView() {
             aria-pressed={filters.has(f.key)}
             onClick={() => toggle(f.key)}
             className={`h-11 rounded-full border px-4 text-[14px] font-semibold transition-colors ${
-              filters.has(f.key) ? 'border-ob-accent bg-ob-accent text-white' : 'border-ob-border bg-ob-surface text-ob-accent hover:bg-ob-bg'
+              filters.has(f.key) ? 'border-ob-accent bg-ob-accent text-ob-onaccent' : 'border-ob-border bg-ob-surface text-ob-accent hover:bg-ob-bg'
             }`}
           >
             {t(f.label)}
@@ -147,7 +147,7 @@ export default function SheltersView() {
               type="button"
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className={`h-9 rounded-full px-3 text-[13px] font-semibold ${view === v ? 'bg-ob-accent text-white' : 'text-ob-muted hover:text-ob-text'}`}
+              className={`h-9 rounded-full px-3 text-[13px] font-semibold ${view === v ? 'bg-ob-accent text-ob-onaccent' : 'text-ob-muted hover:text-ob-text'}`}
             >
               {t(v === 'list' ? 'shelters.list' : 'shelters.map')}
             </button>
@@ -236,7 +236,7 @@ export default function SheltersView() {
                         href={`https://maps.google.com/maps?daddr=${encodeURIComponent(s.address)}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="ml-auto flex h-11 items-center rounded-lg bg-ob-accent px-4 text-[14px] font-semibold text-white hover:brightness-110"
+                        className="ml-auto flex h-11 items-center rounded-lg bg-ob-accent px-4 text-[14px] font-semibold text-ob-onaccent hover:brightness-110"
                       >
                         {t('shelters.directions')}
                       </a>

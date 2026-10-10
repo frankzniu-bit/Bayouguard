@@ -21,7 +21,7 @@ export default function NavLinks({ className = '' }: { className?: string }) {
                 href={href}
                 aria-current={active ? 'page' : undefined}
                 className={`flex h-9 items-center rounded-full px-3 text-[13px] font-semibold transition-colors ${
-                  active ? 'bg-ob-accent text-white' : 'text-ob-muted hover:text-ob-text'
+                  active ? 'bg-ob-accent text-ob-onaccent' : 'text-ob-muted hover:text-ob-text'
                 }`}
               >
                 {t(label)}

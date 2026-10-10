@@ -43,7 +43,7 @@ export default function DataStatus({
         className="ob-panel ob-float flex h-11 items-center gap-2 rounded-full px-3.5 text-[13px] font-medium text-ob-text"
       >
         <span className="relative flex h-2.5 w-2.5" aria-hidden>
-          {(state === 'live' || state === 'waking') && (
+          {state === 'live' && (
             <span className={`absolute inset-0 animate-ping rounded-full opacity-60 ${DOT[state]}`} />
           )}
           <span className={`relative h-2.5 w-2.5 rounded-full ${DOT[state]}`} />

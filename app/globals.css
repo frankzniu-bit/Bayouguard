@@ -20,6 +20,7 @@
   --ob-faint-rgb: 128 153 188;
   --ob-accent-rgb: 26 68 128;
   --ob-water-rgb: 0 147 154;
+  --ob-onaccent-rgb: 255 255 255;
   --ob-panel-alpha: 1;
 
   /* Tier fills (dots, bars) and tier ink (small text). They differ only where
@@ -49,6 +50,8 @@
   --ob-faint-rgb: 107 130 168;
   --ob-accent-rgb: 111 163 255;
   --ob-water-rgb: 60 200 207;
+  /* Light text fails on the brighter dark-mode accent; navy holds 7:1. */
+  --ob-onaccent-rgb: 11 20 38;
   --ob-panel-alpha: 0.9;
 
   --tier-low-rgb: 52 211 153;
@@ -127,7 +130,7 @@ body {
   }
 }
 .reveal {
-  animation: ob-fade-up 0.5s var(--ease-out-expo) both;
+  animation: ob-fade-up 0.25s ease-out both;
 }
 
 @keyframes ob-spin {
@@ -266,20 +269,9 @@ body {
   animation: land-in 0.9s var(--ease-out-expo) both;
 }
 
-/* Stat cards rise in, then drift. Two animations, two delays (set inline). */
-@keyframes stat-bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
+/* Stat cards rise in once. */
 .stat-float {
-  animation:
-    land-in 0.8s var(--ease-out-expo) both,
-    stat-bob 7s ease-in-out infinite;
+  animation: land-in 0.8s var(--ease-out-expo) both;
 }
 
 /* Leaving the landing: everything but the dots steps aside while the field
@@ -336,17 +328,17 @@ body {
  * first frame of a direct visit), then each group slides in from its edge. */
 .chrome {
   transition:
-    opacity 0.55s var(--ease-out-expo),
-    transform 0.75s var(--ease-out-expo);
+    opacity 0.25s ease-out,
+    transform 0.25s ease-out;
 }
 .chrome-d1 {
-  transition-delay: 70ms;
+  transition-delay: 40ms;
 }
 .chrome-d2 {
-  transition-delay: 140ms;
+  transition-delay: 80ms;
 }
 .chrome-d3 {
-  transition-delay: 240ms;
+  transition-delay: 120ms;
 }
 [data-chrome='out'] .chrome {
   opacity: 0;

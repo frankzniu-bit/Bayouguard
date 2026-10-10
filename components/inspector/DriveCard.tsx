@@ -44,7 +44,7 @@ export default function DriveCard({ drive }: { drive: DriveVerdict }) {
       className="rounded-xl border-l-4 p-4"
       style={{ borderColor: TIER_INK[tone], background: TIER_TINT[tone] }}
     >
-      <p id="drive-q" className="text-[12px] font-medium text-ob-muted">
+      <p id="drive-q" className="text-[12px] font-medium text-ob-text">
         {t('insp.roads')}
       </p>
       <div className="mt-1 flex items-center gap-3" style={{ color: TIER_INK[tone] }}>

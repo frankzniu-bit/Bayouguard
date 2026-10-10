@@ -19,6 +19,7 @@ module.exports = {
           faint: 'rgb(var(--ob-faint-rgb) / <alpha-value>)',
           accent: 'rgb(var(--ob-accent-rgb) / <alpha-value>)',
           water: 'rgb(var(--ob-water-rgb) / <alpha-value>)',
+          onaccent: 'rgb(var(--ob-onaccent-rgb) / <alpha-value>)',
         },
         // Risk tier fills; theme-aware (see globals.css). Small text uses the
         // TIER_INK variables instead.

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { fetchSuggestions } from '@/lib/client';
 import type { Suggestion } from '@/lib/geocode';
 import { useI18n } from '@/lib/i18n';
@@ -23,7 +23,18 @@ export default function AddressSearch({
   syncValue,
   busy = false,
   waking = false,
+  variant = 'pill',
+  label,
+  onValue,
+  id,
 }: {
+  /** 'field' is a plain form input: no submit button, no save star. */
+  variant?: 'pill' | 'field';
+  /** Visible label for the field variant. */
+  label?: string;
+  /** Every change to the text, and every picked suggestion. */
+  onValue?: (value: string, coords?: { lat: number; lng: number }) => void;
+  id?: string;
   /** An address handed over from the landing page; searched once on mount. */
   initialValue?: string;
   /** The address the app resolved last; the box follows it. */
@@ -37,6 +48,9 @@ export default function AddressSearch({
   ) => void;
 }) {
   const { t } = useI18n();
+  const autoId = useId();
+  const inputId = id ?? `${autoId}-input`;
+  const listId = `${autoId}-list`;
   const [value, setValue] = useState('');
   const [saved, setSaved] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -64,7 +78,7 @@ export default function AddressSearch({
       setValue(initialRef.current);
       return;
     }
-    const v = readSaved();
+    const v = variant === 'pill' ? readSaved() : null;
     if (v) {
       skipNextFetch.current = true;
       setValue(v.label);
@@ -133,8 +147,32 @@ export default function AddressSearch({
     setValue(s.label);
     setOpen(false);
     setSuggestions([]);
+    onValue?.(s.label, { lat: s.lat, lng: s.lng });
     onSearch?.(s.label, true, { lat: s.lat, lng: s.lng });
   };
+
+  const input = (cls: string) => (
+    <input
+      id={inputId}
+      value={value}
+      onChange={(e) => {
+        typed.current = true;
+        setValue(e.target.value);
+        onValue?.(e.target.value);
+      }}
+      onKeyDown={onKeyDown}
+      onFocus={() => suggestions.length > 0 && setOpen(true)}
+      placeholder={t('search.placeholder')}
+      aria-label={variant === 'pill' || !label ? t('search.label') : undefined}
+      role="combobox"
+      aria-autocomplete="list"
+      aria-expanded={open}
+      aria-controls={listId}
+      aria-activedescendant={open && active >= 0 ? `${listId}-${active}` : undefined}
+      autoComplete="off"
+      className={`text-[14px] text-ob-text outline-none placeholder:text-ob-muted ${cls}`}
+    />
+  );
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,6 +187,12 @@ export default function AddressSearch({
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
+    // In a form field, Enter picks the highlighted suggestion instead of submitting.
+    if (variant === 'field' && e.key === 'Enter' && open && active >= 0 && suggestions[active]) {
+      e.preventDefault();
+      pick(suggestions[active]);
+      return;
+    }
     if (!open || suggestions.length === 0) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -162,55 +206,47 @@ export default function AddressSearch({
   };
 
   return (
-    <div ref={boxRef} className="relative mx-auto w-full max-w-2xl">
-      <form
-        onSubmit={submit}
-        className="ob-panel ob-float flex h-11 w-full items-center gap-1.5 rounded-full p-1 pl-4 focus-within:border-ob-water"
-      >
-        <SearchIcon />
-        <input
-          value={value}
-          onChange={(e) => {
-            typed.current = true;
-            setValue(e.target.value);
-          }}
-          onKeyDown={onKeyDown}
-          onFocus={() => suggestions.length > 0 && setOpen(true)}
-          placeholder={t('search.placeholder')}
-          aria-label={t('search.label')}
-          role="combobox"
-          aria-autocomplete="list"
-          aria-expanded={open}
-          aria-controls="address-listbox"
-          aria-activedescendant={
-            open && active >= 0 ? `address-option-${active}` : undefined
-          }
-          autoComplete="off"
-          className="min-w-0 flex-1 bg-transparent py-2 text-[14px] text-ob-text outline-none placeholder:text-ob-muted"
-        />
-        <button
-          type="button"
-          onClick={save}
-          title={saved === value && value ? t('search.saved') : t('search.save')}
-          aria-label={t('search.save')}
-          aria-pressed={Boolean(saved && saved === value)}
-          className="hidden h-9 w-9 items-center justify-center rounded-full text-ob-muted transition hover:bg-ob-bg2 hover:text-ob-accent sm:flex"
+    <div ref={boxRef} className={`relative w-full ${variant === 'pill' ? 'mx-auto max-w-2xl' : ''}`}>
+      {variant === 'field' ? (
+        <div className="flex flex-col gap-1">
+          {label && (
+            <label htmlFor={inputId} className="text-[13px] font-medium text-ob-text">
+              {label}
+            </label>
+          )}
+          {input('h-11 rounded-lg border border-ob-border bg-ob-surface px-3 focus:border-ob-water')}
+        </div>
+      ) : (
+        <form
+          onSubmit={submit}
+          className="ob-panel ob-float flex h-11 w-full items-center gap-1.5 rounded-full p-1 pl-4 focus-within:border-ob-water"
         >
-          {saved === value && value ? '★' : '☆'}
-        </button>
-        <button
-          type="submit"
-          aria-busy={busy}
-          className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-ob-accent px-4 text-[13px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97]"
-        >
-          {busy && <span aria-hidden className="spin h-3 w-3 rounded-full border-2 border-white border-t-transparent" />}
-          {busy && waking ? t('status.waking') : t('search.submit')}
-        </button>
-      </form>
+          <SearchIcon />
+          {input('min-w-0 flex-1 bg-transparent py-2')}
+          <button
+            type="button"
+            onClick={save}
+            title={saved === value && value ? t('search.saved') : t('search.save')}
+            aria-label={t('search.save')}
+            aria-pressed={Boolean(saved && saved === value)}
+            className="hidden h-9 w-9 items-center justify-center rounded-full text-ob-muted transition hover:bg-ob-bg2 hover:text-ob-accent sm:flex"
+          >
+            {saved === value && value ? '★' : '☆'}
+          </button>
+          <button
+            type="submit"
+            aria-busy={busy}
+            className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-ob-accent px-4 text-[13px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97]"
+          >
+            {busy && <span aria-hidden className="spin h-3 w-3 rounded-full border-2 border-white border-t-transparent" />}
+            {busy && waking ? t('status.waking') : t('search.submit')}
+          </button>
+        </form>
+      )}
 
       {open && suggestions.length > 0 && (
         <ul
-          id="address-listbox"
+          id={listId}
           role="listbox"
           aria-label={t('search.suggestions')}
           className="ob-panel ob-float absolute z-50 mt-2 w-full overflow-hidden rounded-xl py-1 text-left"
@@ -218,7 +254,7 @@ export default function AddressSearch({
           {suggestions.map((s, i) => (
             <li
               key={`${s.lat},${s.lng}`}
-              id={`address-option-${i}`}
+              id={`${listId}-${i}`}
               role="option"
               aria-selected={i === active}
             >

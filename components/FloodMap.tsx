@@ -17,6 +17,7 @@ import {
   Marker,
   Pane,
   Polygon,
+  Polyline,
   Tooltip,
   useMap,
 } from 'react-leaflet';
@@ -28,6 +29,52 @@ import { TIER_HEX, OB, BASEMAP, type Mode } from '@/lib/theme';
 import { useI18n } from '@/lib/i18n';
 import { TEXAS_RINGS } from '@/lib/geoDots';
 import type { MapLayers } from './LayerControl';
+import type { CommunityReport, Reservoir, RoadCollection, Shelter } from '@/lib/contract';
+import { RESERVOIR_POINTS } from './inspector/ReservoirCard';
+
+export interface MapOverlays {
+  shelters?: Shelter[] | null;
+  roads?: RoadCollection | null;
+  reports?: CommunityReport[] | null;
+  reservoirs?: Reservoir[] | null;
+}
+
+function makeShelterIcon(fill: string, status: Shelter['status']) {
+  const opacity = status === 'closed' ? 0.55 : 1;
+  return L.divIcon({
+    className: '',
+    html:
+      `<div style="width:26px;height:26px;border-radius:6px;background:${fill};opacity:${opacity};` +
+      'display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 4px rgba(26,26,46,.3)">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 20 12 4l9 16H3z" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/>' +
+      '<path d="M9.5 20 12 14l2.5 6" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg></div>',
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
+  });
+}
+
+function makeReportIcon(fill: string) {
+  return L.divIcon({
+    className: '',
+    html:
+      '<svg width="20" height="26" viewBox="0 0 26 34" style="filter:drop-shadow(0 1px 2px rgba(26,26,46,.35))">' +
+      `<path d="M13 0C5.8 0 0 5.8 0 13c0 9 13 21 13 21s13-12 13-21C26 5.8 20.2 0 13 0z" fill="${fill}" stroke="#fff" stroke-width="2"/>` +
+      '<path d="M7 15c2-2 4-2 6 0s4 2 6 0" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>',
+    iconSize: [20, 26],
+    iconAnchor: [10, 26],
+  });
+}
+
+function makeReservoirIcon(fill: string, letter: string) {
+  return L.divIcon({
+    className: '',
+    html:
+      `<div style="width:24px;height:24px;border-radius:4px;background:${fill};color:#fff;font:700 12px/24px var(--font-inter),sans-serif;` +
+      `text-align:center;border:2px solid #fff;box-shadow:0 2px 4px rgba(26,26,46,.3)">${letter}</div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
+}
 import WindLayer from './WindLayer';
 
 export interface MapSelection {
@@ -164,6 +211,14 @@ function viewRing(map: L.Map): Array<[number, number]> {
   ];
 }
 
+function MapHandle({ onMap }: { onMap?: (map: L.Map) => void }) {
+  const map = useMap();
+  useEffect(() => {
+    onMap?.(map);
+  }, [map, onMap]);
+  return null;
+}
+
 function ReadyProbe({ onReady }: { onReady?: (map: L.Map) => void }) {
   const map = useMap();
   useEffect(() => {
@@ -241,6 +296,8 @@ export default function FloodMap({
   focusGauge = null,
   initialView,
   onReady,
+  overlays = {},
+  onMap,
 }: {
   center: { lat: number; lng: number } | null;
   gauges: GaugePoint[];
@@ -256,6 +313,9 @@ export default function FloodMap({
   initialView?: { lat: number; lng: number; zoom: number } | null;
   /** Called once the map is laid out and its first tiles have loaded. */
   onReady?: (map: L.Map) => void;
+  overlays?: MapOverlays;
+  /** The Leaflet map, once created (for the map-centre report location). */
+  onMap?: (map: L.Map) => void;
 }) {
   const { t } = useI18n();
   const yourAddress = t('map.yourAddress');
@@ -280,6 +340,19 @@ export default function FloodMap({
   const windColor = mode === 'light' ? 'rgba(26,68,128,0.55)' : 'rgba(157,190,255,0.8)';
   const usgsColor = mode === 'light' ? '#8099BC' : '#6B82A8';
   const addressIcon = useMemo(() => makeAddressIcon(tok.water, tok.surface), [tok]);
+  const shelterIcons = useMemo(
+    () => ({
+      open: makeShelterIcon(tok.accent, 'open'),
+      full: makeShelterIcon(tok.accent, 'full'),
+      closed: makeShelterIcon(tok.muted, 'closed'),
+    }),
+    [tok],
+  );
+  const reportIcon = useMemo(() => makeReportIcon(tok.accent), [tok]);
+  const reservoirIcons = useMemo(
+    () => new Map(RESERVOIR_POINTS.map((p) => [p.name, makeReservoirIcon(tok.water, p.name[0])])),
+    [tok],
+  );
   // Per-gauge icons (not per-tier) so every gauge pulses on its own phase;
   // memoized on the gauge list so selection clicks don't restart animations.
   const rippleIcons = useMemo(
@@ -403,6 +476,51 @@ export default function FloodMap({
         </Marker>
       )}
 
+      {layers.roads &&
+        overlays.roads?.features.map((f, i) => (
+          <Polyline
+            key={`road-${i}`}
+            positions={f.geometry.coordinates.map(([lng, lat]) => [lat, lng] as [number, number])}
+            pathOptions={{ color: tierHex.HIGH, weight: 5, dashArray: '8 6', lineCap: 'butt' }}
+          >
+            <Tooltip direction="top" sticky>
+              {f.properties.name} · {t(f.properties.status === 'closed' ? 'road.closed' : 'road.flooded')}
+            </Tooltip>
+          </Polyline>
+        ))}
+
+      {layers.shelters &&
+        overlays.shelters?.map((s) => (
+          <Marker key={`shelter-${s.id}`} position={[s.lat, s.lng]} icon={shelterIcons[s.status]}>
+            <Tooltip direction="top" offset={[0, -12]}>
+              {s.name} · {t(`shelter.status.${s.status}`)}
+            </Tooltip>
+          </Marker>
+        ))}
+
+      {layers.reservoirs &&
+        RESERVOIR_POINTS.map((p) => {
+          const r = overlays.reservoirs?.find((x) => x.name === p.name);
+          return (
+            <Marker key={`res-${p.name}`} position={[p.lat, p.lng]} icon={reservoirIcons.get(p.name)!}>
+              <Tooltip direction="top" offset={[0, -12]}>
+                {t('res.name', { name: p.name })}
+                {r ? ` · ${r.poolElevationFt.toFixed(1)} ft` : ''}
+              </Tooltip>
+            </Marker>
+          );
+        })}
+
+      {layers.reports &&
+        overlays.reports?.map((r, i) => (
+          <Marker key={r.id ?? `report-${i}`} position={[r.lat, r.lng]} icon={reportIcon}>
+            <Tooltip direction="top" offset={[0, -24]}>
+              {t(`report.${r.severity}`)}
+              {r.note ? ` · ${r.note}` : ''}
+            </Tooltip>
+          </Marker>
+        ))}
+
       {layers.wind && <WindLayer color={windColor} />}
 
       {/* Above the tiles, below the gauges: paper over everything outside Texas. */}
@@ -417,6 +535,7 @@ export default function FloodMap({
 
       <ClampToRegion fitOnStart={!initialView && !(zoomToCenter && center)} />
       <ReadyProbe onReady={onReady} />
+      <MapHandle onMap={onMap} />
       <FocusGauge gauge={focusGauge} />
       <Recenter
         center={center ? [center.lat, center.lng] : null}

@@ -94,6 +94,22 @@ function formatSuggestion(p: Record<string, string>): string {
   return parts.join(', ');
 }
 
+/* Coordinates -> a readable address, for "Locate me". Photon reverse;
+ * null when it has nothing. */
+export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
+  try {
+    const res = await fetch(`https://photon.komoot.io/reverse?lat=${lat}&lon=${lng}&lang=en`, {
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const props = data?.features?.[0]?.properties;
+    return props ? formatSuggestion(props) || null : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function geocode(address: string): Promise<GeoPoint | null> {
   const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   if (token) return geocodeMapbox(address, token);

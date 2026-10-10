@@ -1,7 +1,10 @@
 'use client';
 
-/* Top bar: the brand (back to the landing), the address search in the middle,
- * and the view controls — Map/Graph, theme, language — on the right. */
+/* Top bar, shared by every page: the wordmark (back to the landing), the four
+ * destinations on desktop, the address search on the map, and on the right
+ * the data-status pill, Map/Graph, theme and language. Below xl, theme and
+ * language fold into one settings button; below lg the destinations move to
+ * the bottom tab bar. */
 
 import Link from 'next/link';
 import type { ReactNode } from 'react';
@@ -11,28 +14,45 @@ import { LANGS, useI18n } from '@/lib/i18n';
 import BrandMark from './landing/BrandMark';
 import DataStatus from './DataStatus';
 import SettingsMenu, { LANG_NAME } from './SettingsMenu';
+import NavLinks from './nav/NavLinks';
 
 export type ViewMode = 'graph' | 'map';
 
 interface Props {
-  mode: ViewMode;
-  onMode: (m: ViewMode) => void;
   theme: Mode;
   onToggleTheme: () => void;
   onTheme: (m: Mode) => void;
-  dataSource: DataSource;
+  /** Map page only. */
+  mode?: ViewMode;
+  onMode?: (m: ViewMode) => void;
+  dataSource?: DataSource;
   waking?: boolean;
   /** The search box, centred between the brand and the controls on wide screens. */
-  search: ReactNode;
+  search?: ReactNode;
+  /** Pages with normal flow (not over a map) pin the bar to the top. */
+  floating?: boolean;
   className?: string;
 }
 
-export default function TopBar({ mode, onMode, theme, onToggleTheme, onTheme, dataSource, waking, search, className = '' }: Props) {
+export default function TopBar({
+  theme,
+  onToggleTheme,
+  onTheme,
+  mode,
+  onMode,
+  dataSource,
+  waking,
+  search,
+  floating = true,
+  className = '',
+}: Props) {
   const { lang, setLang, t } = useI18n();
   return (
-    <header className={`pointer-events-none absolute inset-x-0 top-0 z-[70] ${className}`}>
-      {/* One search instance: its own row on phones, centred in the bar from md up. */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 pt-3 md:flex-nowrap md:px-4">
+    <header
+      className={`${floating ? 'pointer-events-none absolute inset-x-0 top-0' : 'sticky top-0 bg-ob-bg/95'} z-[70] ${className}`}
+    >
+      {/* One search instance: its own row on phones, inline from md up. */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-2 px-3 py-3 md:flex-nowrap md:px-4">
         <Link
           href="/"
           aria-label={t('brand.home')}
@@ -42,50 +62,50 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, onTheme, da
           <span className="hidden font-display text-[19px] text-ob-text sm:inline">BayouGuard</span>
         </Link>
 
-        <div className="pointer-events-auto order-last flex min-w-0 basis-full justify-center md:order-none md:basis-auto md:flex-1">
-          <div className="w-full max-w-xl" data-tour="search">
-            {search}
+        <NavLinks className="pointer-events-auto hidden shrink-0 lg:block" />
+
+        {search ? (
+          <div className="pointer-events-auto order-last flex min-w-0 basis-full justify-center md:order-none md:basis-auto md:flex-1">
+            <div className="w-full max-w-xl" data-tour="search">
+              {search}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="hidden flex-1 md:block" />
+        )}
 
         <div className="pointer-events-auto ml-auto flex items-center gap-2 md:ml-0">
-          <DataStatus source={dataSource} waking={waking} />
-          <div
-            role="group"
-            aria-label={t('top.viewMode')}
-            className="ob-panel ob-float flex h-11 items-center rounded-full p-1"
-          >
-            {(['map', 'graph'] as ViewMode[]).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => onMode(m)}
-                aria-pressed={mode === m}
-                className={`h-9 rounded-full px-3.5 whitespace-nowrap text-[13px] font-semibold transition-colors ${
-                  mode === m ? 'bg-ob-accent text-white' : 'text-ob-muted hover:text-ob-text'
-                }`}
-              >
-                {t(m === 'map' ? 'top.map' : 'top.graph')}
-              </button>
-            ))}
-          </div>
+          {dataSource && <DataStatus source={dataSource} waking={waking} />}
+
+          {mode && onMode && (
+            <div role="group" aria-label={t('top.viewMode')} className="ob-panel ob-float flex h-11 items-center rounded-full p-1">
+              {(['map', 'graph'] as ViewMode[]).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => onMode(m)}
+                  aria-pressed={mode === m}
+                  className={`h-9 whitespace-nowrap rounded-full px-3 text-[13px] font-semibold transition-colors ${
+                    mode === m ? 'bg-ob-accent text-white' : 'text-ob-muted hover:text-ob-text'
+                  }`}
+                >
+                  {t(m === 'map' ? 'top.map' : 'top.graph')}
+                </button>
+              ))}
+            </div>
+          )}
 
           <button
             type="button"
             onClick={onToggleTheme}
             aria-label={t(theme === 'dark' ? 'top.themeToLight' : 'top.themeToDark')}
             title={t(theme === 'dark' ? 'top.themeToLight' : 'top.themeToDark')}
-            className="ob-panel ob-float hidden h-11 w-11 items-center justify-center rounded-full text-ob-muted transition-colors hover:text-ob-text lg:flex"
+            className="ob-panel ob-float hidden h-11 w-11 items-center justify-center rounded-full text-ob-muted transition-colors hover:text-ob-text xl:flex"
           >
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </button>
-          <SettingsMenu theme={theme} onTheme={onTheme} className="lg:hidden" />
 
-          <div
-            role="group"
-            aria-label={t('top.language')}
-            className="ob-panel ob-float hidden h-11 items-center rounded-full p-1 lg:flex"
-          >
+          <div role="group" aria-label={t('top.language')} className="ob-panel ob-float hidden h-11 items-center rounded-full p-1 xl:flex">
             {LANGS.map((l) => (
               <button
                 key={l}
@@ -94,7 +114,7 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, onTheme, da
                 aria-pressed={lang === l}
                 aria-label={LANG_NAME[l]}
                 lang={l}
-                className={`h-9 rounded-full px-2.5 text-[12px] font-semibold transition-colors ${
+                className={`h-9 min-w-[36px] rounded-full px-2.5 text-[12px] font-semibold transition-colors ${
                   lang === l ? 'bg-ob-accent text-white' : 'text-ob-muted hover:text-ob-text'
                 }`}
               >
@@ -102,6 +122,8 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, onTheme, da
               </button>
             ))}
           </div>
+
+          <SettingsMenu theme={theme} onTheme={onTheme} className="xl:hidden" />
         </div>
       </div>
     </header>

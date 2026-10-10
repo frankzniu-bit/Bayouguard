@@ -10,6 +10,7 @@ import type { GaugePoint, Tier } from '@/lib/types';
 import { TIER_COLOR } from '@/lib/theme';
 import { useI18n } from '@/lib/i18n';
 import LayerControl, { type MapLayers } from './LayerControl';
+import ReservoirCard from './inspector/ReservoirCard';
 
 export const TIER_ORDER: Tier[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
 
@@ -94,6 +95,9 @@ export default function MapRail({
           <LayerControl layers={layers} onChange={onLayers} />
         </section>
       )}
+      <div className="border-t border-ob-border px-2 py-1">
+        <ReservoirCard collapsible />
+      </div>
     </div>
   );
 }

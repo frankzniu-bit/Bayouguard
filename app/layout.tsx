@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { DM_Serif_Display, Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { LanguageProvider } from '@/lib/i18n';
+import MotionRoot from '@/components/MotionRoot';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -50,7 +51,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH }} />
       </head>
       <body className="h-full font-sans bg-ob-bg text-ob-text antialiased">
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <MotionRoot>{children}</MotionRoot>
+        </LanguageProvider>
       </body>
     </html>
   );

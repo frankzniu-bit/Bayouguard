@@ -14,6 +14,10 @@ export interface MapLayers {
   wind: boolean;
   satellite: boolean;
   usgs: boolean;
+  shelters: boolean;
+  roads: boolean;
+  reports: boolean;
+  reservoirs: boolean;
 }
 
 export const DEFAULT_LAYERS: MapLayers = {
@@ -23,9 +27,13 @@ export const DEFAULT_LAYERS: MapLayers = {
   satellite: false,
   // ~1.2 MB upstream; only fetched when someone turns it on.
   usgs: false,
+  shelters: false,
+  roads: false,
+  reports: false,
+  reservoirs: false,
 };
 
-const LAYER_KEYS: Array<keyof MapLayers> = ['dots', 'ripples', 'wind', 'satellite', 'usgs'];
+const LAYER_KEYS: Array<keyof MapLayers> = ['dots', 'ripples', 'shelters', 'roads', 'reports', 'reservoirs', 'wind', 'satellite', 'usgs'];
 
 export default function LayerControl({
   layers,

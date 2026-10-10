@@ -32,6 +32,7 @@ import { getHcfws, type GaugeExtra } from './hcfws';
 import { buildOutlook } from './outlook';
 import { DEMO_GAUGES } from './fixtures';
 import { gaugeName } from './gaugeNames';
+import { haversine } from './geo';
 
 export const BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').replace(/\/+$/, '');
 export const HAS_BACKEND = BASE.length > 0;
@@ -109,17 +110,6 @@ function driveFromTier(tier: Tier): DriveVerdict {
 function zipFromAddress(address: string): string {
   const m = address.match(/\b(\d{5})(?:-\d{4})?\b/);
   return m ? m[1] : '';
-}
-
-export function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 3959; // miles
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.asin(Math.sqrt(a));
 }
 
 function byDistance(gauges: NamedGauge[], lat: number, lng: number) {

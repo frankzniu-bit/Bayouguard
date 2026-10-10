@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { fetchSuggestions } from '@/lib/client';
 import type { Suggestion } from '@/lib/geocode';
 import { useI18n } from '@/lib/i18n';
+import { onSavedChange, readSaved, writeSaved } from '@/lib/savedAddress';
 
-const STORAGE_KEY = 'bayouguard_saved_address';
 const DEBOUNCE_MS = 220;
 
 function SearchIcon() {
@@ -20,9 +20,16 @@ function SearchIcon() {
 export default function AddressSearch({
   onSearch,
   initialValue,
+  syncValue,
+  busy = false,
+  waking = false,
 }: {
   /** An address handed over from the landing page; searched once on mount. */
   initialValue?: string;
+  /** The address the app resolved last; the box follows it. */
+  syncValue?: string;
+  busy?: boolean;
+  waking?: boolean;
   onSearch?: (
     addr: string,
     submitted: boolean,
@@ -57,14 +64,26 @@ export default function AddressSearch({
       setValue(initialRef.current);
       return;
     }
-    const v = localStorage.getItem(STORAGE_KEY);
+    const v = readSaved();
     if (v) {
       skipNextFetch.current = true;
-      setValue(v);
-      setSaved(v);
-      onSearchRef.current?.(v, false);
+      setValue(v.label);
+      setSaved(v.label);
+      onSearchRef.current?.(v.label, false, v.lat != null && v.lng != null ? { lat: v.lat, lng: v.lng } : undefined);
     }
   }, []);
+
+  // The saved address can change elsewhere (the address card's Save button).
+  useEffect(() => onSavedChange(() => setSaved(readSaved()?.label ?? null)), []);
+
+  // Follow the resolved address (a chip, Locate me, a corrected spelling).
+  useEffect(() => {
+    if (!syncValue) return;
+    skipNextFetch.current = true;
+    typed.current = false;
+    setValue(syncValue);
+    setOpen(false);
+  }, [syncValue]);
 
   // Debounced type-ahead. Aborts the in-flight request on each keystroke.
   useEffect(() => {
@@ -104,8 +123,9 @@ export default function AddressSearch({
 
   const save = () => {
     if (!value) return;
-    localStorage.setItem(STORAGE_KEY, value);
-    setSaved(value);
+    if (saved === value) writeSaved(null);
+    else writeSaved({ label: value });
+    setSaved(saved === value ? null : value);
   };
 
   const pick = (s: Suggestion) => {
@@ -180,9 +200,11 @@ export default function AddressSearch({
         </button>
         <button
           type="submit"
-          className="h-9 shrink-0 rounded-full bg-ob-accent px-4 text-[13px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97]"
+          aria-busy={busy}
+          className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-ob-accent px-4 text-[13px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97]"
         >
-          {t('search.submit')}
+          {busy && <span aria-hidden className="spin h-3 w-3 rounded-full border-2 border-white border-t-transparent" />}
+          {busy && waking ? t('status.waking') : t('search.submit')}
         </button>
       </form>
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { fetchSuggestions } from '@/lib/client';
 import type { Suggestion } from '@/lib/geocode';
+import { useI18n } from '@/lib/i18n';
 
 const STORAGE_KEY = 'bayouguard_saved_address';
 const DEBOUNCE_MS = 220;
@@ -28,6 +29,7 @@ export default function AddressSearch({
     coords?: { lat: number; lng: number },
   ) => void;
 }) {
+  const { t } = useI18n();
   const [value, setValue] = useState('');
   const [saved, setSaved] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -154,8 +156,8 @@ export default function AddressSearch({
           }}
           onKeyDown={onKeyDown}
           onFocus={() => suggestions.length > 0 && setOpen(true)}
-          placeholder="Enter a Texas address…"
-          aria-label="Search address"
+          placeholder={t('search.placeholder')}
+          aria-label={t('search.label')}
           role="combobox"
           aria-autocomplete="list"
           aria-expanded={open}
@@ -169,8 +171,9 @@ export default function AddressSearch({
         <button
           type="button"
           onClick={save}
-          title={saved === value && value ? 'Saved' : 'Save address'}
-          aria-label="Save address"
+          title={saved === value && value ? t('search.saved') : t('search.save')}
+          aria-label={t('search.save')}
+          aria-pressed={Boolean(saved && saved === value)}
           className="hidden h-9 w-9 items-center justify-center rounded-full text-ob-muted transition hover:bg-ob-bg2 hover:text-ob-accent sm:flex"
         >
           {saved === value && value ? '★' : '☆'}
@@ -179,7 +182,7 @@ export default function AddressSearch({
           type="submit"
           className="h-9 shrink-0 rounded-full bg-ob-accent px-4 text-[13px] font-semibold text-white transition hover:brightness-110 active:scale-[0.97]"
         >
-          Check risk
+          {t('search.submit')}
         </button>
       </form>
 
@@ -187,7 +190,7 @@ export default function AddressSearch({
         <ul
           id="address-listbox"
           role="listbox"
-          aria-label="Address suggestions"
+          aria-label={t('search.suggestions')}
           className="ob-panel ob-float absolute z-50 mt-2 w-full overflow-hidden rounded-xl py-1 text-left"
         >
           {suggestions.map((s, i) => (

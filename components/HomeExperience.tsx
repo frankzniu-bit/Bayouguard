@@ -56,7 +56,7 @@ export default function HomeExperience({
   const { t } = useI18n();
   const { view, loading, wake, notice, search } = useFloodData(initial, initialAddress, initialCoords);
   const [mode, setMode] = useState<ViewMode>('map');
-  const { mode: theme, toggle: toggleTheme } = useTheme();
+  const { mode: theme, toggle: toggleTheme, setMode: setTheme } = useTheme();
   const [selection, setSelection] = useState<GraphSelection | null>(
     initialAddress && initial.snapshot ? ADDRESS_SELECTION : null,
   );
@@ -181,6 +181,7 @@ export default function HomeExperience({
         onMode={setMode}
         theme={theme}
         onToggleTheme={toggleTheme}
+        onTheme={setTheme}
         dataSource={view.dataSource}
         waking={wake === 'waking'}
         search={<AddressSearch onSearch={onSearch} initialValue={initialAddress} />}
@@ -245,7 +246,7 @@ export default function HomeExperience({
       {!shown && (
         <div className="chrome chrome-right chrome-d2 pointer-events-none absolute right-4 top-[76px] z-40 hidden lg:block">
           <div className="pointer-events-auto">
-            <RiskBoard gauges={visible} sample={sample} onPick={pickGauge} />
+            <RiskBoard gauges={visible} onPick={pickGauge} />
           </div>
         </div>
       )}
@@ -261,9 +262,7 @@ export default function HomeExperience({
       {!shown && (
         <div className="chrome chrome-bottom chrome-d3 pointer-events-none absolute inset-x-0 bottom-4 z-30 flex justify-center px-4">
           <p className="ob-panel rounded-full px-4 py-1.5 text-center text-[11px] text-ob-muted">
-            {mode === 'map'
-              ? 'Drag to pan · scroll to zoom · tap a gauge to inspect'
-              : 'Drag to pan · scroll to zoom · tap a node to inspect'}
+            {t(mode === 'map' ? 'map.hint.map' : 'map.hint.graph')}
           </p>
         </div>
       )}
@@ -273,7 +272,7 @@ export default function HomeExperience({
         {shown && intro === 'done' && (
           <motion.aside
             key="inspector"
-            aria-label="Gauge inspector"
+            aria-label={t('map.inspector')}
             initial={{ opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 24 }}
@@ -286,7 +285,7 @@ export default function HomeExperience({
               snapshot={view.snapshot}
               dataSource={view.dataSource}
               center={view.center}
-              switchLabel={otherMode === 'map' ? 'View on map' : 'View as graph'}
+              switchLabel={t(otherMode === 'map' ? 'map.viewOnMap' : 'map.viewAsGraph')}
               onSwitch={() => setMode(otherMode)}
               onClose={() => {
                 setSelection(null);

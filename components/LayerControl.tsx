@@ -1,5 +1,7 @@
 'use client';
 
+import { useI18n } from '@/lib/i18n';
+
 /* Map layer toggles. A checkbox list (the rail supplies the card) that lets
  * the user compose their own view:
  * plain risk dots, animated "tsunami" ripples, wind flow, satellite imagery,
@@ -19,16 +21,11 @@ export const DEFAULT_LAYERS: MapLayers = {
   ripples: true,
   wind: true,
   satellite: false,
-  usgs: true,
+  // ~1.2 MB upstream; only fetched when someone turns it on.
+  usgs: false,
 };
 
-const LAYER_META: Array<{ key: keyof MapLayers; label: string; hint: string }> = [
-  { key: 'dots', label: 'Gauge dots', hint: 'Risk-tier colored gauges' },
-  { key: 'ripples', label: 'Ripple FX', hint: 'Pulses scale with risk' },
-  { key: 'wind', label: 'Wind flow', hint: 'Live direction of travel' },
-  { key: 'satellite', label: 'Satellite', hint: 'Esri imagery basemap' },
-  { key: 'usgs', label: 'Statewide USGS', hint: 'All-Texas stream gauges' },
-];
+const LAYER_KEYS: Array<keyof MapLayers> = ['dots', 'ripples', 'wind', 'satellite', 'usgs'];
 
 export default function LayerControl({
   layers,
@@ -37,14 +34,17 @@ export default function LayerControl({
   layers: MapLayers;
   onChange: (next: MapLayers) => void;
 }) {
+  const { t } = useI18n();
   return (
     <div>
       <p className="mb-1 px-2 text-[12px] font-medium text-ob-muted">
-        Map layers
+        {t('layers.title')}
       </p>
       <ul className="flex flex-col gap-1">
-        {LAYER_META.map(({ key, label, hint }) => {
+        {LAYER_KEYS.map((key) => {
           const on = layers[key];
+          const label = t(`layers.${key}`);
+          const hint = t(`layers.${key}.hint`);
           return (
             <li key={key}>
               <button

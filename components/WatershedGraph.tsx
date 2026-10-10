@@ -531,7 +531,7 @@ export default function WatershedGraph({
         ref={canvasRef}
         tabIndex={0}
         role="application"
-        aria-label="Houston watershed flood network. Drag to pan, scroll to zoom, arrow keys to cycle gauges, Enter to inspect."
+        aria-label={t('graph.aria')}
         className="block h-full w-full outline-none focus-visible:ring-2 focus-visible:ring-ob-accent/60"
       />
       {gauges.length === 0 && (

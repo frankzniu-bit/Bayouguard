@@ -4,6 +4,8 @@
  * Houston metro pinned. The watershed graph only spans one metro, so this gives
  * the statewide context the graph itself can't. Pure SVG, theme-aware. */
 
+import { useI18n } from '@/lib/i18n';
+
 // Simplified Texas border, clockwise from the NW panhandle. [lng, lat].
 const TX: Array<[number, number]> = [
   [-103.04, 36.5],
@@ -76,6 +78,7 @@ const PATH =
 const [hx, hy] = project(HOUSTON[0], HOUSTON[1]);
 
 export default function TexasLocator() {
+  const { t } = useI18n();
   return (
     <div className="ob-panel pointer-events-none flex flex-col items-center gap-1 rounded-xl p-3 ob-float">
       <svg
@@ -83,7 +86,7 @@ export default function TexasLocator() {
         height={H}
         viewBox={`0 0 ${W} ${H}`}
         role="img"
-        aria-label="Locator map of Texas with Houston highlighted"
+        aria-label={t('map.locator')}
       >
         <path
           d={PATH}

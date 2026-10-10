@@ -10,6 +10,7 @@ import type { DataSource } from '@/lib/types';
 import { LANGS, useI18n } from '@/lib/i18n';
 import BrandMark from './landing/BrandMark';
 import DataStatus from './DataStatus';
+import SettingsMenu, { LANG_NAME } from './SettingsMenu';
 
 export type ViewMode = 'graph' | 'map';
 
@@ -18,6 +19,7 @@ interface Props {
   onMode: (m: ViewMode) => void;
   theme: Mode;
   onToggleTheme: () => void;
+  onTheme: (m: Mode) => void;
   dataSource: DataSource;
   waking?: boolean;
   /** The search box, centred between the brand and the controls on wide screens. */
@@ -25,15 +27,15 @@ interface Props {
   className?: string;
 }
 
-export default function TopBar({ mode, onMode, theme, onToggleTheme, dataSource, waking, search, className = '' }: Props) {
-  const { lang, setLang } = useI18n();
+export default function TopBar({ mode, onMode, theme, onToggleTheme, onTheme, dataSource, waking, search, className = '' }: Props) {
+  const { lang, setLang, t } = useI18n();
   return (
     <header className={`pointer-events-none absolute inset-x-0 top-0 z-[70] ${className}`}>
       {/* One search instance: its own row on phones, centred in the bar from md up. */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 pt-3 md:flex-nowrap md:px-4">
         <Link
           href="/"
-          aria-label="BayouGuard home"
+          aria-label={t('brand.home')}
           className="ob-panel ob-float pointer-events-auto flex h-11 shrink-0 items-center gap-2 rounded-full px-2.5 text-ob-accent sm:pr-4"
         >
           <BrandMark className="h-6 w-6" />
@@ -50,7 +52,7 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, dataSource,
           <DataStatus source={dataSource} waking={waking} />
           <div
             role="group"
-            aria-label="View mode"
+            aria-label={t('top.viewMode')}
             className="ob-panel ob-float flex h-11 items-center rounded-full p-1"
           >
             {(['map', 'graph'] as ViewMode[]).map((m) => (
@@ -59,11 +61,11 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, dataSource,
                 type="button"
                 onClick={() => onMode(m)}
                 aria-pressed={mode === m}
-                className={`h-9 rounded-full px-3.5 text-[13px] font-semibold capitalize transition-colors ${
+                className={`h-9 rounded-full px-3.5 whitespace-nowrap text-[13px] font-semibold transition-colors ${
                   mode === m ? 'bg-ob-accent text-white' : 'text-ob-muted hover:text-ob-text'
                 }`}
               >
-                {m}
+                {t(m === 'map' ? 'top.map' : 'top.graph')}
               </button>
             ))}
           </div>
@@ -71,16 +73,17 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, dataSource,
           <button
             type="button"
             onClick={onToggleTheme}
-            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-            className="ob-panel ob-float flex h-11 w-11 items-center justify-center rounded-full text-ob-muted transition-colors hover:text-ob-text"
+            aria-label={t(theme === 'dark' ? 'top.themeToLight' : 'top.themeToDark')}
+            title={t(theme === 'dark' ? 'top.themeToLight' : 'top.themeToDark')}
+            className="ob-panel ob-float hidden h-11 w-11 items-center justify-center rounded-full text-ob-muted transition-colors hover:text-ob-text lg:flex"
           >
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </button>
+          <SettingsMenu theme={theme} onTheme={onTheme} className="lg:hidden" />
 
           <div
             role="group"
-            aria-label="Language"
+            aria-label={t('top.language')}
             className="ob-panel ob-float hidden h-11 items-center rounded-full p-1 lg:flex"
           >
             {LANGS.map((l) => (
@@ -89,6 +92,8 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, dataSource,
                 type="button"
                 onClick={() => setLang(l)}
                 aria-pressed={lang === l}
+                aria-label={LANG_NAME[l]}
+                lang={l}
                 className={`h-9 rounded-full px-2.5 text-[12px] font-semibold transition-colors ${
                   lang === l ? 'bg-ob-accent text-white' : 'text-ob-muted hover:text-ob-text'
                 }`}

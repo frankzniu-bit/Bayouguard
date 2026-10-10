@@ -7,8 +7,10 @@
 import { useLayoutEffect, useState } from 'react';
 import FrozenField from '@/components/FrozenField';
 import { readHandoff, type Handoff } from '@/lib/dotField';
+import { useI18n } from '@/lib/i18n';
 
 export default function MapLoading() {
+  const { t } = useI18n();
   const [handoff, setHandoff] = useState<Handoff | null>(null);
 
   useLayoutEffect(() => {
@@ -16,10 +18,10 @@ export default function MapLoading() {
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-ob-bg" role="status" aria-label="Loading the map">
+    <div className="fixed inset-0 bg-ob-bg" role="status" aria-label={t('map.loading')}>
       {handoff && <FrozenField handoff={handoff} />}
       <p className="fade-in-late absolute inset-x-0 bottom-8 text-center text-[12px] text-ob-muted">
-        Reading the gauges…
+        {t('map.readingGauges')}
       </p>
     </div>
   );

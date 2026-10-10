@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import type { GraphSelection } from './WatershedGraph';
 import type { DataSource, HomeSnapshot, Tier, DriveVerdict, Outlook, RainForecast } from '@/lib/types';
 import type { GaugeHistory } from '@/lib/history';
-import { TIER_COLOR, TIER_INK, TIER_TINT, TIER_LABEL } from '@/lib/theme';
+import { TIER_COLOR, TIER_INK, TIER_TINT } from '@/lib/theme';
 import { classifyTrend } from '@/lib/trend';
 import { useI18n } from '@/lib/i18n';
 import { outlookDetail, riskSentence, weatherLabel } from '@/lib/describe';
@@ -32,19 +32,17 @@ const OUTLOOK_TINT: Record<Outlook['level'], string> = {
 };
 
 // Live gauge trend -> arrow + color. Rising water is the danger direction.
-function TrendArrow({ trend }: { trend: number }) {
+export function TrendArrow({ trend }: { trend: number }) {
+  const { t, num } = useI18n();
   const state = classifyTrend(trend);
   if (state === 'steady') {
-    return <span className="font-mono text-xs text-ob-muted">→ steady</span>;
+    return <span className="text-xs text-ob-muted">→ {t('trend.steady')}</span>;
   }
   const rising = state === 'rising';
+  const label = t(rising ? 'trend.rising' : 'trend.falling', { rate: num(Math.abs(trend), 2) });
   return (
-    <span
-      className="font-mono text-xs"
-      style={{ color: rising ? TIER_INK.HIGH : TIER_INK.LOW }}
-      title={`${rising ? 'Rising' : 'Falling'} ${Math.abs(trend).toFixed(2)} ft/hr`}
-    >
-      {rising ? '↑' : '↓'} {Math.abs(trend).toFixed(2)} ft/hr
+    <span className="text-xs font-medium" style={{ color: rising ? TIER_INK.HIGH : TIER_INK.LOW }}>
+      <span aria-hidden>{rising ? '↑' : '↓'}</span> {label}
     </span>
   );
 }
@@ -65,7 +63,8 @@ function haversineMiles(
   return R * 2 * Math.asin(Math.sqrt(a));
 }
 
-function TierBadge({ tier }: { tier: Tier }) {
+export function TierBadge({ tier }: { tier: Tier }) {
+  const { t } = useI18n();
   return (
     <span
       className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold"
@@ -75,7 +74,7 @@ function TierBadge({ tier }: { tier: Tier }) {
         className="h-2 w-2 rounded-full"
         style={{ backgroundColor: TIER_COLOR[tier] }}
       />
-      {TIER_LABEL[tier]}
+      {t(`tier.${tier}`)}
     </span>
   );
 }
@@ -89,10 +88,12 @@ function Metric({
   value: string | number;
   unit?: string;
 }) {
+  // Numbers set in mono; words (weather) in the UI face, which has Vietnamese.
+  const numeric = typeof value === 'number' || /^[\d.,\s-]+$/.test(value);
   return (
     <div className="rounded-lg border border-ob-border bg-ob-surface2 p-3">
       <p className="text-[12px] text-ob-muted font-medium">{label}</p>
-      <p className="mt-1 font-mono text-xl tabular text-ob-text">
+      <p className={`mt-1 tabular text-ob-text ${numeric ? 'font-mono text-xl' : 'text-base font-medium'}`}>
         {value}
         {unit && <span className="ml-1 text-xs text-ob-muted">{unit}</span>}
       </p>
@@ -132,15 +133,14 @@ function OutlookCard({ outlook }: { outlook: Outlook }) {
 /* Hourly rain bars for the next 12h. Height scales to the wettest hour so a
  * drizzle day still reads; the wettest hour caps the scale. */
 function RainBars({ rain }: { rain: RainForecast }) {
+  const { t, num } = useI18n();
   const max = Math.max(0.1, ...rain.inches);
   return (
     <div className="mt-4">
       <div className="mb-1.5 flex items-baseline justify-between text-xs">
-        <span className="text-[12px] text-ob-muted font-medium">
-          Rain · next 12h
-        </span>
+        <span className="text-[12px] text-ob-muted font-medium">{t('insp.rain12')}</span>
         <span className="font-mono tabular text-ob-muted">
-          {rain.totalNext12h.toFixed(2)}&quot; total
+          {t('insp.rainTotal', { inches: num(rain.totalNext12h, 2) })}
         </span>
       </div>
       <div className="flex h-10 items-end gap-1">
@@ -157,7 +157,7 @@ function RainBars({ rain }: { rain: RainForecast }) {
         ))}
       </div>
       <div className="mt-1 flex justify-between font-mono text-[10px] text-ob-muted">
-        <span>now</span>
+        <span>{t('common.now')}</span>
         <span>+6h</span>
         <span>+12h</span>
       </div>
@@ -168,6 +168,7 @@ function RainBars({ rain }: { rain: RainForecast }) {
 /* 48h water-level sparkline for a single gauge. Fetches on gauge select;
  * renders nothing until (and unless) history arrives — additive UI only. */
 function HistorySparkline({ gaugeId, color }: { gaugeId: number; color: string }) {
+  const { t, num } = useI18n();
   const [history, setHistory] = useState<GaugeHistory | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -186,9 +187,7 @@ function HistorySparkline({ gaugeId, color }: { gaugeId: number; color: string }
   if (loading) {
     return (
       <div className="mt-4">
-        <p className="text-[12px] text-ob-muted font-medium">
-          Level · last 48h
-        </p>
+        <p className="text-[12px] text-ob-muted font-medium">{t('insp.history')}</p>
         <div className="mt-1.5 h-14 animate-pulse rounded-lg bg-ob-bg2/60" />
       </div>
     );
@@ -221,11 +220,9 @@ function HistorySparkline({ gaugeId, color }: { gaugeId: number; color: string }
   return (
     <div className="mt-4">
       <div className="mb-1.5 flex items-baseline justify-between text-xs">
-        <span className="text-[12px] text-ob-muted font-medium">
-          Level · last 48h
-        </span>
+        <span className="text-[12px] text-ob-muted font-medium">{t('insp.history')}</span>
         <span className="font-mono tabular text-ob-muted">
-          {last.level.toFixed(2)} ft now
+          {t('insp.historyNow', { ft: num(last.level, 2) })}
         </span>
       </div>
       <svg
@@ -233,7 +230,7 @@ function HistorySparkline({ gaugeId, color }: { gaugeId: number; color: string }
         className="h-14 w-full"
         preserveAspectRatio="none"
         role="img"
-        aria-label={`Water level over the last 48 hours, currently ${last.level.toFixed(1)} feet`}
+        aria-label={t('insp.historyAria', { ft: num(last.level, 1) })}
       >
         <path d={area} fill={color} opacity={0.12} />
         {floodInRange && floodLevel != null && (
@@ -255,10 +252,10 @@ function HistorySparkline({ gaugeId, color }: { gaugeId: number; color: string }
         <span>-48h</span>
         {floodInRange && floodLevel != null && (
           <span style={{ color: TIER_INK.CRITICAL }}>
-            flood {floodLevel.toFixed(1)} ft
+            {t('insp.floodLine', { ft: num(floodLevel, 1) })}
           </span>
         )}
-        <span>now</span>
+        <span>{t('common.now')}</span>
       </div>
     </div>
   );
@@ -297,7 +294,7 @@ export default function InspectorPanel({
   onSwitch,
   onClose,
 }: Props) {
-  const { t, num } = useI18n();
+  const { t, num, time } = useI18n();
   // ── Gauge node ───────────────────────────────────────────────────────────
   if (selection?.kind === 'gauge' && selection.gauge) {
     const g = selection.gauge;
@@ -310,7 +307,7 @@ export default function InspectorPanel({
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[12px] text-ob-muted font-medium">
-              Flood gauge{g.county ? ` · ${g.county} network` : ''}
+              {t('insp.floodGauge')}{g.county ? ` · ${t('insp.network', { county: g.county })}` : ''}
             </p>
             <h2 className="text-lg font-semibold leading-snug text-ob-text">{g.name}</h2>
             {g.trend != null && (
@@ -324,7 +321,7 @@ export default function InspectorPanel({
 
         <div className="mt-4">
           <div className="mb-1.5 flex items-baseline justify-between text-xs">
-            <span className="text-ob-muted">Water level vs flood stage</span>
+            <span className="text-ob-muted">{t('insp.levelVsFlood')}</span>
             <span className="font-mono tabular text-ob-text">
               {fillPct.toFixed(0)}%
             </span>
@@ -335,22 +332,22 @@ export default function InspectorPanel({
         <HistorySparkline gaugeId={g.id} color="rgb(var(--ob-water-rgb))" />
 
         <div className="mt-4 grid grid-cols-2 gap-2.5">
-          <Metric label="Current" value={g.current.toFixed(1)} unit="ft" />
-          <Metric label="Flood stage" value={g.flood.toFixed(1)} unit="ft" />
-          <Metric label="Headroom" value={g.buffer.toFixed(1)} unit="ft" />
+          <Metric label={t('insp.current')} value={num(g.current, 1)} unit={t('common.ft')} />
+          <Metric label={t('insp.floodStage')} value={num(g.flood, 1)} unit={t('common.ft')} />
+          <Metric label={t('insp.headroom')} value={num(g.buffer, 1)} unit={t('common.ft')} />
           {dist != null ? (
-            <Metric label="From you" value={dist.toFixed(1)} unit="mi" />
+            <Metric label={t('insp.fromYou')} value={num(dist, 1)} unit={t('common.mi')} />
           ) : (
-            <Metric label="Tier" value={TIER_LABEL[g.tier]} />
+            <Metric label={t('insp.tier')} value={t(`tier.${g.tier}`)} />
           )}
           {g.rainfall != null && g.rainfall > 0 && (
-            <Metric label="Rain at site" value={g.rainfall.toFixed(2)} unit="in" />
+            <Metric label={t('insp.rainAtSite')} value={num(g.rainfall, 2)} unit="in" />
           )}
         </div>
 
         <p className="mt-4 font-mono text-[11px] leading-relaxed text-ob-muted">
           {g.lat.toFixed(4)}, {g.lng.toFixed(4)}
-          {g.readAt ? ` · read ${new Date(g.readAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : ''}
+          {g.readAt ? ` · ${t('insp.readAt', { time: time(g.readAt) })}` : ''}
         </p>
       </PanelShell>
     );
@@ -363,9 +360,7 @@ export default function InspectorPanel({
     <PanelShell onClose={onClose} onSwitch={onSwitch} switchLabel={switchLabel}>
       <div className="flex items-center justify-between">
         <div className="min-w-0">
-          <p className="text-[12px] text-ob-muted font-medium">
-            Your location
-          </p>
+          <p className="text-[12px] text-ob-muted font-medium">{t('insp.yourLocation')}</p>
           <h2 className="truncate text-xl font-semibold tracking-tight text-ob-text" title={risk.address}>
             {risk.address}
           </h2>
@@ -380,7 +375,7 @@ export default function InspectorPanel({
         >
           {risk.score}
         </span>
-        <span className="pb-1 text-sm text-ob-muted">/ 100 risk score</span>
+        <span className="pb-1 text-sm text-ob-muted">{t('insp.scoreOf')}</span>
       </div>
       <p className="mt-1 text-[12px] font-medium text-ob-muted">{t(`riskSource.${risk.source}`)}</p>
       <p className="mt-3 text-sm leading-relaxed text-ob-muted" title={risk.backendMessage}>
@@ -391,10 +386,10 @@ export default function InspectorPanel({
 
       {weather && (
         <div className="mt-4 grid grid-cols-2 gap-2.5">
-          <Metric label="Temp" value={weather.tempF} unit="°F" />
-          <Metric label="Conditions" value={weatherLabel(weather.code, t)} />
-          <Metric label="Wind" value={weather.windMph} unit="mph" />
-          <Metric label="Humidity" value={weather.humidity} unit="%" />
+          <Metric label={t('insp.temp')} value={weather.tempF} unit="°F" />
+          <Metric label={t('insp.conditions')} value={weatherLabel(weather.code, t)} />
+          <Metric label={t('insp.wind')} value={weather.windMph} unit={t('common.mph')} />
+          <Metric label={t('insp.humidity')} value={weather.humidity} unit="%" />
         </div>
       )}
 
@@ -402,7 +397,7 @@ export default function InspectorPanel({
         className="mt-3 rounded-xl border p-3"
         style={{ borderColor: DRIVE_COLOR[drive.state], backgroundColor: TIER_TINT[risk.tier] }}
       >
-        <p className="text-[12px] text-ob-muted font-medium">Roads</p>
+        <p className="text-[12px] text-ob-muted font-medium">{t('insp.roads')}</p>
         <p className="mt-0.5 font-semibold" style={{ color: DRIVE_COLOR[drive.state] }}>
           {t(`drive.${drive.state}`)}
         </p>
@@ -412,9 +407,7 @@ export default function InspectorPanel({
       {rain && <RainBars rain={rain} />}
 
       <div className="mt-4">
-        <p className="mb-2 text-[12px] text-ob-muted font-medium">
-          Nearest gauges
-        </p>
+        <p className="mb-2 text-[12px] text-ob-muted font-medium">{t('insp.nearest')}</p>
         <ul className="flex flex-col gap-2.5">
           {bayous.map((b) => {
             const pct = b.flood > 0 ? Math.min(100, (b.stage / b.flood) * 100) : 0;
@@ -427,7 +420,7 @@ export default function InspectorPanel({
                   <span className="flex shrink-0 items-center gap-2">
                     {b.trend != null && <TrendArrow trend={b.trend} />}
                     <span className="font-mono tabular text-ob-muted">
-                      {b.stage.toFixed(1)} / {b.flood.toFixed(1)} ft
+                      {num(b.stage, 1)} / {num(b.flood, 1)} {t('common.ft')}
                     </span>
                   </span>
                 </div>
@@ -456,6 +449,7 @@ function PanelShell({
   onSwitch: () => void;
   switchLabel: string;
 }) {
+  const { t } = useI18n();
   return (
     <div className="ob-panel ob-float reveal flex max-h-full flex-col rounded-xl">
       <div className="thin-scroll overflow-y-auto p-5">{children}</div>
@@ -470,10 +464,10 @@ function PanelShell({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close inspector"
+          aria-label={t('insp.close')}
           className="h-11 rounded-lg border border-ob-border px-4 text-sm text-ob-muted transition-colors hover:text-ob-text"
         >
-          Close
+          {t('common.close')}
         </button>
       </div>
     </div>

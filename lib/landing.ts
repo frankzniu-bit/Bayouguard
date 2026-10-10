@@ -9,6 +9,7 @@ import { getUsgsGauges } from './usgs';
 import { getRainForecast } from './weather';
 import { loadGauges, normalizeTier } from './api';
 import type { Tier } from './types';
+import type { MsgKey } from './i18n/en';
 
 /** One dot on the landing map. `tier` is null for statewide gauges, which carry no flood stage. */
 export interface LandingDot {
@@ -19,9 +20,10 @@ export interface LandingDot {
 
 export interface LandingStat {
   value: string;
-  label: string;
+  label: MsgKey;
   /** Short, true detail under the number — what the number is made of. */
-  detail: string;
+  detail: MsgKey;
+  params?: Record<string, string | number>;
 }
 
 export interface LandingData {
@@ -61,23 +63,24 @@ export async function getLandingData(): Promise<LandingData> {
   const stats: LandingStat[] = [
     {
       value: total.toLocaleString('en-US'),
-      label: 'Gauges live',
-      detail: `${usgs.length.toLocaleString('en-US')} statewide · ${harrisDots.length} around Houston`,
+      label: 'stat.gauges',
+      detail: 'stat.gauges.detail',
+      params: { statewide: usgs.length.toLocaleString('en-US'), houston: harrisDots.length },
     },
     {
       value: String(nearFlood),
-      label: 'Near flood stage',
-      detail: harris.source === 'demo' ? 'Sample data · backend offline' : 'Within 2 ft of flooding',
+      label: 'stat.near',
+      detail: harris.source === 'demo' ? 'stat.near.demo' : 'stat.near.detail',
     },
     {
       value: rainIn === null ? '—' : `${rainIn.toFixed(2)}″`,
-      label: 'Rain next 12 h',
-      detail: 'Downtown Houston · Open-Meteo',
+      label: 'stat.rain',
+      detail: 'stat.rain.detail',
     },
     {
       value: '5 min',
-      label: 'Between readings',
-      detail: 'USGS · Harris County FWS',
+      label: 'stat.cadence',
+      detail: 'stat.cadence.detail',
     },
   ];
 

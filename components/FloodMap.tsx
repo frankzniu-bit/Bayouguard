@@ -24,7 +24,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { GaugePoint, Tier } from '@/lib/types';
 import type { UsgsGauge } from '@/lib/usgs';
-import { TIER_HEX, TIER_LABEL, OB, BASEMAP, type Mode } from '@/lib/theme';
+import { TIER_HEX, OB, BASEMAP, type Mode } from '@/lib/theme';
+import { useI18n } from '@/lib/i18n';
 import { TEXAS_RINGS } from '@/lib/geoDots';
 import type { MapLayers } from './LayerControl';
 import WindLayer from './WindLayer';
@@ -256,6 +257,8 @@ export default function FloodMap({
   /** Called once the map is laid out and its first tiles have loaded. */
   onReady?: (map: L.Map) => void;
 }) {
+  const { t } = useI18n();
+  const yourAddress = t('map.yourAddress');
   const start: [number, number] = initialView
     ? [initialView.lat, initialView.lng]
     : center
@@ -380,7 +383,7 @@ export default function FloodMap({
               }}
             >
               <Tooltip direction="top" offset={[0, -4]}>
-                {g.name} · {TIER_LABEL[g.tier]}
+                {g.name} · {t(`tier.${g.tier}`)}
               </Tooltip>
             </CircleMarker>
           );
@@ -395,7 +398,7 @@ export default function FloodMap({
           }}
         >
           <Tooltip direction="top" offset={[0, -30]}>
-            {address ?? 'Your address'}
+            {address ?? yourAddress}
           </Tooltip>
         </Marker>
       )}

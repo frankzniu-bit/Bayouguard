@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import BrandMark from './landing/BrandMark';
+import { useI18n, type MsgKey } from '@/lib/i18n';
 
 const STORAGE_KEY = 'bayouguard_tour_v1';
 const GAP = 12;
@@ -16,31 +17,15 @@ const PAD = 6;
 interface Step {
   /** data-tour value of the element to spotlight; null centres the card. */
   target: string | null;
-  title: string;
-  body: string;
+  title: MsgKey;
+  body: MsgKey;
 }
 
 const STEPS: Step[] = [
-  {
-    target: 'search',
-    title: 'Start with your address',
-    body: 'Type any Texas address. BayouGuard finds the gauges nearest to you and says what the water is doing there.',
-  },
-  {
-    target: 'filters',
-    title: 'Every gauge, by risk',
-    body: 'Each row is a filter and a count. Turn a tier off to hide those gauges on the map.',
-  },
-  {
-    target: 'board',
-    title: 'Closest to flooding',
-    body: 'Ranked by feet left before flood stage. Tap one to fly to it.',
-  },
-  {
-    target: null,
-    title: 'Tap any dot',
-    body: 'Every dot is a gauge. Tap one for its level, its trend, and the last 48 hours.',
-  },
+  { target: 'search', title: 'tour.search.title', body: 'tour.search.body' },
+  { target: 'filters', title: 'tour.filters.title', body: 'tour.filters.body' },
+  { target: 'board', title: 'tour.board.title', body: 'tour.board.body' },
+  { target: null, title: 'tour.dot.title', body: 'tour.dot.body' },
 ];
 
 function visibleRect(target: string | null): DOMRect | null {
@@ -51,6 +36,7 @@ function visibleRect(target: string | null): DOMRect | null {
 }
 
 export default function Tour({ ready = true }: { ready?: boolean }) {
+  const { t } = useI18n();
   const [steps, setSteps] = useState<Step[] | null>(null);
   const [i, setI] = useState(0);
   const [rect, setRect] = useState<DOMRect | null>(null);
@@ -147,15 +133,15 @@ export default function Tour({ ready = true }: { ready?: boolean }) {
           <span className="font-display text-[14px] text-ob-text">BayouGuard</span>
         </div>
         <h2 id="tour-title" className="mt-2 text-[16px] font-semibold tracking-[-0.01em]">
-          {step.title}
+          {t(step.title)}
         </h2>
-        <p className="mt-1 text-[13px] leading-relaxed text-ob-muted">{step.body}</p>
+        <p className="mt-1 text-[13px] leading-relaxed text-ob-muted">{t(step.body)}</p>
 
         <div className="mt-4 flex items-center">
           <button type="button" onClick={finish} className="text-[13px] font-medium text-ob-muted hover:text-ob-text">
-            Skip
+            {t('tour.skip')}
           </button>
-          <span className="mx-auto flex gap-1.5" aria-label={`Step ${i + 1} of ${steps.length}`}>
+          <span className="mx-auto flex gap-1.5" aria-label={t('tour.step', { n: i + 1, total: steps.length })}>
             {steps.map((_, k) => (
               <span
                 key={k}
@@ -169,7 +155,7 @@ export default function Tour({ ready = true }: { ready?: boolean }) {
             onClick={() => (last ? finish() : setI(i + 1))}
             className="h-9 rounded-full bg-ob-accent px-4 text-[13px] font-semibold text-white hover:brightness-110"
           >
-            {last ? 'Done' : 'Next'}
+            {last ? t('tour.done') : t('tour.next')}
           </button>
         </div>
       </div>

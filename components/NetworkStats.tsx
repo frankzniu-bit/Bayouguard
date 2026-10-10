@@ -1,52 +1,22 @@
 'use client';
 
-/* Live summary of the whole gauge network: total online + a breakdown by risk
- * tier. Sits as a floating strip over the graph. */
+/* The whole network in one line of words — "338 gauges · 13 high · 1
+ * critical" — for screens too narrow for the rail. */
 
-import type { GaugePoint, Tier } from '@/lib/types';
-import { TIER_COLOR, TIER_LABEL } from '@/lib/theme';
-
-const ORDER: Tier[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
+import type { GaugePoint } from '@/lib/types';
+import { useI18n } from '@/lib/i18n';
 
 export default function NetworkStats({ gauges }: { gauges: GaugePoint[] }) {
-  const counts = ORDER.reduce<Record<Tier, number>>(
-    (acc, t) => {
-      acc[t] = 0;
-      return acc;
-    },
-    { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 },
-  );
-  for (const g of gauges) counts[g.tier] = (counts[g.tier] ?? 0) + 1;
-
+  const { t } = useI18n();
+  let high = 0;
+  let critical = 0;
+  for (const g of gauges) {
+    if (g.tier === 'HIGH') high += 1;
+    else if (g.tier === 'CRITICAL') critical += 1;
+  }
   return (
-    <div className="ob-panel ob-float pointer-events-auto flex items-center gap-1 rounded-xl px-2 py-2 sm:gap-2 sm:px-3">
-      <div className="flex flex-col px-2">
-        <span className="font-mono text-lg leading-none tabular text-ob-text">
-          {gauges.length}
-        </span>
-        <span className="text-[12px] text-ob-muted font-medium">
-          gauges live
-        </span>
-      </div>
-      <div className="h-8 w-px bg-ob-border" />
-      <ul className="flex items-center gap-1 sm:gap-1.5">
-        {ORDER.map((t) => (
-          <li
-            key={t}
-            className="flex items-center gap-1.5 rounded-lg px-1.5 py-1"
-            aria-label={`${TIER_LABEL[t]} risk: ${counts[t]} gauges`}
-            title={`${TIER_LABEL[t]} risk`}
-          >
-            <span
-              className="h-2.5 w-2.5 rounded-[3px]"
-              style={{ backgroundColor: TIER_COLOR[t] }}
-            />
-            <span className="font-mono text-sm tabular text-ob-text">
-              {counts[t]}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <p className="ob-panel ob-float pointer-events-auto rounded-xl px-3 py-2 text-[13px] font-medium text-ob-text tabular">
+      {t('network.summary', { total: gauges.length, high, critical })}
+    </p>
   );
 }

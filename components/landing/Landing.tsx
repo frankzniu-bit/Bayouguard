@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import type { LandingData } from '@/lib/landing';
 import { fitTexas, packDots, writeHandoff, type Camera } from '@/lib/dotField';
 import { fetchSuggestions, warmBackend } from '@/lib/client';
+import { useI18n } from '@/lib/i18n';
 import TexasField from './TexasField';
 import ZoomTransition from './ZoomTransition';
 import BrandMark from './BrandMark';
@@ -34,14 +35,18 @@ interface Leaving {
 
 const CARD_SPOTS = ['left-[6%] top-[14%]', 'right-[6%] top-[22%]', 'left-[3%] bottom-[16%]', 'right-[4%] bottom-[10%]'];
 
-export default function Landing({
-  data,
-  freshness,
-}: {
-  data: LandingData;
-  freshness: string;
-}) {
+export default function Landing({ data }: { data: LandingData }) {
   const router = useRouter();
+  const { t, locale } = useI18n();
+  const freshness = data.latestReading
+    ? t('land.freshAt', {
+        time: new Intl.DateTimeFormat(locale, {
+          hour: 'numeric',
+          minute: '2-digit',
+          timeZone: 'America/Chicago',
+        }).format(new Date(data.latestReading)),
+      })
+    : t('land.fresh');
   const [address, setAddress] = useState('');
   const [finding, setFinding] = useState(false);
   const [leaving, setLeaving] = useState<Leaving | null>(null);
@@ -114,20 +119,18 @@ export default function Landing({
           <span className="font-display text-[30px] text-ob-text">BayouGuard</span>
         </div>
         <p className="text-[12px] font-medium text-ob-accent">
-          Texas floodwater, mapped
+          {t('land.tagline')}
         </p>
       </header>
 
-      <section className="relative mt-2 w-full max-w-[1180px]" aria-label="Every gauge in Texas">
+      <section className="relative mt-2 w-full max-w-[1180px]" aria-label={t('land.heroAria')}>
         <div
           ref={stage}
           className="land-in relative mx-auto h-[min(58vh,520px)] min-h-[300px] w-full max-w-[640px]"
           style={{ animationDelay: '0ms' }}
         >
           <TexasField dots={data.dots} hidden={Boolean(leaving)} />
-          <p className="sr-only">
-            {data.dots.length} river and bayou gauges across Texas, drawn as dots on a map of the state.
-          </p>
+          <p className="sr-only">{t('land.heroSr', { n: data.dots.length })}</p>
         </div>
 
         {data.stats.map((s, i) => (
@@ -140,18 +143,18 @@ export default function Landing({
               <CountUp value={s.value} delayMs={520 + i * 90} />
             </span>
             <figcaption className="mt-1.5 text-[12px] font-medium text-ob-muted">
-              {s.label}
+              {t(s.label)}
             </figcaption>
-            <p className="mt-1 text-[11px] leading-snug text-ob-muted">{s.detail}</p>
+            <p className="mt-1 text-[11px] leading-snug text-ob-muted">{t(s.detail, s.params)}</p>
           </figure>
         ))}
       </section>
 
       <section className="land-in leave-down flex w-full max-w-[392px] flex-col items-center text-center" style={{ animationDelay: '220ms' }}>
-        <h1 className="text-[22px] font-semibold tracking-[-0.02em]">Every river gauge in Texas.</h1>
+        <h1 className="text-[22px] font-semibold tracking-[-0.02em]">{t('land.title')}</h1>
         <p className="mt-1 text-[14px] leading-relaxed text-ob-muted">
-          Live water levels on one living map.
-          <span className="hidden sm:inline"> Hover to look closer.</span>
+          {t('land.subtitle')}
+          <span className="hidden sm:inline"> {t('land.hover')}</span>
         </p>
         <p className="mt-3 text-[12px] text-ob-muted">{freshness}</p>
 
@@ -160,18 +163,18 @@ export default function Landing({
           onClick={enter}
           className="mt-3 flex h-12 w-full items-center justify-center rounded-xl bg-ob-accent text-[15px] font-semibold text-white transition-transform duration-150 hover:brightness-110 active:scale-[0.98]"
         >
-          Enter the map
+          {t('land.enter')}
         </Link>
 
         <form onSubmit={check} className="mt-2.5 flex w-full gap-2">
           <label htmlFor="landing-address" className="sr-only">
-            Your Texas address
+            {t('land.addressLabel')}
           </label>
           <input
             id="landing-address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            placeholder="Your Texas address"
+            placeholder={t('land.addressLabel')}
             autoComplete="street-address"
             className="h-11 min-w-0 flex-1 rounded-xl border border-ob-border bg-ob-surface px-3.5 text-[14px] text-ob-text outline-none transition placeholder:text-ob-muted focus:border-ob-water"
           />
@@ -180,7 +183,7 @@ export default function Landing({
             disabled={finding}
             className="h-11 shrink-0 rounded-xl border border-ob-accent/40 bg-ob-surface px-4 text-[14px] font-semibold text-ob-accent transition hover:bg-ob-accent/5 active:scale-[0.98] disabled:opacity-70"
           >
-            {finding ? 'Finding…' : 'Check risk'}
+            {finding ? t('land.finding') : t('search.submit')}
           </button>
         </form>
 
@@ -188,7 +191,7 @@ export default function Landing({
         <dl className="mt-6 grid w-full grid-cols-2 gap-2 lg:hidden">
           {data.stats.slice(0, 2).map((s) => (
             <div key={s.label} className="ob-float rounded-xl bg-ob-surface px-3.5 py-3 text-left">
-              <dt className="text-[12px] font-medium text-ob-muted">{s.label}</dt>
+              <dt className="text-[12px] font-medium text-ob-muted">{t(s.label)}</dt>
               <dd className="mt-1 text-[20px] font-bold leading-none text-ob-accent/80 tabular">
                 <CountUp value={s.value} delayMs={500} />
               </dd>
@@ -200,10 +203,10 @@ export default function Landing({
       <footer className="leave-down mt-auto flex flex-col items-center gap-1 pt-10 text-center text-[11px] text-ob-muted">
         {data.sample && (
           <p className="rounded-full border border-ob-border bg-ob-surface px-3 py-1 text-ob-muted">
-            Harris County gauges are sample data until the BayouGuard backend is connected
+            {t('land.sample')}
           </p>
         )}
-        <p>Congressional App Challenge 2026 · Data: USGS, Harris County Flood Warning System, Open-Meteo</p>
+        <p>{t('land.credit')}</p>
       </footer>
 
 

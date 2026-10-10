@@ -19,6 +19,7 @@ export async function GET(request: Request) {
   const lngRaw = searchParams.get('lng');
   const budget = Number(searchParams.get('budget'));
   const lang = searchParams.get('lang') ?? undefined;
+  const lite = searchParams.get('lite') === '1';
 
   const coords =
     latRaw && lngRaw
@@ -33,6 +34,6 @@ export async function GET(request: Request) {
     ? Math.min(budget, MAX_BUDGET_MS)
     : WARM_TIMEOUT_MS;
 
-  const view = await getFloodView(address, valid, { timeoutMs, lang });
+  const view = await getFloodView(address, valid, { timeoutMs, lang, lite });
   return NextResponse.json(view);
 }

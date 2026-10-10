@@ -29,9 +29,9 @@ export default async function CheckPage({ searchParams }: { searchParams: Params
   const coords = Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? { lat, lng } : undefined;
 
   const initial = await Promise.race([
-    getFloodView(address, coords, { timeoutMs: SSR_BUDGET_MS - 500 }),
+    getFloodView(address, coords, { timeoutMs: SSR_BUDGET_MS - 500, lite: true }),
     new Promise<ReturnType<typeof demoView>>((resolve) =>
-      setTimeout(() => resolve(demoView(coords ?? null, address, true)), SSR_BUDGET_MS),
+      setTimeout(() => resolve({ ...demoView(coords ?? null, address, true), gauges: [] }), SSR_BUDGET_MS),
     ),
   ]);
 

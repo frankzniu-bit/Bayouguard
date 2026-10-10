@@ -3,7 +3,6 @@
 /* Risk score as a semicircle: 0-100 maps to 0-180°. The arc sweeps in once
  * when a score arrives; its colour eases over 600 ms when the tier changes. */
 
-import { motion } from 'framer-motion';
 import type { RiskSnapshot } from '@/lib/types';
 import { TIER_COLOR, TIER_INK } from '@/lib/theme';
 import { useI18n } from '@/lib/i18n';
@@ -25,16 +24,19 @@ export default function RiskArc({ risk, large = false }: { risk: RiskSnapshot; l
         <div className="relative h-[72px] w-[128px] shrink-0">
           <svg viewBox="0 0 128 72" className="h-full w-full" aria-hidden>
             <path d={ARC} fill="none" stroke="rgb(var(--ob-border-rgb))" strokeWidth="10" strokeLinecap="round" />
-            <motion.path
+            <path
               key={risk.address}
+              className="arc-sweep"
               d={ARC}
               fill="none"
               strokeWidth="10"
               strokeLinecap="round"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: Math.max(0.02, risk.score / 100) }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              style={{ stroke: TIER_COLOR[risk.tier], transition: 'stroke 600ms ease-out' }}
+              pathLength={1}
+              style={{
+                stroke: TIER_COLOR[risk.tier],
+                strokeDasharray: `${Math.max(0.02, risk.score / 100)} 1`,
+                transition: 'stroke 600ms ease-out, stroke-dasharray 600ms ease-out',
+              }}
             />
           </svg>
           <span

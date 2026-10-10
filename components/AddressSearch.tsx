@@ -70,18 +70,19 @@ export default function AddressSearch({
     onSearchRef.current = onSearch;
   });
 
-  // An address from the landing page wins over the saved one, and has already
+  // An address handed in (the URL) wins over the saved one, and has already
   // been searched server-side — so it only fills the box.
   // Otherwise restore the saved address: refresh status only, don't open the map.
   // Reads onSearch from a ref so the empty dep array is genuinely safe.
   const initialRef = useRef(initialValue);
+  const isPill = useRef(variant === 'pill');
   useEffect(() => {
     if (initialRef.current) {
       skipNextFetch.current = true;
       setValue(initialRef.current);
       return;
     }
-    const v = variant === 'pill' ? readSaved() : null;
+    const v = isPill.current ? readSaved() : null;
     if (v) {
       skipNextFetch.current = true;
       setValue(v.label);

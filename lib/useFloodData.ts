@@ -16,6 +16,8 @@ export function useFloodData(
   initial: FloodView,
   initialAddress?: string,
   initialCoords?: { lat: number; lng: number },
+  /** Skip the gauge list (pages without a map). */
+  lite = false,
 ) {
   const { lang } = useI18n();
   const [view, setView] = useState<FloodView>(initial);
@@ -47,7 +49,7 @@ export function useFloodData(
           if (id !== seq.current) return;
           setView(interim);
           setWake('waking');
-        });
+        }, lite);
         if (id !== seq.current) return null;
         setView(next);
         if (!next.backendTimedOut) awake.current = true;
@@ -64,7 +66,7 @@ export function useFloodData(
         if (id === seq.current) setLoading(false);
       }
     },
-    [],
+    [lite],
   );
 
   // On mount: start Render waking, and if the server render couldn't wait for

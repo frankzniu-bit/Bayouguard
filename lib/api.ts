@@ -27,7 +27,7 @@ import {
   type RawTier,
 } from './contract';
 import { geocode, inServiceArea } from './geocode';
-import { getWeather, getRainForecast } from './weather';
+import { getConditions } from './weather';
 import { getHcfws, type GaugeExtra } from './hcfws';
 import { buildOutlook } from './outlook';
 import { DEMO_GAUGES } from './fixtures';
@@ -231,7 +231,8 @@ export function demoView(
 export async function getFloodView(
   address?: string,
   coords?: { lat: number; lng: number },
-  opts: { timeoutMs?: number; lang?: string } = {},
+  /** lite: leave the gauge list out — the result page shows no map. */
+  opts: { timeoutMs?: number; lang?: string; lite?: boolean } = {},
 ): Promise<FloodView> {
   const timeoutMs = opts.timeoutMs ?? WARM_TIMEOUT_MS;
   const query = address?.trim();
@@ -262,12 +263,11 @@ export async function getFloodView(
     `/risk?address=${encodeURIComponent(resolvedAddress)}` +
     `&lat=${geo.lat}&lng=${geo.lng}&lang=${lang}`;
 
-  const [risk, load, weather, { extras }, rain] = await Promise.all([
+  const [risk, load, { weather, rain }, { extras }] = await Promise.all([
     backendGet<BackendRisk>(riskPath, timeoutMs, isBackendRisk),
     loadGauges(timeoutMs, hcfws),
-    getWeather(geo.lat, geo.lng),
+    getConditions(geo.lat, geo.lng),
     hcfws,
-    getRainForecast(geo.lat, geo.lng),
   ]);
 
   const sorted = byDistance(load.gauges, geo.lat, geo.lng);
@@ -340,7 +340,7 @@ export async function getFloodView(
     snapshot,
     center,
     address: resolvedAddress,
-    gauges: toGaugePoints(load.gauges, extras),
+    gauges: opts.lite ? [] : toGaugePoints(load.gauges, extras),
     dataSource,
     gaugeSource: load.source,
     backendTimedOut: (!risk.ok && risk.timedOut) || load.timedOut,

@@ -41,7 +41,7 @@ export default function CheckView({
   coords?: { lat: number; lng: number };
 }) {
   const { t, num } = useI18n();
-  const { view, loading, wake, notice, search } = useFloodData(initial, address, coords);
+  const { view, loading, wake, notice, search } = useFloodData(initial, address, coords, true);
   const snap = view.snapshot;
 
   useEffect(() => {

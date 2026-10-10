@@ -129,6 +129,16 @@ body {
     transform: translateY(0);
   }
 }
+/* The risk arc draws in once from empty to its score. */
+@keyframes arc-sweep {
+  from {
+    stroke-dasharray: 0 1;
+  }
+}
+.arc-sweep {
+  animation: arc-sweep 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .reveal {
   animation: ob-fade-up 0.25s ease-out both;
 }

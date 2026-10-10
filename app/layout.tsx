@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import { DM_Serif_Display, Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { LanguageProvider } from '@/lib/i18n';
-import MotionRoot from '@/components/MotionRoot';
 import ServiceWorker from '@/components/ServiceWorker';
 
 const inter = Inter({
@@ -17,12 +16,14 @@ const display = DM_Serif_Display({
   subsets: ['latin'],
   variable: '--font-display',
   display: 'swap',
+  preload: false,
 });
 
 const jbMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-jbmono',
   display: 'swap',
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -61,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="h-full font-sans bg-ob-bg text-ob-text antialiased">
         <LanguageProvider>
-          <MotionRoot>{children}</MotionRoot>
+          {children}
           <ServiceWorker />
         </LanguageProvider>
       </body>

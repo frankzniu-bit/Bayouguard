@@ -15,6 +15,7 @@ import type L from 'leaflet';
 import dynamic from 'next/dynamic';
 import { AnimatePresence, motion } from 'framer-motion';
 import TopBar, { type ViewMode } from './TopBar';
+import MotionRoot from './MotionRoot';
 import type { GraphSelection } from './WatershedGraph';
 import AddressSearch from './AddressSearch';
 import TexasLocator from './TexasLocator';
@@ -301,6 +302,7 @@ export default function HomeExperience({
     'ob-panel ob-float flex h-11 items-center justify-center gap-2 rounded-full text-[13px] font-semibold text-ob-accent transition-colors hover:bg-ob-bg';
 
   return (
+    <MotionRoot>
     <div className="fixed inset-0 overflow-hidden bg-ob-bg">
       {/* ── BACKGROUND (swappable) ──
           z-0 establishes a stacking context so Leaflet's internal panes
@@ -589,5 +591,6 @@ export default function HomeExperience({
 
       <Tour ready />
     </div>
+    </MotionRoot>
   );
 }

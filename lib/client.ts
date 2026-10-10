@@ -18,8 +18,10 @@ export async function fetchFloodView(
   coords: { lat: number; lng: number } | undefined,
   budgetMs: number,
   lang: string,
+  lite = false,
 ): Promise<FloodView> {
   const params = new URLSearchParams({ budget: String(budgetMs), lang });
+  if (lite) params.set('lite', '1');
   if (address) params.set('address', address);
   if (coords) {
     params.set('lat', String(coords.lat));
@@ -43,13 +45,14 @@ export async function fetchUntilAwake(
   deadline: number,
   lang: string,
   onInterim?: (view: FloodView) => void,
+  lite = false,
 ): Promise<FloodView> {
   let last: FloodView | null = null;
   for (;;) {
     const remaining = deadline - Date.now();
     const budget = Math.max(3_000, Math.min(SLICE_MS, remaining));
     try {
-      const view = await fetchFloodView(address, coords, budget, lang);
+      const view = await fetchFloodView(address, coords, budget, lang, lite);
       if (!view.backendTimedOut || Date.now() >= deadline) return view;
       last = view;
       onInterim?.(view);

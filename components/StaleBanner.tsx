@@ -33,7 +33,7 @@ export default function StaleBanner({ gauges }: { gauges: GaugePoint[] }) {
   return (
     <p
       role="status"
-      className="pointer-events-auto rounded-lg border border-tier-med/50 px-3 py-1.5 text-[12px] font-medium"
+      className="pointer-events-auto rounded-lg border border-tier-med/50 px-3 py-1.5 text-[0.75rem] font-medium"
       style={{ background: 'var(--tier-med-tint)', color: 'var(--tier-med-ink)' }}
     >
       {minutes >= 120

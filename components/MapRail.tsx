@@ -44,14 +44,14 @@ export default function MapRail({
 
   return (
     <div className="ob-panel ob-float thin-scroll flex max-h-full w-[248px] flex-col overflow-y-auto rounded-xl">
-      <section className="px-4 pb-3 pt-4" data-tour="filters">
-        <p className="text-[12px] font-medium text-ob-muted">{t('rail.network')}</p>
+      <section className="px-4 pb-3 pt-4">
+        <p className="text-[0.75rem] font-medium text-ob-muted">{t('rail.network')}</p>
         <p className="mt-1 flex items-baseline gap-1.5">
-          <span className="text-[28px] font-bold leading-none tracking-[-0.03em] tabular">{gauges.length}</span>
-          <span className="text-[13px] text-ob-muted">{t('rail.gauges')}</span>
+          <span className="text-[1.75rem] font-bold leading-none tracking-[-0.03em] tabular">{gauges.length}</span>
+          <span className="text-[0.8125rem] text-ob-muted">{t('rail.gauges')}</span>
         </p>
         {sample && (
-          <p className="mt-2 rounded-lg bg-tier-med/10 px-2 py-1.5 text-[11px] leading-snug text-ob-muted">
+          <p className="mt-2 rounded-lg bg-tier-med/10 px-2 py-1.5 text-[0.75rem] leading-snug text-ob-muted">
             {t('rail.notLive')}
           </p>
         )}
@@ -67,12 +67,12 @@ export default function MapRail({
                   aria-checked={on}
                   onClick={() => onToggleTier(tier)}
                   title={t(`tierHint.${tier}`)}
-                  className={`group w-full rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-ob-bg ${on ? '' : 'opacity-45'}`}
+                  className={`group min-h-[44px] w-full rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-ob-bg ${on ? '' : 'opacity-45'}`}
                 >
-                  <span className="flex items-center gap-2 text-[13px]">
+                  <span className="flex items-center gap-2 text-[0.8125rem]">
                     <span className="h-2.5 w-2.5 rounded-[3px]" style={{ backgroundColor: TIER_COLOR[tier] }} />
                     <span className="font-medium text-ob-text">{t(`tier.${tier}`)}</span>
-                    <span className="ml-auto font-mono text-[12px] tabular text-ob-muted">{counts[tier]}</span>
+                    <span className="ml-auto font-mono text-[0.75rem] tabular text-ob-muted">{counts[tier]}</span>
                   </span>
                   <span className="mt-1 block h-1 overflow-hidden rounded-full bg-ob-bg2">
                     <span
@@ -91,7 +91,7 @@ export default function MapRail({
       </section>
 
       {showLayers && (
-        <section className="border-t border-ob-border px-2 pb-2 pt-3" data-tour="layers">
+        <section className="border-t border-ob-border px-2 pb-2 pt-3">
           <LayerControl layers={layers} onChange={onLayers} />
         </section>
       )}

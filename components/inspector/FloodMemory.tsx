@@ -29,13 +29,13 @@ export default function FloodMemory({ zip }: { zip: string }) {
   const count = data.claimsSince2015.toLocaleString(locale);
   return (
     <section className="rounded-lg border border-ob-border bg-ob-surface2 p-3">
-      <p className="text-[12px] font-medium text-ob-muted">{t('memory.title')}</p>
-      <p className="mt-1 text-[14px] leading-snug text-ob-text">
+      <p className="text-[0.75rem] font-medium text-ob-muted">{t('memory.title')}</p>
+      <p className="mt-1 text-[0.875rem] leading-snug text-ob-text">
         {events
           ? t('memory.withEvents', { zip: data.zip, count, events })
           : t('memory.plain', { zip: data.zip, count })}
       </p>
-      <p className="mt-1 text-[11px] text-ob-muted">{t('memory.source')}</p>
+      <p className="mt-1 text-[0.75rem] text-ob-muted">{t('memory.source')}</p>
     </section>
   );
 }

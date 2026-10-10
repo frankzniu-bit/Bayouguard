@@ -38,11 +38,10 @@ export default function ActionRow({
     if (result === 'copied') setNote(t('action.copied'));
     else if (result === 'downloaded') setNote(t('action.downloaded'));
     else if (result === 'failed') setNote(t('action.shareFailed'));
-    if (result !== 'shared' && result !== 'cancelled') window.setTimeout(() => setNote(null), 3000);
   };
 
   const btn =
-    'flex h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-ob-border bg-ob-surface px-2 text-[13px] font-semibold text-ob-accent transition-colors hover:bg-ob-bg';
+    'flex h-11 flex-1 items-center justify-center gap-1.5 rounded-lg border border-ob-border bg-ob-surface px-2 text-[0.8125rem] font-semibold text-ob-accent transition-colors hover:bg-ob-bg';
 
   return (
     <div>
@@ -61,12 +60,12 @@ export default function ActionRow({
       {showAlerts && (
       <Link
         href={`/alerts?${new URLSearchParams({ address, ...(center ? { lat: String(center.lat), lng: String(center.lng) } : {}) }).toString()}`}
-        className="mt-2 flex h-11 w-full items-center justify-center rounded-lg bg-ob-accent px-3 text-[14px] font-semibold text-ob-onaccent transition hover:brightness-110"
+        className="mt-2 flex h-11 w-full items-center justify-center rounded-lg bg-ob-accent px-3 text-[0.875rem] font-semibold text-ob-onaccent transition hover:brightness-110"
       >
         {t('action.alerts')}
       </Link>
       )}
-      <p role="status" aria-live="polite" className="mt-1 min-h-[16px] text-center text-[12px] text-ob-muted">
+      <p role="status" aria-live="polite" className="mt-1 min-h-[16px] text-center text-[0.75rem] text-ob-muted">
         {note}
       </p>
     </div>

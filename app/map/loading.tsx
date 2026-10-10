@@ -8,7 +8,7 @@ export default function MapLoading() {
   const { t } = useI18n();
   return (
     <div className="fixed inset-0 bg-ob-bg2" role="status" aria-label={t('map.loading')}>
-      <p className="fade-in-late absolute inset-x-0 bottom-24 text-center text-[14px] text-ob-muted">{t('map.readingGauges')}</p>
+      <p className="fade-in-late absolute inset-x-0 bottom-24 text-center text-[0.875rem] text-ob-muted">{t('map.readingGauges')}</p>
     </div>
   );
 }

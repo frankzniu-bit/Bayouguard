@@ -21,7 +21,6 @@ import AddressSearch from './AddressSearch';
 import InspectorPanel from './InspectorPanel';
 import MapRail from './MapRail';
 import RiskBoard from './RiskBoard';
-import Tour from './Tour';
 import StaleBanner from './StaleBanner';
 import MapLegend from './MapLegend';
 import BottomSheet from './BottomSheet';
@@ -30,6 +29,7 @@ import ReportForm from './ReportForm';
 import WelcomeCard, { LocateIcon } from './WelcomeCard';
 import LayerControl, { DEFAULT_LAYERS, type MapLayers } from './LayerControl';
 import Skeleton from './Skeleton';
+import ZoomButtons from './ZoomButtons';
 import { useTheme } from '@/lib/useTheme';
 import { useFloodData } from '@/lib/useFloodData';
 import { useEndpoint } from '@/lib/useEndpoint';
@@ -79,9 +79,29 @@ export default function HomeExperience({
   const [hiddenTiers, setHiddenTiers] = useState<ReadonlySet<Tier>>(new Set());
   const [searched, setSearched] = useState(Boolean(initialAddress && initial.center));
   const mapRef = useRef<L.Map | null>(null);
+  // The welcome card steps aside when closed (remembered) or when someone
+  // starts dragging the map (they've found their way already).
+  const [welcomeClosed, setWelcomeClosed] = useState(false);
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('bayouguard_welcome_closed') === '1') setWelcomeClosed(true);
+    } catch {
+      // Storage blocked: the card just shows again next visit.
+    }
+  }, []);
+  const closeWelcome = useCallback((remember: boolean) => {
+    setWelcomeClosed(true);
+    if (!remember) return;
+    try {
+      localStorage.setItem('bayouguard_welcome_closed', '1');
+    } catch {
+      // Not remembered.
+    }
+  }, []);
   const onMap = useCallback((m: L.Map) => {
     mapRef.current = m;
-  }, []);
+    m.once('dragstart', () => closeWelcome(false));
+  }, [closeWelcome]);
 
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const isWide = useMediaQuery('(min-width: 768px)');
@@ -131,8 +151,13 @@ export default function HomeExperience({
       return next;
     });
 
+  // Remember the search, and put it in the URL so refresh, share and the
+  // back button all keep the address (replaceState: no server round trip).
   const remember = (v: FloodView | null) => {
-    if (v?.center && v.address && !v.outOfArea) writeLastSearch({ label: v.address, ...v.center });
+    if (!v?.center || !v.address || v.outOfArea) return;
+    writeLastSearch({ label: v.address, ...v.center });
+    const qs = new URLSearchParams({ address: v.address, lat: v.center.lat.toFixed(5), lng: v.center.lng.toFixed(5) });
+    window.history.replaceState(window.history.state, '', `/map?${qs.toString()}`);
   };
 
   // When the server render couldn't wait for the backend, the client's first
@@ -234,12 +259,23 @@ export default function HomeExperience({
     setSelection(null);
     setFocus(null);
   };
+  // Escape closes the inspector on wide screens (sheets handle it themselves).
+  useEffect(() => {
+    if (!selection || !isWide) return;
+    const esc = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setSelection(null);
+      setFocus(null);
+    };
+    window.addEventListener('keydown', esc);
+    return () => window.removeEventListener('keydown', esc);
+  }, [selection, isWide]);
 
   const otherMode: ViewMode = mode === 'map' ? 'graph' : 'map';
   const sample = view.dataSource !== 'live';
   // An address selection needs a scored snapshot to show.
   const shown = selection?.kind === 'address' && !view.snapshot ? null : selection;
-  const showWelcome = !view.address && !loading && !shown;
+  const showWelcome = !welcomeClosed && !view.address && !loading && !shown;
   const vh = typeof window === 'undefined' ? 800 : window.innerHeight;
   const inspectorInset = useMemo(
     () =>
@@ -298,7 +334,7 @@ export default function HomeExperience({
   );
 
   const toolBtn =
-    'ob-panel ob-float flex h-11 items-center justify-center gap-2 rounded-full text-[13px] font-semibold text-ob-accent transition-colors hover:bg-ob-bg';
+    'ob-panel ob-float flex h-11 items-center justify-center gap-2 rounded-full text-[0.8125rem] font-semibold text-ob-accent transition-colors hover:bg-ob-bg';
 
   return (
     <MotionRoot>
@@ -365,7 +401,7 @@ export default function HomeExperience({
         {view.offline ? (
           <p
             role="status"
-            className="pointer-events-auto rounded-lg border border-ob-border bg-ob-surface px-3 py-1.5 text-[12px] font-medium text-ob-text"
+            className="pointer-events-auto rounded-lg border border-ob-border bg-ob-surface px-3 py-1.5 text-[0.75rem] font-medium text-ob-text"
           >
             {t('offline.banner', { time: time(view.fetchedAt) })}
           </p>
@@ -375,7 +411,7 @@ export default function HomeExperience({
         {loading && (
           <span
             role="status"
-            className="ob-panel ob-float inline-flex max-w-md items-center gap-2 rounded-full px-3 py-1.5 text-[12px] text-ob-text"
+            className="ob-panel ob-float inline-flex max-w-md items-center gap-2 rounded-full px-3 py-1.5 text-[0.75rem] text-ob-text"
           >
             <span className="spin h-3 w-3 shrink-0 rounded-full border-2 border-ob-accent border-t-transparent" />
             {wake === 'waking' ? t('wake.message') : t('search.reading')}
@@ -384,7 +420,7 @@ export default function HomeExperience({
         {!loading && noticeKey && (
           <span
             role="alert"
-            className="ob-panel ob-float pointer-events-auto inline-flex max-w-md items-center gap-3 rounded-xl px-3 py-2 text-[13px] text-ob-text"
+            className="ob-panel ob-float pointer-events-auto inline-flex max-w-md items-center gap-3 rounded-xl px-3 py-2 text-[0.8125rem] text-ob-text"
           >
             {t(noticeKey)}
             {canRetry && (
@@ -407,7 +443,7 @@ export default function HomeExperience({
         {overlayFailed.length > 0 && (
           <span
             role="alert"
-            className="ob-panel ob-float pointer-events-auto inline-flex max-w-md items-center gap-3 rounded-xl px-3 py-2 text-[13px] text-ob-text"
+            className="ob-panel ob-float pointer-events-auto inline-flex max-w-md items-center gap-3 rounded-xl px-3 py-2 text-[0.8125rem] text-ob-text"
           >
             {t('layers.error')}
             <button
@@ -420,7 +456,12 @@ export default function HomeExperience({
           </span>
         )}
         {showWelcome && (
-          <WelcomeCard onPick={(q, c) => void onSearch(q, true, c)} onLocate={locate} locating={locating} />
+          <WelcomeCard
+            onPick={(q, c) => void onSearch(q, true, c)}
+            onLocate={locate}
+            onClose={() => closeWelcome(true)}
+            locating={locating}
+          />
         )}
       </div>
 
@@ -475,6 +516,7 @@ export default function HomeExperience({
               {t('layers.button')}
             </button>
           )}
+          {mode === 'map' && <ZoomButtons map={mapRef} className="pointer-events-auto self-end" vertical />}
           <button
             type="button"
             onClick={locate}
@@ -516,6 +558,7 @@ export default function HomeExperience({
           <div className="ob-panel ob-float pointer-events-auto w-[360px] rounded-xl p-4">{reportForm}</div>
         )}
         <div className="pointer-events-auto flex gap-2">
+          {mode === 'map' && <ZoomButtons map={mapRef} />}
           <button type="button" onClick={locate} disabled={locating} className={`${toolBtn} px-4 disabled:opacity-60`}>
             <LocateIcon />
             {locating ? t('locate.finding') : t('locate.me')}
@@ -527,7 +570,7 @@ export default function HomeExperience({
           )}
         </div>
         {!shown && (
-          <p className="ob-panel rounded-full px-4 py-1.5 text-center text-[12px] text-ob-muted">
+          <p className="ob-panel rounded-full px-4 py-1.5 text-center text-[0.75rem] text-ob-muted">
             {t(mode === 'map' ? 'map.hint.map' : 'map.hint.graph')}
           </p>
         )}
@@ -582,7 +625,6 @@ export default function HomeExperience({
 
       <BottomTabs />
 
-      <Tour ready />
     </div>
     </MotionRoot>
   );

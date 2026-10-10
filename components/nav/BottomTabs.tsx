@@ -24,7 +24,7 @@ export default function BottomTabs() {
               <Link
                 href={href}
                 aria-current={active ? 'page' : undefined}
-                className={`flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-medium transition-colors ${
+                className={`flex h-full flex-col items-center justify-center gap-0.5 text-[0.75rem] font-medium transition-colors ${
                   active ? 'text-ob-accent' : 'text-ob-muted hover:text-ob-text'
                 }`}
               >

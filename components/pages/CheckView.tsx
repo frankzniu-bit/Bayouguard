@@ -28,7 +28,7 @@ const TODO: Record<Tier, MsgKey[]> = {
 };
 
 function Arrow() {
-  return <span aria-hidden className="ml-auto text-[20px] leading-none">→</span>;
+  return <span aria-hidden className="ml-auto text-[1.25rem] leading-none">→</span>;
 }
 
 export default function CheckView({
@@ -51,7 +51,7 @@ export default function CheckView({
   }, [view]);
 
   const big =
-    'flex min-h-[56px] w-full items-center gap-3 rounded-xl px-5 text-left text-[18px] font-semibold transition hover:brightness-110 active:scale-[0.99]';
+    'flex min-h-[56px] w-full items-center gap-3 rounded-xl px-5 text-left text-[1.125rem] font-semibold transition hover:brightness-110 active:scale-[0.99]';
   const mapHref = `/map?${new URLSearchParams({
     address: view.address ?? address,
     ...(view.center ? { lat: String(view.center.lat), lng: String(view.center.lng) } : {}),
@@ -61,7 +61,7 @@ export default function CheckView({
   if (!snap && (view.pending || loading)) {
     body = (
       <div aria-busy className="mt-6 flex flex-col gap-4">
-        <p role="status" className="flex items-center gap-3 text-[18px] text-ob-text">
+        <p role="status" className="flex items-center gap-3 text-[1.125rem] text-ob-text">
           <span aria-hidden className="spin h-5 w-5 shrink-0 rounded-full border-[3px] border-ob-accent border-t-transparent" />
           {wake === 'waking' ? t('wake.message') : t('check.loading')}
         </p>
@@ -74,8 +74,8 @@ export default function CheckView({
     const titleKey: MsgKey = notice === 'outOfArea' ? 'check.outOfAreaTitle' : notice === 'notFound' ? 'check.notFoundTitle' : 'error.unreachable';
     body = (
       <section className="mt-6 rounded-xl border border-ob-border bg-ob-surface p-5">
-        <h2 className="text-[22px] font-semibold text-ob-text">{t(titleKey)}</h2>
-        <p className="mt-2 text-[17px] leading-relaxed text-ob-text">
+        <h2 className="text-[1.375rem] font-semibold text-ob-text">{t(titleKey)}</h2>
+        <p className="mt-2 text-[1.0625rem] leading-relaxed text-ob-text">
           {notice === 'outOfArea' ? t('error.outOfArea') : notice === 'notFound' ? t('error.notFound') : t('wake.failed')}
         </p>
         <div className="mt-4 flex flex-col gap-3">
@@ -97,7 +97,7 @@ export default function CheckView({
     body = (
       <div className="mt-5 flex flex-col gap-6">
         {wake === 'waking' && (
-          <p role="status" className="rounded-lg border border-ob-border bg-ob-surface px-4 py-3 text-[16px] text-ob-text">
+          <p role="status" className="rounded-lg border border-ob-border bg-ob-surface px-4 py-3 text-[1rem] text-ob-text">
             {t('wake.message')}
           </p>
         )}
@@ -111,27 +111,27 @@ export default function CheckView({
         <DriveCard drive={snap.drive} large />
 
         <section className="rounded-xl border border-ob-border bg-ob-surface p-5">
-          <h2 className="mb-3 text-[16px] font-medium text-ob-muted">{t('check.risk')}</h2>
+          <h2 className="mb-3 text-[1rem] font-medium text-ob-muted">{t('check.risk')}</h2>
           <RiskArc risk={snap.risk} large />
         </section>
 
         {o && (
           <section className="rounded-xl border border-ob-border bg-ob-surface p-5">
-            <h2 className="text-[16px] font-medium text-ob-muted">{t('check.next')}</h2>
-            <p className="mt-1 text-[20px] font-semibold leading-snug" style={{ color: TIER_INK[o.level === 'WARNING' ? 'HIGH' : o.level === 'WATCH' ? 'MEDIUM' : 'LOW'] }}>
+            <h2 className="text-[1rem] font-medium text-ob-muted">{t('check.next')}</h2>
+            <p className="mt-1 text-[1.25rem] font-semibold leading-snug" style={{ color: TIER_INK[o.level === 'WARNING' ? 'HIGH' : o.level === 'WATCH' ? 'MEDIUM' : 'LOW'] }}>
               {t(`outlook.${o.kind}`)}
             </p>
-            <p className="mt-1 text-[17px] leading-relaxed text-ob-text">
+            <p className="mt-1 text-[1.0625rem] leading-relaxed text-ob-text">
               {t(`outlook.rain.${rainBucket(o.rain6)}`, { inches: num(o.rain6, 2) })}
             </p>
           </section>
         )}
 
         <section>
-          <h2 className="text-[22px] font-semibold text-ob-text">{t('check.todo')}</h2>
+          <h2 className="text-[1.375rem] font-semibold text-ob-text">{t('check.todo')}</h2>
           <ul className="mt-3 flex flex-col gap-2">
             {TODO[tier].map((k) => (
-              <li key={k} className="flex gap-3 text-[18px] leading-snug text-ob-text">
+              <li key={k} className="flex gap-3 text-[1.125rem] leading-snug text-ob-text">
                 <span aria-hidden className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: TIER_INK[tier] }} />
                 {t(k)}
               </li>
@@ -162,8 +162,8 @@ export default function CheckView({
         <details className="group rounded-xl border border-ob-border bg-ob-surface">
           <summary className="flex min-h-[60px] cursor-pointer list-none items-center gap-3 px-5 py-3 [&::-webkit-details-marker]:hidden">
             <span className="min-w-0 flex-1">
-              <span className="block text-[18px] font-semibold text-ob-text">{t('check.details')}</span>
-              <span className="block text-[15px] text-ob-muted">{t('check.detailsHint')}</span>
+              <span className="block text-[1.125rem] font-semibold text-ob-text">{t('check.details')}</span>
+              <span className="block text-[0.9375rem] text-ob-muted">{t('check.detailsHint')}</span>
             </span>
             <span aria-hidden className="text-ob-muted transition-transform duration-200 group-open:rotate-180">▾</span>
           </summary>
@@ -172,7 +172,7 @@ export default function CheckView({
           </div>
         </details>
 
-        <p className="text-[15px] leading-relaxed text-ob-muted">
+        <p className="text-[0.9375rem] leading-relaxed text-ob-muted">
           {t(`footer.${view.dataSource}`)} {t('footer.disclaimer')}
         </p>
       </div>
@@ -182,10 +182,10 @@ export default function CheckView({
   return (
     <PageShell dataSource={view.dataSource} waking={wake === 'waking'}>
       <div className="mx-auto max-w-xl pt-2">
-        <Link href="/" className="inline-flex min-h-[48px] items-center gap-2 text-[17px] font-semibold text-ob-accent">
+        <Link href="/" className="inline-flex min-h-[48px] items-center gap-2 text-[1.0625rem] font-semibold text-ob-accent">
           <span aria-hidden>←</span> {t('check.back')}
         </Link>
-        <h1 className="mt-1 text-[26px] font-bold leading-tight tracking-[-0.01em] text-ob-text">{view.address ?? address}</h1>
+        <h1 className="mt-1 text-[1.625rem] font-bold leading-tight tracking-[-0.01em] text-ob-text">{view.address ?? address}</h1>
         {body}
       </div>
     </PageShell>

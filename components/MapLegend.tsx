@@ -45,10 +45,10 @@ export default function MapLegend({
         className="flex min-h-[44px] w-full items-center justify-between gap-2 px-3 py-2 text-left"
       >
         <span className="min-w-0">
-          <span id={titleId} className="block text-[12px] font-medium text-ob-muted">
+          <span id={titleId} className="block text-[0.75rem] font-medium text-ob-muted">
             {t('legend.title')}
           </span>
-          <span className="block text-[13px] font-medium text-ob-text tabular">
+          <span className="block text-[0.8125rem] font-medium text-ob-text tabular">
             {t('network.summary', { total: gauges.length, high, critical })}
           </span>
         </span>
@@ -57,7 +57,7 @@ export default function MapLegend({
         </span>
       </button>
       {open && (
-        <ul className="flex flex-col gap-1.5 border-t border-ob-border px-3 py-2.5 text-[12px] text-ob-text">
+        <ul className="flex flex-col gap-1.5 border-t border-ob-border px-3 py-2.5 text-[0.75rem] text-ob-text">
           {ORDER.map((tier) => (
             <li key={tier} className="flex items-center gap-2">
               <span className="h-3 w-3 shrink-0 rounded-full ring-2 ring-white" style={{ background: TIER_COLOR[tier] }} />
@@ -73,7 +73,7 @@ export default function MapLegend({
           </li>
           {layers.shelters && (
             <li className="flex items-center gap-2">
-              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-ob-accent text-[9px] text-ob-onaccent" aria-hidden>
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded bg-ob-accent text-[0.5625rem] text-ob-onaccent" aria-hidden>
                 ▲
               </span>
               <span>
@@ -104,7 +104,7 @@ export default function MapLegend({
           )}
           {layers.reservoirs && (
             <li className="flex items-center gap-2">
-              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-ob-water text-[9px] font-bold text-white" aria-hidden>
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-ob-water text-[0.5625rem] font-bold text-white" aria-hidden>
                 R
               </span>
               <span>

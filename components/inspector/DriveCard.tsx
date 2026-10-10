@@ -45,14 +45,14 @@ export default function DriveCard({ drive, large = false }: { drive: DriveVerdic
       className={`rounded-xl border-l-4 ${large ? 'p-5' : 'p-4'}`}
       style={{ borderColor: TIER_INK[tone], background: TIER_TINT[tone] }}
     >
-      <p id="drive-q" className={`font-medium text-ob-text ${large ? 'text-[16px]' : 'text-[12px]'}`}>
+      <p id="drive-q" className={`font-medium text-ob-text ${large ? 'text-[1rem]' : 'text-[0.75rem]'}`}>
         {t('insp.roads')}
       </p>
       <div className="mt-1 flex items-center gap-3" style={{ color: TIER_INK[tone] }}>
         <Icon state={drive.state} large={large} />
-        <p className={`font-bold leading-tight tracking-[-0.01em] ${large ? 'text-[32px]' : 'text-[24px]'}`}>{t(`drive.${drive.state}`)}</p>
+        <p className={`font-bold leading-tight tracking-[-0.01em] ${large ? 'text-[2rem]' : 'text-[1.5rem]'}`}>{t(`drive.${drive.state}`)}</p>
       </div>
-      <p className={`mt-1.5 leading-snug text-ob-text ${large ? 'text-[18px]' : 'text-[14px]'}`}>{t(`drive.${drive.state}.msg`)}</p>
+      <p className={`mt-1.5 leading-snug text-ob-text ${large ? 'text-[1.125rem]' : 'text-[0.875rem]'}`}>{t(`drive.${drive.state}.msg`)}</p>
     </section>
   );
 }

@@ -48,7 +48,7 @@ export default function InspectorPanel({
       <>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[12px] font-medium text-ob-muted">
+            <p className="text-[0.75rem] font-medium text-ob-muted">
               {t('insp.floodGauge')}
               {g.county ? ` · ${t('insp.network', { county: g.county })}` : ''}
             </p>
@@ -63,7 +63,7 @@ export default function InspectorPanel({
         </div>
 
         {dist != null && address && (
-          <p className="mt-2 text-[13px] text-ob-muted">
+          <p className="mt-2 text-[0.8125rem] text-ob-muted">
             {t('insp.nearestTo', { miles: num(dist, 1), address })}
           </p>
         )}
@@ -92,13 +92,13 @@ export default function InspectorPanel({
           )}
         </div>
 
-        <p className="mt-4 text-[12px] leading-relaxed text-ob-muted">
+        <p className="mt-4 text-[0.75rem] leading-relaxed text-ob-muted">
           <span className="font-mono">
             {g.lat.toFixed(4)}, {g.lng.toFixed(4)}
           </span>
           {g.readAt ? ` · ${t('insp.readAt', { time: time(g.readAt) })}` : ''}
         </p>
-        <p className="mt-2 text-[12px] leading-snug text-ob-muted">
+        <p className="mt-2 text-[0.75rem] leading-snug text-ob-muted">
           {t(`footer.${dataSource}`)} {t('footer.disclaimer')}
         </p>
       </>

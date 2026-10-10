@@ -34,7 +34,7 @@ function Badge({ status }: { status: Shelter['status'] }) {
   const tone = STATUS_TONE[status];
   return (
     <span
-      className="inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-[12px] font-semibold"
+      className="inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-[0.75rem] font-semibold"
       style={{ color: TIER_INK[tone], background: TIER_TINT[tone] }}
     >
       {t(`shelter.status.${status}`)}
@@ -105,13 +105,13 @@ export default function SheltersView() {
 
   return (
     <PageShell>
-      <h1 className="text-[26px] font-semibold tracking-[-0.01em] text-ob-text">{t('shelters.title')}</h1>
-      <p className="mt-1 text-[15px] text-ob-muted">
+      <h1 className="text-[1.625rem] font-semibold tracking-[-0.01em] text-ob-text">{t('shelters.title')}</h1>
+      <p className="mt-1 text-[0.9375rem] text-ob-muted">
         {origin ? t('shelters.sortedFrom', { address: origin.label }) : t('shelters.sortedHint')}
       </p>
 
       {demo && (
-        <p className="mt-4 rounded-lg border-l-4 px-3 py-2 text-[14px] text-ob-text" style={{ borderColor: 'var(--tier-med-ink)', background: 'var(--tier-med-tint)' }}>
+        <p className="mt-4 rounded-lg border-l-4 px-3 py-2 text-[0.875rem] text-ob-text" style={{ borderColor: 'var(--tier-med-ink)', background: 'var(--tier-med-tint)' }}>
           {t('shelters.demo')}
         </p>
       )}
@@ -121,7 +121,7 @@ export default function SheltersView() {
           type="button"
           aria-pressed={filters.size === 0}
           onClick={() => setFilters(new Set())}
-          className={`h-11 rounded-full border px-4 text-[14px] font-semibold transition-colors ${
+          className={`h-11 rounded-full border px-4 text-[0.875rem] font-semibold transition-colors ${
             filters.size === 0 ? 'border-ob-accent bg-ob-accent text-ob-onaccent' : 'border-ob-border bg-ob-surface text-ob-accent hover:bg-ob-bg'
           }`}
         >
@@ -133,7 +133,7 @@ export default function SheltersView() {
             type="button"
             aria-pressed={filters.has(f.key)}
             onClick={() => toggle(f.key)}
-            className={`h-11 rounded-full border px-4 text-[14px] font-semibold transition-colors ${
+            className={`h-11 rounded-full border px-4 text-[0.875rem] font-semibold transition-colors ${
               filters.has(f.key) ? 'border-ob-accent bg-ob-accent text-ob-onaccent' : 'border-ob-border bg-ob-surface text-ob-accent hover:bg-ob-bg'
             }`}
           >
@@ -147,7 +147,7 @@ export default function SheltersView() {
               type="button"
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className={`h-9 rounded-full px-3 text-[13px] font-semibold ${view === v ? 'bg-ob-accent text-ob-onaccent' : 'text-ob-muted hover:text-ob-text'}`}
+              className={`h-9 rounded-full px-3 text-[0.8125rem] font-semibold ${view === v ? 'bg-ob-accent text-ob-onaccent' : 'text-ob-muted hover:text-ob-text'}`}
             >
               {t(v === 'list' ? 'shelters.list' : 'shelters.map')}
             </button>
@@ -156,7 +156,7 @@ export default function SheltersView() {
       </div>
 
       {updated && (
-        <p className="mt-3 text-[13px] text-ob-muted">{t('shelters.updated', { time: time(updated) })}</p>
+        <p className="mt-3 text-[0.8125rem] text-ob-muted">{t('shelters.updated', { time: time(updated) })}</p>
       )}
 
       {loading ? (
@@ -166,7 +166,7 @@ export default function SheltersView() {
           ))}
         </div>
       ) : error ? (
-        <p className="mt-6 text-[15px] text-ob-text">
+        <p className="mt-6 text-[0.9375rem] text-ob-text">
           {t('shelters.error')}{' '}
           <button type="button" onClick={retry} className="font-semibold text-ob-accent hover:underline">
             {t('action.retry')}
@@ -174,8 +174,8 @@ export default function SheltersView() {
         </p>
       ) : !anyActive ? (
         <section className="mt-6 rounded-xl border border-ob-border bg-ob-surface p-5">
-          <p className="text-[16px] font-semibold text-ob-text">{t('shelters.none.title')}</p>
-          <p className="mt-1 text-[15px] leading-relaxed text-ob-muted">
+          <p className="text-[1rem] font-semibold text-ob-text">{t('shelters.none.title')}</p>
+          <p className="mt-1 text-[0.9375rem] leading-relaxed text-ob-muted">
             {t('shelters.none.body')}{' '}
             <a href="https://www.readyharris.org" target="_blank" rel="noreferrer" className="font-semibold text-ob-accent underline">
               readyharris.org
@@ -190,7 +190,7 @@ export default function SheltersView() {
             </div>
           )}
           {shown.length === 0 ? (
-            <p className="mt-6 text-[15px] text-ob-muted">{t('shelters.noMatch')}</p>
+            <p className="mt-6 text-[0.9375rem] text-ob-muted">{t('shelters.noMatch')}</p>
           ) : (
             <ul className="mt-4 flex flex-col gap-3">
               {shown.map(({ s, miles }) => {
@@ -199,15 +199,15 @@ export default function SheltersView() {
                   <li key={s.id} className="rounded-xl border border-ob-border bg-ob-surface p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <h2 className="text-[16px] font-semibold leading-snug text-ob-text">{s.name}</h2>
-                        <p className="mt-0.5 text-[14px] text-ob-muted">{s.address}</p>
+                        <h2 className="text-[1rem] font-semibold leading-snug text-ob-text">{s.name}</h2>
+                        <p className="mt-0.5 text-[0.875rem] text-ob-muted">{s.address}</p>
                         {miles != null && (
-                          <p className="mt-0.5 text-[14px] text-ob-text">{t('shelters.distance', { miles: num(miles, 1) })}</p>
+                          <p className="mt-0.5 text-[0.875rem] text-ob-text">{t('shelters.distance', { miles: num(miles, 1) })}</p>
                         )}
                       </div>
                       <Badge status={s.status} />
                     </div>
-                    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[14px] text-ob-text">
+                    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[0.875rem] text-ob-text">
                       <li className={`flex items-center gap-1.5 ${s.petFriendly ? '' : 'text-ob-muted'}`}>
                         <PawIcon />
                         {t(s.petFriendly ? 'shelters.pets' : 'shelters.noPets')}
@@ -219,7 +219,7 @@ export default function SheltersView() {
                     </ul>
                     {pct != null && s.capacity && (
                       <div className="mt-3">
-                        <div className="flex justify-between text-[13px] text-ob-muted">
+                        <div className="flex justify-between text-[0.8125rem] text-ob-muted">
                           <span>{t('shelters.capacity')}</span>
                           <span className="font-mono tabular text-ob-text">
                             {(s.occupancy ?? 0).toLocaleString(locale)} / {s.capacity.toLocaleString(locale)}
@@ -231,12 +231,12 @@ export default function SheltersView() {
                       </div>
                     )}
                     <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                      {demo && <span className="text-[12px] font-medium text-ob-muted">{t('shelters.sample')}</span>}
+                      {demo && <span className="text-[0.75rem] font-medium text-ob-muted">{t('shelters.sample')}</span>}
                       <a
                         href={`https://maps.google.com/maps?daddr=${encodeURIComponent(s.address)}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="ml-auto flex h-11 items-center rounded-lg bg-ob-accent px-4 text-[14px] font-semibold text-ob-onaccent hover:brightness-110"
+                        className="ml-auto flex h-11 items-center rounded-lg bg-ob-accent px-4 text-[0.875rem] font-semibold text-ob-onaccent hover:brightness-110"
                       >
                         {t('shelters.directions')}
                       </a>

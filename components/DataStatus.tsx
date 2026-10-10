@@ -40,7 +40,7 @@ export default function DataStatus({
         onBlur={() => setOpen(false)}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
-        className="ob-panel ob-float flex h-11 items-center gap-2 rounded-full px-3.5 text-[13px] font-medium text-ob-text"
+        className="ob-panel ob-float flex h-11 items-center gap-2 rounded-full px-3.5 text-[0.8125rem] font-medium text-ob-text"
       >
         <span className="relative flex h-2.5 w-2.5" aria-hidden>
           {state === 'live' && (
@@ -53,7 +53,7 @@ export default function DataStatus({
       <p
         id={tipId}
         role="tooltip"
-        className={`ob-panel ob-float absolute right-0 top-[calc(100%+8px)] z-[90] w-64 rounded-xl p-3 text-[12px] leading-relaxed text-ob-muted transition-opacity duration-150 ${
+        className={`ob-panel ob-float absolute right-0 top-[calc(100%+8px)] z-[90] w-64 rounded-xl p-3 text-[0.75rem] leading-relaxed text-ob-muted transition-opacity duration-150 ${
           open ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
       >

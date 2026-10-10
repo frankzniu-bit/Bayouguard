@@ -189,7 +189,7 @@ body {
   border-radius: 8px !important;
 }
 .leaflet-tooltip {
-  font-size: 12px;
+  font-size: 0.8125rem;
   font-weight: 500;
   padding: 4px 8px;
 }
@@ -201,7 +201,7 @@ body {
 }
 .leaflet-popup-content {
   margin: 12px 14px;
-  font-size: 13px;
+  font-size: 0.875rem;
 }
 /* Esri's dark canvas is neutral grey; pull it toward the navy panels. */
 [data-theme='dark'] .tiles-base {
@@ -218,7 +218,7 @@ body {
 .leaflet-control-attribution {
   background: rgb(var(--ob-surface-rgb) / 0.85) !important;
   color: rgb(var(--ob-muted-rgb)) !important;
-  font-size: 10px;
+  font-size: 0.6875rem;
 }
 .leaflet-control-attribution a {
   color: rgb(var(--ob-muted-rgb)) !important;

@@ -29,13 +29,13 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
       <div className="flex items-start gap-4">
         <span
           aria-hidden
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ob-accent text-[18px] font-bold text-ob-onaccent"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ob-accent text-[1.125rem] font-bold text-ob-onaccent"
         >
           {n}
         </span>
         <div className="min-w-0 flex-1">
-          <h2 className="text-[20px] font-semibold leading-snug text-ob-text">{title}</h2>
-          <div className="mt-2 text-[17px] leading-relaxed text-ob-text">{children}</div>
+          <h2 className="text-[1.25rem] font-semibold leading-snug text-ob-text">{title}</h2>
+          <div className="mt-2 text-[1.0625rem] leading-relaxed text-ob-text">{children}</div>
         </div>
       </div>
     </li>
@@ -43,7 +43,7 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
 }
 
 const BIG =
-  'mt-4 flex min-h-[56px] w-full items-center gap-3 rounded-xl px-5 text-left text-[18px] font-semibold transition hover:brightness-110';
+  'mt-4 flex min-h-[56px] w-full items-center gap-3 rounded-xl px-5 text-left text-[1.125rem] font-semibold transition hover:brightness-110';
 
 function OutLink({ href, children, primary = false }: { href: string; children: React.ReactNode; primary?: boolean }) {
   const { t } = useI18n();
@@ -64,7 +64,7 @@ function OutLink({ href, children, primary = false }: { href: string; children: 
 function HowTo({ steps }: { steps: MsgKey[] }) {
   const { t } = useI18n();
   return (
-    <ol className="mt-2 list-decimal pl-6 text-[17px] leading-relaxed">
+    <ol className="mt-2 list-decimal pl-6 text-[1.0625rem] leading-relaxed">
       {steps.map((k) => (
         <li key={k}>{t(k)}</li>
       ))}
@@ -108,8 +108,8 @@ export default function AlertsView({
   return (
     <PageShell>
       <div className="mx-auto max-w-xl pt-4">
-        <h1 className="text-[30px] font-bold leading-tight tracking-[-0.01em] text-ob-text">{t('alerts.title')}</h1>
-        <p className="mt-2 text-[18px] leading-relaxed text-ob-muted">{t('alerts.intro')}</p>
+        <h1 className="text-[1.875rem] font-bold leading-tight tracking-[-0.01em] text-ob-text">{t('alerts.title')}</h1>
+        <p className="mt-2 text-[1.125rem] leading-relaxed text-ob-muted">{t('alerts.intro')}</p>
 
         <ol className="mt-6 flex flex-col gap-4">
           <Step n={1} title={t('alerts.bayou.title')}>
@@ -121,7 +121,7 @@ export default function AlertsView({
                 <OutLink href={`${HCFWS}/GageDetail/Index/${siteId(nearest.id)}`} primary>
                   {t('alerts.bayou.open', { name: nearest.name })}
                 </OutLink>
-                <p className="mt-3 text-[16px] text-ob-muted">{t('alerts.bayou.then')}</p>
+                <p className="mt-3 text-[1rem] text-ob-muted">{t('alerts.bayou.then')}</p>
               </>
             ) : (
               <>
@@ -157,7 +157,7 @@ export default function AlertsView({
           </Step>
         </ol>
 
-        <p className="mt-6 text-[16px] leading-relaxed text-ob-muted">{t('alerts.why')}</p>
+        <p className="mt-6 text-[1rem] leading-relaxed text-ob-muted">{t('alerts.why')}</p>
       </div>
     </PageShell>
   );

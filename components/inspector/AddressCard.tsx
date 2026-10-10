@@ -31,7 +31,7 @@ function Section({ title, aside, children }: { title: string; aside?: React.Reac
   return (
     <section className="mt-5">
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h3 className="text-[12px] font-medium text-ob-muted">{title}</h3>
+        <h3 className="text-[0.75rem] font-medium text-ob-muted">{title}</h3>
         {aside}
       </div>
       {children}
@@ -67,8 +67,8 @@ export default function AddressCard({
     <div>
       {!detailsOnly && (
         <>
-          <p className="text-[12px] font-medium text-ob-muted">{t('insp.yourLocation')}</p>
-          <h2 className="mb-3 text-[18px] font-semibold leading-snug text-ob-text">{risk.address}</h2>
+          <p className="text-[0.75rem] font-medium text-ob-muted">{t('insp.yourLocation')}</p>
+          <h2 className="mb-3 text-[1.125rem] font-semibold leading-snug text-ob-text">{risk.address}</h2>
           <DriveCard drive={drive} />
           <div className="mt-5">
             <RiskArc risk={risk} />
@@ -81,9 +81,9 @@ export default function AddressCard({
           <OutlookCard outlook={outlook} />
           <div className="mt-3">
             <div className="mb-1 flex items-baseline justify-between">
-              <p className="text-[12px] font-medium text-ob-muted">{t('forecast.title')}</p>
+              <p className="text-[0.75rem] font-medium text-ob-muted">{t('forecast.title')}</p>
               {forecast.source === 'demo' && (
-                <span className="rounded-full border border-ob-border px-2 py-0.5 text-[11px] font-medium text-ob-muted">
+                <span className="rounded-full border border-ob-border px-2 py-0.5 text-[0.75rem] font-medium text-ob-muted">
                   {t('label.demo')}
                 </span>
               )}
@@ -93,7 +93,7 @@ export default function AddressCard({
             ) : forecast.data ? (
               <ForecastChart forecast={forecast.data} />
             ) : (
-              <p className="text-[13px] text-ob-muted">
+              <p className="text-[0.8125rem] text-ob-muted">
                 {t('forecast.error')}{' '}
                 <button type="button" onClick={forecast.retry} className="font-semibold text-ob-accent hover:underline">
                   {t('action.retry')}
@@ -119,9 +119,9 @@ export default function AddressCard({
               return (
                 <li key={b.id}>
                   <div className="mb-1 flex items-start justify-between gap-2">
-                    <span className="min-w-0 text-[13px] leading-snug text-ob-text">
+                    <span className="min-w-0 text-[0.8125rem] leading-snug text-ob-text">
                       {b.name}
-                      <span className="block text-[12px] text-ob-muted">
+                      <span className="block text-[0.75rem] text-ob-muted">
                         {num(b.miles, 1)} {t('common.mi')}
                         {b.trend != null && (
                           <>
@@ -131,7 +131,7 @@ export default function AddressCard({
                         )}
                       </span>
                     </span>
-                    <span className="shrink-0 font-mono text-[12px] tabular text-ob-muted">
+                    <span className="shrink-0 font-mono text-[0.75rem] tabular text-ob-muted">
                       {num(b.stage, 1)} / {num(b.flood, 1)} {t('common.ft')}
                     </span>
                   </div>
@@ -169,7 +169,7 @@ export default function AddressCard({
           <div className="mt-5">
             <ActionRow snapshot={snapshot} center={center} />
           </div>
-          <p className="mt-3 text-[12px] leading-snug text-ob-muted">
+          <p className="mt-3 text-[0.75rem] leading-snug text-ob-muted">
             {t(`footer.${dataSource}`)} {t('footer.disclaimer')}
           </p>
         </>

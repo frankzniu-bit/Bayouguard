@@ -32,6 +32,12 @@ export default function BottomSheet({
   const [vh, setVh] = useState(800);
 
   useEffect(() => {
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', esc);
+    return () => window.removeEventListener('keydown', esc);
+  }, [onClose]);
+
+  useEffect(() => {
     const read = () => setVh(window.innerHeight);
     read();
     window.addEventListener('resize', read);

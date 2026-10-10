@@ -48,7 +48,7 @@ export function TierBadge({ tier }: { tier: Tier }) {
   const { t } = useI18n();
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold"
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.75rem] font-semibold"
       style={{ backgroundColor: TIER_TINT[tier], color: TIER_INK[tier] }}
     >
       <span
@@ -73,7 +73,7 @@ export function Metric({
   const numeric = typeof value === 'number' || /^[\d.,\s-]+$/.test(value);
   return (
     <div className="rounded-lg border border-ob-border bg-ob-surface2 p-3">
-      <p className="text-[12px] text-ob-muted font-medium">{label}</p>
+      <p className="text-[0.75rem] text-ob-muted font-medium">{label}</p>
       <p className={`mt-1 tabular text-ob-text ${numeric ? 'font-mono text-xl' : 'text-base font-medium'}`}>
         {value}
         {unit && <span className="ml-1 text-xs text-ob-muted">{unit}</span>}
@@ -92,12 +92,12 @@ export function OutlookCard({ outlook }: { outlook: Outlook }) {
         <p className="font-semibold leading-snug" style={{ color }}>
           {t(`outlook.${outlook.kind}`)}
         </p>
-        <span className="shrink-0 rounded-full border px-2 py-0.5 text-[12px] font-semibold" style={{ borderColor: color, color }}>
+        <span className="shrink-0 rounded-full border px-2 py-0.5 text-[0.75rem] font-semibold" style={{ borderColor: color, color }}>
           {t(`outlook.level.${outlook.level}`)}
         </span>
       </div>
-      <p className="mt-1 text-[13px] leading-relaxed text-ob-text">{outlookDetail(outlook, t, num)}</p>
-      <p className="mt-1.5 text-[12px] text-ob-text">{t('outlook.note')}</p>
+      <p className="mt-1 text-[0.8125rem] leading-relaxed text-ob-text">{outlookDetail(outlook, t, num)}</p>
+      <p className="mt-1.5 text-[0.75rem] text-ob-text">{t('outlook.note')}</p>
     </div>
   );
 }
@@ -110,7 +110,7 @@ export function RainBars({ rain }: { rain: RainForecast }) {
   return (
     <div className="mt-4">
       <div className="mb-1.5 flex items-baseline justify-between text-xs">
-        <span className="text-[12px] text-ob-muted font-medium">{t('insp.rain12')}</span>
+        <span className="text-[0.75rem] text-ob-muted font-medium">{t('insp.rain12')}</span>
         <span className="font-mono tabular text-ob-muted">
           {t('insp.rainTotal', { inches: num(rain.totalNext12h, 2) })}
         </span>
@@ -128,7 +128,7 @@ export function RainBars({ rain }: { rain: RainForecast }) {
           />
         ))}
       </div>
-      <div className="mt-1 flex justify-between font-mono text-[10px] text-ob-muted">
+      <div className="mt-1 flex justify-between font-mono text-[0.75rem] text-ob-muted">
         <span>{t('common.now')}</span>
         <span>+6h</span>
         <span>+12h</span>
@@ -159,7 +159,7 @@ export function HistorySparkline({ gaugeId, color }: { gaugeId: number; color: s
   if (loading) {
     return (
       <div className="mt-4">
-        <p className="text-[12px] text-ob-muted font-medium">{t('insp.history')}</p>
+        <p className="text-[0.75rem] text-ob-muted font-medium">{t('insp.history')}</p>
         <div className="mt-1.5 h-14 animate-pulse rounded-lg bg-ob-bg2/60" />
       </div>
     );
@@ -192,7 +192,7 @@ export function HistorySparkline({ gaugeId, color }: { gaugeId: number; color: s
   return (
     <div className="mt-4">
       <div className="mb-1.5 flex items-baseline justify-between text-xs">
-        <span className="text-[12px] text-ob-muted font-medium">{t('insp.history')}</span>
+        <span className="text-[0.75rem] text-ob-muted font-medium">{t('insp.history')}</span>
         <span className="font-mono tabular text-ob-muted">
           {t('insp.historyNow', { ft: num(last.level, 2) })}
         </span>
@@ -220,7 +220,7 @@ export function HistorySparkline({ gaugeId, color }: { gaugeId: number; color: s
         <path d={path} fill="none" stroke={color} strokeWidth={1.5} />
         <circle cx={x(points.length - 1)} cy={y(last.level)} r={2.5} fill={color} />
       </svg>
-      <div className="mt-1 flex justify-between font-mono text-[10px] text-ob-muted">
+      <div className="mt-1 flex justify-between font-mono text-[0.75rem] text-ob-muted">
         <span>-48h</span>
         {floodInRange && floodLevel != null && (
           <span style={{ color: TIER_INK.CRITICAL }}>

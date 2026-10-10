@@ -537,13 +537,13 @@ export default function WatershedGraph({
       {gauges.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center p-6">
           <div className="ob-panel ob-float max-w-xs rounded-xl p-5 text-center">
-            <p className="text-[15px] font-semibold text-ob-text">{t('graph.empty.title')}</p>
-            <p className="mt-1 text-[13px] leading-relaxed text-ob-muted">{t('graph.empty.body')}</p>
+            <p className="text-[0.9375rem] font-semibold text-ob-text">{t('graph.empty.title')}</p>
+            <p className="mt-1 text-[0.8125rem] leading-relaxed text-ob-muted">{t('graph.empty.body')}</p>
             {onSwitchToMap && (
               <button
                 type="button"
                 onClick={onSwitchToMap}
-                className="mt-4 h-11 rounded-lg bg-ob-accent px-4 text-[14px] font-semibold text-ob-onaccent"
+                className="mt-4 h-11 rounded-lg bg-ob-accent px-4 text-[0.875rem] font-semibold text-ob-onaccent"
               >
                 {t('graph.empty.action')}
               </button>

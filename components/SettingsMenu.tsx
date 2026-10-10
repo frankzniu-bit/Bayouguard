@@ -58,7 +58,7 @@ export default function SettingsMenu({
           aria-label={t('top.settings')}
           className="ob-panel ob-float absolute right-0 top-[calc(100%+8px)] z-[95] w-60 rounded-xl p-3"
         >
-          <p className="text-[12px] font-medium text-ob-muted">{t('top.language')}</p>
+          <p className="text-[0.75rem] font-medium text-ob-muted">{t('top.language')}</p>
           <div role="radiogroup" aria-label={t('top.language')} className="mt-1.5 flex flex-col gap-1">
             {LANGS.map((l) => (
               <button
@@ -68,7 +68,7 @@ export default function SettingsMenu({
                 aria-checked={lang === l}
                 lang={l}
                 onClick={() => setLang(l)}
-                className={`flex h-11 items-center rounded-lg px-3 text-left text-[14px] transition-colors ${
+                className={`flex h-11 items-center rounded-lg px-3 text-left text-[0.875rem] transition-colors ${
                   lang === l ? 'bg-ob-accent text-ob-onaccent' : 'text-ob-text hover:bg-ob-bg'
                 }`}
               >
@@ -76,7 +76,7 @@ export default function SettingsMenu({
               </button>
             ))}
           </div>
-          <p className="mt-3 text-[12px] font-medium text-ob-muted">{t('top.theme')}</p>
+          <p className="mt-3 text-[0.75rem] font-medium text-ob-muted">{t('top.theme')}</p>
           <div role="radiogroup" aria-label={t('top.theme')} className="mt-1.5 grid grid-cols-2 gap-1">
             {(['light', 'dark'] as Mode[]).map((m) => (
               <button
@@ -85,7 +85,7 @@ export default function SettingsMenu({
                 role="radio"
                 aria-checked={theme === m}
                 onClick={() => onTheme(m)}
-                className={`h-11 rounded-lg text-[14px] transition-colors ${
+                className={`h-11 rounded-lg text-[0.875rem] transition-colors ${
                   theme === m ? 'bg-ob-accent text-ob-onaccent' : 'border border-ob-border text-ob-text hover:bg-ob-bg'
                 }`}
               >

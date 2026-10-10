@@ -21,16 +21,16 @@ export default function RiskBoard({
   const ranked = [...gauges].sort((a, b) => a.buffer - b.buffer).slice(0, ROWS);
 
   return (
-    <section className="ob-panel ob-float w-[320px] rounded-xl p-4" data-tour="board" aria-labelledby="risk-board-title">
+    <section className="ob-panel ob-float w-[320px] rounded-xl p-4" aria-labelledby="risk-board-title">
       <div className="flex items-baseline justify-between">
-        <h2 id="risk-board-title" className="text-[15px] font-semibold tracking-[-0.01em]">
+        <h2 id="risk-board-title" className="text-[0.9375rem] font-semibold tracking-[-0.01em]">
           {t('board.title')}
         </h2>
-        <span className="text-[12px] text-ob-muted">{t('board.unit')}</span>
+        <span className="text-[0.75rem] text-ob-muted">{t('board.unit')}</span>
       </div>
 
       {ranked.length === 0 ? (
-        <p className="mt-3 text-[13px] text-ob-muted">{t('board.empty')}</p>
+        <p className="mt-3 text-[0.8125rem] text-ob-muted">{t('board.empty')}</p>
       ) : (
         <ol className="mt-3 flex flex-col">
           {ranked.map((g, i) => {
@@ -41,15 +41,15 @@ export default function RiskBoard({
                 <button
                   type="button"
                   onClick={() => onPick(g)}
-                  className="group -mx-2 flex w-[calc(100%+16px)] flex-col gap-1.5 rounded-xl px-2 py-2 text-left transition-colors hover:bg-ob-bg"
+                  className="group -mx-2 flex min-h-[48px] w-[calc(100%+16px)] flex-col gap-1.5 rounded-xl px-2 py-2 text-left transition-colors hover:bg-ob-bg"
                   aria-label={t('board.rowLabel', { name: g.name, tier: t(`tier.${g.tier}`), ft: num(g.buffer, 1) })}
                 >
-                  <span className="flex items-center gap-2 text-[13px]">
-                    <span className="w-4 font-mono text-[11px] text-ob-muted tabular">{i + 1}</span>
+                  <span className="flex items-center gap-2 text-[0.8125rem]">
+                    <span className="w-4 font-mono text-[0.75rem] text-ob-muted tabular">{i + 1}</span>
                     <span className="h-2 w-2 rounded-[3px]" style={{ backgroundColor: TIER_COLOR[g.tier] }} />
                     <span className="truncate font-medium" title={g.name}>{g.name}</span>
                     <span
-                      className="ml-auto font-mono text-[12px] font-semibold tabular"
+                      className="ml-auto font-mono text-[0.75rem] font-semibold tabular"
                       style={{ color: over || g.tier !== 'LOW' ? TIER_INK[g.tier] : undefined }}
                     >
                       {over ? t('board.over', { ft: num(Math.abs(g.buffer), 1) }) : num(g.buffer, 1)}

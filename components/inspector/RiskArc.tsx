@@ -40,7 +40,7 @@ export default function RiskArc({ risk, large = false }: { risk: RiskSnapshot; l
             />
           </svg>
           <span
-            className="absolute inset-x-0 bottom-0 text-center font-mono text-[34px] font-semibold leading-none tabular"
+            className="absolute inset-x-0 bottom-0 text-center font-mono text-[2.125rem] font-semibold leading-none tabular"
             style={{ color: TIER_INK[risk.tier], transition: 'color 600ms ease-out' }}
           >
             {risk.score}
@@ -48,11 +48,11 @@ export default function RiskArc({ risk, large = false }: { risk: RiskSnapshot; l
         </div>
         <div className="min-w-0 pb-0.5">
           <TierBadge tier={risk.tier} />
-          <p className="mt-1.5 text-[13px] text-ob-muted">{t('insp.scoreOf')}</p>
+          <p className="mt-1.5 text-[0.8125rem] text-ob-muted">{t('insp.scoreOf')}</p>
         </div>
       </div>
-      <p className={`mt-2 font-medium text-ob-muted ${large ? 'text-[15px]' : 'text-[12px]'}`}>{t(`riskSource.${risk.source}`)}</p>
-      <p className={`mt-2 leading-relaxed text-ob-text ${large ? 'text-[17px]' : 'text-[14px]'}`} title={risk.backendMessage}>
+      <p className={`mt-2 font-medium text-ob-muted ${large ? 'text-[0.9375rem]' : 'text-[0.75rem]'}`}>{t(`riskSource.${risk.source}`)}</p>
+      <p className={`mt-2 leading-relaxed text-ob-text ${large ? 'text-[1.0625rem]' : 'text-[0.875rem]'}`} title={risk.backendMessage}>
         {sentence}
       </p>
     </section>

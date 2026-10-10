@@ -157,7 +157,9 @@ export default function AddressSearch({
 
   const input = (cls: string) => (
     <input
+      ref={inputRef}
       id={inputId}
+      enterKeyHint="search"
       value={value}
       onChange={(e) => {
         typed.current = true;
@@ -174,9 +176,29 @@ export default function AddressSearch({
       aria-controls={listId}
       aria-activedescendant={open && active >= 0 ? `${listId}-${active}` : undefined}
       autoComplete="off"
-      className={`text-[14px] text-ob-text outline-none placeholder:text-ob-muted ${cls}`}
+      className={`min-w-0 text-[1rem] text-ob-text outline-none placeholder:text-ob-muted ${cls}`}
     />
   );
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const clear = () => {
+    skipNextFetch.current = true;
+    setValue('');
+    setSuggestions([]);
+    setOpen(false);
+    onValue?.('');
+    inputRef.current?.focus();
+  };
+  const clearButton = value ? (
+    <button
+      type="button"
+      onClick={clear}
+      aria-label={t('search.clear')}
+      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[1.25rem] leading-none text-ob-muted transition hover:bg-ob-bg hover:text-ob-text"
+    >
+      ×
+    </button>
+  ) : null;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,15 +236,18 @@ export default function AddressSearch({
       {variant === 'field' ? (
         <div className="flex flex-col gap-1">
           {label && (
-            <label htmlFor={inputId} className={`font-medium text-ob-text ${large ? 'text-[17px]' : 'text-[13px]'}`}>
+            <label htmlFor={inputId} className={`font-medium text-ob-text ${large ? 'text-[1.0625rem]' : 'text-[0.8125rem]'}`}>
               {label}
             </label>
           )}
-          {input(
-            large
-              ? 'h-14 rounded-xl border-2 border-ob-border bg-ob-surface px-4 !text-[18px] focus:border-ob-water'
-              : 'h-11 rounded-lg border border-ob-border bg-ob-surface px-3 focus:border-ob-water',
-          )}
+          <div className="relative">
+            {input(
+              large
+                ? 'h-14 w-full rounded-xl border-2 border-ob-border bg-ob-surface pl-4 pr-12 !text-[1.125rem] focus:border-ob-water'
+                : 'h-11 w-full rounded-lg border border-ob-border bg-ob-surface pl-3 pr-11 focus:border-ob-water',
+            )}
+            {clearButton && <div className={`absolute right-1 top-1/2 -translate-y-1/2 ${large ? 'right-2' : ''}`}>{clearButton}</div>}
+          </div>
         </div>
       ) : (
         <form
@@ -230,7 +255,8 @@ export default function AddressSearch({
           className="ob-panel ob-float flex h-11 w-full items-center gap-1.5 rounded-full p-1 pl-4 focus-within:border-ob-water"
         >
           <SearchIcon />
-          {input('min-w-0 flex-1 bg-transparent py-2')}
+          {input('flex-1 bg-transparent py-2')}
+          {clearButton}
           <button
             type="button"
             onClick={save}
@@ -244,7 +270,7 @@ export default function AddressSearch({
           <button
             type="submit"
             aria-busy={busy}
-            className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-ob-accent px-4 text-[13px] font-semibold text-ob-onaccent transition hover:brightness-110 active:scale-[0.97]"
+            className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-ob-accent px-4 text-[0.8125rem] font-semibold text-ob-onaccent transition hover:brightness-110 active:scale-[0.97]"
           >
             {busy && <span aria-hidden className="spin h-3 w-3 rounded-full border-2 border-white border-t-transparent" />}
             {busy && waking ? t('status.waking') : t('search.submit')}
@@ -270,7 +296,7 @@ export default function AddressSearch({
                 type="button"
                 onMouseEnter={() => setActive(i)}
                 onClick={() => pick(s)}
-                className={`flex min-h-[48px] w-full items-center gap-3 px-4 py-2.5 text-left transition ${large ? 'text-[17px]' : 'text-sm'} ${
+                className={`flex min-h-[48px] w-full items-center gap-3 px-4 py-2.5 text-left transition ${large ? 'text-[1.0625rem]' : 'text-sm'} ${
                   i === active ? 'bg-ob-accent/10 text-ob-accent' : 'text-ob-muted hover:bg-ob-bg'
                 }`}
               >

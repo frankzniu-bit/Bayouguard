@@ -43,7 +43,7 @@ export default function LayerControl({
   const { t } = useI18n();
   return (
     <div>
-      <p className="mb-1 px-2 text-[12px] font-medium text-ob-muted">
+      <p className="mb-1 px-2 text-[0.75rem] font-medium text-ob-muted">
         {t('layers.title')}
       </p>
       <ul className="flex flex-col gap-1">
@@ -59,10 +59,10 @@ export default function LayerControl({
                 aria-checked={on}
                 title={hint}
                 onClick={() => onChange({ ...layers, [key]: !on })}
-                className="group flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition hover:bg-ob-bg"
+                className="group flex min-h-[44px] w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition hover:bg-ob-bg"
               >
                 <span
-                  className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition ${
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition ${
                     on
                       ? 'border-ob-accent bg-ob-accent'
                       : 'border-ob-border bg-ob-surface'
@@ -82,12 +82,12 @@ export default function LayerControl({
                   )}
                 </span>
                 <span
-                  className={`flex flex-col text-[13px] leading-tight transition ${
+                  className={`flex flex-col text-[0.8125rem] leading-tight transition ${
                     on ? 'text-ob-text' : 'text-ob-muted'
                   }`}
                 >
                   {label}
-                  <span className="text-[11px] text-ob-muted">{hint}</span>
+                  <span className="text-[0.75rem] text-ob-muted">{hint}</span>
                 </span>
               </button>
             </li>

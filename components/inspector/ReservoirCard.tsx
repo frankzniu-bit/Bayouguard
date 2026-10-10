@@ -25,18 +25,18 @@ function Row({ r }: { r: Reservoir }) {
   return (
     <li className="rounded-lg border border-ob-border bg-ob-surface2 p-3">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="text-[14px] font-semibold text-ob-text">{t('res.name', { name: r.name })}</p>
-        <p className="text-[12px] font-medium" style={{ color: trendColor }}>
+        <p className="text-[0.875rem] font-semibold text-ob-text">{t('res.name', { name: r.name })}</p>
+        <p className="text-[0.75rem] font-medium" style={{ color: trendColor }}>
           {t(`res.trend.${r.trend}`)}
         </p>
       </div>
-      <p className="mt-1 text-[13px] text-ob-muted">
+      <p className="mt-1 text-[0.8125rem] text-ob-muted">
         {t('res.pool')}: <span className="font-mono tabular text-ob-text">{num(r.poolElevationFt, 1)} ft</span>
         {peak ? <> · {t('res.harvey', { ft: num(peak, 1) })}</> : null}
       </p>
       {r.percentCapacity != null ? (
         <div className="mt-2">
-          <div className="flex justify-between text-[12px] text-ob-muted">
+          <div className="flex justify-between text-[0.75rem] text-ob-muted">
             <span>{t('res.capacity')}</span>
             <span className="font-mono tabular text-ob-text">{Math.round(r.percentCapacity)}%</span>
           </div>
@@ -45,9 +45,9 @@ function Row({ r }: { r: Reservoir }) {
           </div>
         </div>
       ) : (
-        <p className="mt-1 text-[12px] text-ob-muted">{t('res.capacityUnknown')}</p>
+        <p className="mt-1 text-[0.75rem] text-ob-muted">{t('res.capacityUnknown')}</p>
       )}
-      <p className="mt-1 text-[12px] text-ob-muted">
+      <p className="mt-1 text-[0.75rem] text-ob-muted">
         {t('res.outflow')}:{' '}
         {r.outflowCfs != null ? (
           <span className="font-mono tabular text-ob-text">{r.outflowCfs.toLocaleString()} cfs</span>
@@ -71,7 +71,7 @@ export default function ReservoirCard({ collapsible = false }: { collapsible?: b
       <Skeleton className="h-20" />
     </div>
   ) : error || !data ? (
-    <p className="text-[13px] text-ob-muted">
+    <p className="text-[0.8125rem] text-ob-muted">
       {t('res.error')}{' '}
       <button type="button" onClick={retry} className="font-semibold text-ob-accent hover:underline">
         {t('action.retry')}
@@ -84,7 +84,7 @@ export default function ReservoirCard({ collapsible = false }: { collapsible?: b
           <Row key={r.name} r={r} />
         ))}
       </ul>
-      <p className="mt-2 text-[11px] leading-snug text-ob-muted">
+      <p className="mt-2 text-[0.75rem] leading-snug text-ob-muted">
         {source === 'live' ? t('res.sourceLive') : source === 'partial' ? t('res.sourcePartial') : t('res.sourceDemo')}
       </p>
     </>
@@ -99,7 +99,7 @@ export default function ReservoirCard({ collapsible = false }: { collapsible?: b
           onClick={() => setOpen((o) => !o)}
           className="flex min-h-[44px] w-full items-center justify-between gap-2 rounded-lg px-2 text-left hover:bg-ob-bg"
         >
-          <span id={titleId} className="text-[12px] font-medium text-ob-muted">
+          <span id={titleId} className="text-[0.75rem] font-medium text-ob-muted">
             {t('res.title')}
           </span>
           <span aria-hidden className={`text-ob-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
@@ -107,13 +107,13 @@ export default function ReservoirCard({ collapsible = false }: { collapsible?: b
           </span>
         </button>
       ) : (
-        <p id={titleId} className="text-[12px] font-medium text-ob-muted">
+        <p id={titleId} className="text-[0.75rem] font-medium text-ob-muted">
           {t('res.title')}
         </p>
       )}
       {open && (
         <div className={collapsible ? 'px-2 pb-2' : 'mt-2'}>
-          <p className="mb-2 text-[13px] leading-snug text-ob-text">{t('res.context')}</p>
+          <p className="mb-2 text-[0.8125rem] leading-snug text-ob-text">{t('res.context')}</p>
           {body}
         </div>
       )}

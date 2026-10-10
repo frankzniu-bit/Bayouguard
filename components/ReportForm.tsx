@@ -51,16 +51,16 @@ export default function ReportForm({
   return (
     <form onSubmit={submit} className="flex flex-col gap-3">
       <div>
-        <h2 className="text-[16px] font-semibold text-ob-text">{t('report.title')}</h2>
-        <p className="mt-0.5 text-[13px] text-ob-muted">{whereLabel}</p>
+        <h2 className="text-[1rem] font-semibold text-ob-text">{t('report.title')}</h2>
+        <p className="mt-0.5 text-[0.8125rem] text-ob-muted">{whereLabel}</p>
       </div>
       <fieldset>
-        <legend className="text-[12px] font-medium text-ob-muted">{t('report.severity')}</legend>
+        <legend className="text-[0.75rem] font-medium text-ob-muted">{t('report.severity')}</legend>
         <div className="mt-1.5 flex flex-col gap-1.5">
           {SEVERITIES.map((s) => (
             <label
               key={s}
-              className={`flex min-h-[44px] cursor-pointer items-center gap-3 rounded-lg border px-3 text-[14px] transition-colors ${
+              className={`flex min-h-[44px] cursor-pointer items-center gap-3 rounded-lg border px-3 text-[0.875rem] transition-colors ${
                 severity === s ? 'border-ob-accent bg-ob-accent/10 text-ob-text' : 'border-ob-border text-ob-text hover:bg-ob-bg'
               }`}
             >
@@ -78,16 +78,16 @@ export default function ReportForm({
         </div>
       </fieldset>
       <label className="flex flex-col gap-1">
-        <span className="text-[12px] font-medium text-ob-muted">{t('report.note')}</span>
+        <span className="text-[0.75rem] font-medium text-ob-muted">{t('report.note')}</span>
         <input
           value={note}
           onChange={(e) => setNote(e.target.value.slice(0, 140))}
           maxLength={140}
-          className="h-11 rounded-lg border border-ob-border bg-ob-surface px-3 text-[14px] text-ob-text outline-none focus:border-ob-water"
+          className="h-11 rounded-lg border border-ob-border bg-ob-surface px-3 text-[1rem] text-ob-text outline-none focus:border-ob-water"
         />
       </label>
       {error && (
-        <p role="alert" className="text-[13px]" style={{ color: 'var(--tier-high-ink)' }}>
+        <p role="alert" className="text-[0.8125rem]" style={{ color: 'var(--tier-high-ink)' }}>
           {t('report.error')}
         </p>
       )}
@@ -95,14 +95,14 @@ export default function ReportForm({
         <button
           type="button"
           onClick={onCancel}
-          className="h-11 flex-1 rounded-lg border border-ob-border bg-ob-surface text-[14px] font-semibold text-ob-accent hover:bg-ob-bg"
+          className="h-11 flex-1 rounded-lg border border-ob-border bg-ob-surface text-[0.875rem] font-semibold text-ob-accent hover:bg-ob-bg"
         >
           {t('action.cancel')}
         </button>
         <button
           type="submit"
           disabled={!severity || sending}
-          className="h-11 flex-1 rounded-lg bg-ob-accent text-[14px] font-semibold text-ob-onaccent transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-11 flex-1 rounded-lg bg-ob-accent text-[0.875rem] font-semibold text-ob-onaccent transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {sending ? t('report.sending') : t('report.submit')}
         </button>

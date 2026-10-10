@@ -79,15 +79,15 @@ export default function HomeView({ network }: { network: { total: number; near: 
   };
 
   const big =
-    'flex h-14 w-full items-center justify-center gap-2 rounded-xl text-[18px] font-semibold transition hover:brightness-110 active:scale-[0.99] disabled:opacity-60';
+    'flex h-14 w-full items-center justify-center gap-2 rounded-xl text-[1.125rem] font-semibold transition hover:brightness-110 active:scale-[0.99] disabled:opacity-60';
 
   return (
     <PageShell>
       <div className="mx-auto max-w-xl pt-6 sm:pt-12">
-        <h1 className="reveal text-[32px] font-bold leading-[1.15] tracking-[-0.02em] text-ob-text sm:text-[40px]">
+        <h1 className="reveal text-[2rem] font-bold leading-[1.15] tracking-[-0.02em] text-ob-text sm:text-[2.5rem]">
           {t('home.title')}
         </h1>
-        <p className="reveal mt-3 text-[18px] leading-relaxed text-ob-muted">{t('home.subtitle')}</p>
+        <p className="reveal mt-3 text-[1.125rem] leading-relaxed text-ob-muted">{t('home.subtitle')}</p>
 
         <form onSubmit={submit} noValidate className="mt-8 flex flex-col gap-3">
           <AddressSearch
@@ -113,7 +113,7 @@ export default function HomeView({ network }: { network: { total: number; near: 
             {locating ? t('home.locating') : t('home.locate')}
           </button>
           {message && (
-            <p role="alert" className="text-[16px] text-ob-text">
+            <p role="alert" className="text-[1rem] text-ob-text">
               {message}
             </p>
           )}
@@ -123,7 +123,7 @@ export default function HomeView({ network }: { network: { total: number; near: 
           <button
             type="button"
             onClick={() => go(saved.label, saved.lat != null && saved.lng != null ? { lat: saved.lat, lng: saved.lng } : undefined)}
-            className="mt-4 flex min-h-[56px] w-full items-center gap-3 rounded-xl border border-ob-border bg-ob-surface px-4 text-left text-[17px] text-ob-text hover:bg-ob-bg"
+            className="mt-4 flex min-h-[56px] w-full items-center gap-3 rounded-xl border border-ob-border bg-ob-surface px-4 text-left text-[1.0625rem] text-ob-text hover:bg-ob-bg"
           >
             <span aria-hidden className="text-ob-accent">★</span>
             <span className="min-w-0 flex-1">{t('home.again', { address: saved.label })}</span>
@@ -132,14 +132,14 @@ export default function HomeView({ network }: { network: { total: number; near: 
         )}
 
         <div className="mt-8">
-          <p className="text-[16px] font-medium text-ob-muted">{t('home.try')}</p>
+          <p className="text-[1rem] font-medium text-ob-muted">{t('home.try')}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {EXAMPLES.map((e) => (
               <button
                 key={e.label}
                 type="button"
                 onClick={() => go(e.query, { lat: e.lat, lng: e.lng })}
-                className="h-12 rounded-full border border-ob-border bg-ob-surface px-5 text-[16px] font-semibold text-ob-accent transition-colors hover:bg-ob-bg"
+                className="h-12 rounded-full border border-ob-border bg-ob-surface px-5 text-[1rem] font-semibold text-ob-accent transition-colors hover:bg-ob-bg"
               >
                 {e.label}
               </button>
@@ -154,15 +154,15 @@ export default function HomeView({ network }: { network: { total: number; near: 
           >
             <span aria-hidden className={`h-3 w-3 shrink-0 rounded-full ${network.live ? 'bg-tier-low' : 'bg-tier-med'}`} />
             <span className="min-w-0 flex-1">
-              <span className="block text-[16px] font-semibold text-ob-text">
+              <span className="block text-[1rem] font-semibold text-ob-text">
                 {t('home.network', { total: network.total.toLocaleString(locale), near: network.near })}
               </span>
-              <span className="block text-[15px] text-ob-accent">{t('home.explore')} →</span>
+              <span className="block text-[0.9375rem] text-ob-accent">{t('home.explore')} →</span>
             </span>
           </Link>
         )}
 
-        <p className="mt-6 text-[15px] text-ob-muted">{t('home.free')}</p>
+        <p className="mt-6 text-[0.9375rem] text-ob-muted">{t('home.free')}</p>
       </div>
     </PageShell>
   );

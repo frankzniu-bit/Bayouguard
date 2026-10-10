@@ -73,14 +73,14 @@ export default function TopBar({
         >
           <BrandMark className="h-6 w-6" />
           {/* On the map the search needs the room; the wordmark waits for very wide screens. */}
-          <span className={`font-display text-[19px] text-ob-text ${search ? 'hidden 2xl:inline' : ''}`}>BayouGuard</span>
+          <span className={`font-display text-[1.1875rem] text-ob-text ${search ? 'hidden 2xl:inline' : ''}`}>BayouGuard</span>
         </Link>
 
         <NavLinks className="pointer-events-auto hidden shrink-0 lg:block" />
 
         {search ? (
           <div className="pointer-events-auto order-last flex min-w-0 basis-full justify-center md:order-none md:basis-auto md:flex-1">
-            <div className="w-full max-w-xl" data-tour="search">
+            <div className="w-full max-w-xl">
               {search}
             </div>
           </div>
@@ -100,7 +100,7 @@ export default function TopBar({
                   onClick={() => onMode(m)}
                   aria-pressed={mode === m}
                   aria-label={t(m === 'map' ? 'top.map' : 'top.graph')}
-                  className={`flex h-9 min-w-[40px] items-center justify-center whitespace-nowrap rounded-full px-2.5 text-[13px] font-semibold transition-colors xl:px-3 ${
+                  className={`flex h-9 min-w-[40px] items-center justify-center whitespace-nowrap rounded-full px-2.5 text-[0.8125rem] font-semibold transition-colors xl:px-3 ${
                     mode === m ? 'bg-ob-accent text-ob-onaccent' : 'text-ob-muted hover:text-ob-text'
                   }`}
                 >
@@ -130,7 +130,7 @@ export default function TopBar({
                 aria-pressed={lang === l}
                 aria-label={LANG_NAME[l]}
                 lang={l}
-                className={`h-9 min-w-[36px] rounded-full px-2.5 text-[12px] font-semibold transition-colors ${
+                className={`h-9 min-w-[36px] rounded-full px-2.5 text-[0.75rem] font-semibold transition-colors ${
                   lang === l ? 'bg-ob-accent text-ob-onaccent' : 'text-ob-muted hover:text-ob-text'
                 }`}
               >

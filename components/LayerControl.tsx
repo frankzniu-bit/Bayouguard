@@ -4,16 +4,15 @@ import { useI18n } from '@/lib/i18n';
 
 /* Map layer toggles. A checkbox list (the rail supplies the card) that lets
  * the user compose their own view:
- * plain risk dots, animated "tsunami" ripples, wind flow, satellite imagery,
- * and the statewide USGS context layer. Map mode only — the graph background
- * has its own visual language. */
+ * risk dots, ripples on dangerous gauges, shelters, roads, community reports,
+ * reservoirs, wind flow and satellite imagery. Map mode only — the graph
+ * background has its own visual language. */
 
 export interface MapLayers {
   dots: boolean;
   ripples: boolean;
   wind: boolean;
   satellite: boolean;
-  usgs: boolean;
   shelters: boolean;
   roads: boolean;
   reports: boolean;
@@ -26,15 +25,13 @@ export const DEFAULT_LAYERS: MapLayers = {
   // Decorative and the costliest layer on slow phones; opt in.
   wind: false,
   satellite: false,
-  // ~1.2 MB upstream; only fetched when someone turns it on.
-  usgs: false,
   shelters: false,
   roads: false,
   reports: false,
   reservoirs: false,
 };
 
-const LAYER_KEYS: Array<keyof MapLayers> = ['dots', 'ripples', 'shelters', 'roads', 'reports', 'reservoirs', 'wind', 'satellite', 'usgs'];
+const LAYER_KEYS: Array<keyof MapLayers> = ['dots', 'ripples', 'shelters', 'roads', 'reports', 'reservoirs', 'wind', 'satellite'];
 
 export default function LayerControl({
   layers,

@@ -1,22 +1,21 @@
 'use client';
 
-/* Interactive Leaflet map of Texas, and only Texas: panning is clamped to the
- * state, minZoom is computed from its bounds so even ultrawide windows can't
- * zoom past it, and everything outside the border is masked to the page's
- * paper colour. Zoom stops where the basemap's tiles stop (16), so labels are
- * never stretched into blurry giants. Composable
- * layers controlled by the LayerControl checkboxes: risk-tier gauge dots,
- * "tsunami" ripple pulses, animated wind flow, satellite imagery, and the
- * statewide USGS context network. Loaded client-only (Leaflet touches window). */
+/* Interactive Leaflet map of the Houston-area sensor network, and only that:
+ * panning is clamped to the region the gauges cover, and minZoom is computed
+ * from it so even ultrawide windows can't zoom out past it. Zoom stops where
+ * the basemap's tiles stop (16), and the street labels fade out while zooming
+ * so old and new labels never stack up. Composable layers controlled by the
+ * LayerControl checkboxes: risk-tier gauge dots, ripples on dangerous gauges,
+ * wind flow, satellite imagery, shelters, roads, reports and reservoirs.
+ * Loaded client-only (Leaflet touches window). */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   MapContainer,
   TileLayer,
   CircleMarker,
   Marker,
   Pane,
-  Polygon,
   Polyline,
   Tooltip,
   useMap,
@@ -24,10 +23,8 @@ import {
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { GaugePoint, Tier } from '@/lib/types';
-import type { UsgsGauge } from '@/lib/usgs';
 import { TIER_HEX, OB, BASEMAP, type Mode } from '@/lib/theme';
 import { useI18n } from '@/lib/i18n';
-import { TEXAS_RINGS } from '@/lib/geoDots';
 import type { MapLayers } from './LayerControl';
 import type { CommunityReport, Reservoir, RoadCollection, Shelter } from '@/lib/contract';
 import { RESERVOIR_POINTS } from './inspector/ReservoirCard';
@@ -85,25 +82,20 @@ export interface MapSelection {
 
 const HOUSTON: [number, number] = [29.7604, -95.3698];
 
-// Texas's extent with a sliver of margin, so the border isn't flush with the
-// screen edge at the widest zoom.
+// Every gauge in the network (29.31-30.69 N, 96.09-94.84 W) with a margin:
+// BayouGuard covers greater Houston, so the map does too.
 const REGION_BOUNDS: [[number, number], [number, number]] = [
-  [25.4, -107.1], // SW
-  [36.9, -93.1], // NE
+  [29.05, -96.4], // SW
+  [30.9, -94.55], // NE
 ];
 // The grey canvas basemap has tiles to 16. Past that Leaflet stretches them
 // and the labels turn into blurred giants, so the map stops here.
 const MAX_ZOOM = 16;
 const CANVAS_NATIVE_ZOOM = MAX_ZOOM;
 
-const TEXAS_LINES = TEXAS_RINGS.map((ring) => ring.map(([lat, lng]) => [lat, lng] as [number, number]));
-// How far past the viewport the mask's outer edge reaches, in viewports — enough
-// that a pan or a one-level zoom-out never shows its edge before it's redrawn.
-const MASK_PAD = 1.5;
-
-// Regional zoom shows the gauge cluster in statewide Texas context; street zoom
-// is reserved for an explicit address search.
-const REGION_ZOOM = 7;
+// Regional zoom shows the whole network; street zoom is reserved for an
+// explicit address search.
+const REGION_ZOOM = 9;
 const ADDRESS_ZOOM = 13;
 const GAUGE_ZOOM = 11;
 
@@ -169,48 +161,41 @@ function FocusGauge({ gauge }: { gauge: GaugePoint | null }) {
   return null;
 }
 
-/* Hands the map out once it's laid out and its first tiles are in (or after a
- * short wait), so the intro can melt the dots into a map that's really there. */
-/* Everything that isn't Texas, as a polygon with every Texas ring cut out of
- * it. The outer ring follows the viewport instead of spanning the world: at
- * street zoom a world-sized ring is millions of pixels across and the browser
- * gives up drawing it — the whole map went blank. noClip keeps Leaflet from
- * clipping the holes away once you're zoomed inside Texas. */
-function TexasMask({ fill }: { fill: string }) {
+/* Street labels live in their own pane and fade out for the length of a
+ * zoom, coming back once the new zoom's labels have loaded. Otherwise Leaflet
+ * shows the old zoom's labels stretched and blurry on top of the new ones. */
+function LabelFade() {
   const map = useMap();
-  const [outer, setOuter] = useState<Array<[number, number]>>(() => viewRing(map));
   useEffect(() => {
-    let raf = 0;
-    const update = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setOuter(viewRing(map)));
+    const el = map.getContainer();
+    let timer = 0;
+    const show = () => {
+      window.clearTimeout(timer);
+      el.classList.remove('labels-hidden');
     };
-    // After a pan or zoom settles, not on every frame of it: the ring already
-    // reaches 1.5 viewports past the edge, so mid-pan nothing shows through.
-    map.on('moveend zoomend resize', update);
+    const hide = () => {
+      window.clearTimeout(timer);
+      el.classList.add('labels-hidden');
+    };
+    const settle = () => {
+      let labels: L.TileLayer | null = null;
+      map.eachLayer((layer) => {
+        if (layer instanceof L.TileLayer && layer.options.pane === 'labels') labels = layer;
+      });
+      // Show on the labels' load event, or after a beat if it never comes (cached tiles).
+      timer = window.setTimeout(show, 900);
+      if (labels) (labels as L.TileLayer).once('load', show);
+      else show();
+    };
+    map.on('zoomstart', hide);
+    map.on('zoomend', settle);
     return () => {
-      cancelAnimationFrame(raf);
-      map.off('moveend zoomend resize', update);
+      window.clearTimeout(timer);
+      map.off('zoomstart', hide);
+      map.off('zoomend', settle);
     };
   }, [map]);
-  return (
-    <Polygon
-      positions={[outer, ...TEXAS_LINES]}
-      interactive={false}
-      noClip
-      pathOptions={{ stroke: false, fillColor: fill, fillOpacity: 1 }}
-    />
-  );
-}
-
-function viewRing(map: L.Map): Array<[number, number]> {
-  const b = map.getBounds().pad(MASK_PAD);
-  return [
-    [b.getSouth(), b.getWest()],
-    [b.getNorth(), b.getWest()],
-    [b.getNorth(), b.getEast()],
-    [b.getSouth(), b.getEast()],
-  ];
+  return null;
 }
 
 function MapHandle({ onMap }: { onMap?: (map: L.Map) => void }) {
@@ -306,14 +291,11 @@ export default function FloodMap({
   const startZoom = zoomToCenter && center ? ADDRESS_ZOOM : REGION_ZOOM;
   const tok = OB[mode];
   const tierHex = TIER_HEX[mode];
-  const maskColor = tok.bg;
-  const borderColor = mode === 'light' ? 'rgba(26,68,128,0.5)' : 'rgba(157,178,214,0.5)';
   const { base: tileBase, labels: tileLabels } = BASEMAP[mode];
   // A white keyline lifts the tier fill off grey tiles; ink marks the selection.
   const strokeColor = mode === 'light' ? '#ffffff' : tok.bg;
   const selectedStroke = tok.text;
   const windColor = mode === 'light' ? 'rgba(26,68,128,0.55)' : 'rgba(157,190,255,0.8)';
-  const usgsColor = mode === 'light' ? '#8099BC' : '#6B82A8';
   const addressIcon = useMemo(() => makeAddressIcon(tok.water, tok.surface), [tok]);
   const shelterIcons = useMemo(
     () => ({
@@ -338,24 +320,6 @@ export default function FloodMap({
     [rippling, tierHex],
   );
 
-  // Statewide USGS context layer — fetched once on demand, kept for the session.
-  const [usgs, setUsgs] = useState<UsgsGauge[] | null>(null);
-  useEffect(() => {
-    if (!layers.usgs || usgs !== null) return;
-    let cancelled = false;
-    fetch('/api/usgs-gauges')
-      .then((res) => (res.ok ? res.json() : { gauges: [] }))
-      .then((data: { gauges: UsgsGauge[] }) => {
-        if (!cancelled) setUsgs(data.gauges ?? []);
-      })
-      .catch(() => {
-        if (!cancelled) setUsgs([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [layers.usgs, usgs]);
-
   return (
     <MapContainer
       center={start}
@@ -378,29 +342,11 @@ export default function FloodMap({
       ) : (
         <>
           <TileLayer key={tileBase} className="tiles-base" attribution={BASEMAP.attribution} url={tileBase} maxNativeZoom={CANVAS_NATIVE_ZOOM} />
-          <TileLayer key={tileLabels} url={tileLabels} maxNativeZoom={CANVAS_NATIVE_ZOOM} />
+          <Pane name="labels" style={{ zIndex: 250 }} className="leaflet-labels-pane">
+            <TileLayer key={tileLabels} pane="labels" url={tileLabels} maxNativeZoom={CANVAS_NATIVE_ZOOM} />
+          </Pane>
         </>
       )}
-
-      {/* Statewide USGS context gauges — small, neutral, non-tiered. */}
-      {layers.usgs &&
-        usgs?.map((g) => (
-          <CircleMarker
-            key={`usgs-${g.id}`}
-            center={[g.lat, g.lng]}
-            radius={3}
-            pathOptions={{
-              color: usgsColor,
-              weight: 1,
-              fillColor: usgsColor,
-              fillOpacity: 0.55,
-            }}
-          >
-            <Tooltip direction="top" offset={[0, -4]}>
-              USGS · {g.name} · {g.levelFt.toFixed(1)} ft
-            </Tooltip>
-          </CircleMarker>
-        ))}
 
       {/* Ripple pulses under the dots — the "tsunami" layer. */}
       {layers.ripples &&
@@ -504,18 +450,9 @@ export default function FloodMap({
 
       {layers.wind && <WindLayer color={windColor} />}
 
-      {/* Above the tiles, below the gauges: paper over everything outside Texas. */}
-      <Pane name="not-texas" style={{ zIndex: 350 }}>
-        <TexasMask fill={maskColor} />
-        <Polygon
-          positions={TEXAS_LINES}
-          interactive={false}
-          pathOptions={{ color: borderColor, weight: 1.2, fill: false }}
-        />
-      </Pane>
-
       <ClampToRegion fitOnStart={!(zoomToCenter && center)} />
       <MapHandle onMap={onMap} />
+      <LabelFade />
       <FocusGauge gauge={focusGauge} />
       <Recenter
         center={center ? [center.lat, center.lng] : null}

@@ -113,12 +113,6 @@ export default function MapLegend({
               </span>
             </li>
           )}
-          {layers.usgs && (
-            <li className="flex items-center gap-2">
-              <span className="h-2 w-2 shrink-0 rounded-full bg-ob-faint" aria-hidden />
-              {t('layers.usgs')}
-            </li>
-          )}
         </ul>
       )}
     </section>

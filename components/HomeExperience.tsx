@@ -18,7 +18,6 @@ import TopBar, { type ViewMode } from './TopBar';
 import MotionRoot from './MotionRoot';
 import type { GraphSelection } from './WatershedGraph';
 import AddressSearch from './AddressSearch';
-import TexasLocator from './TexasLocator';
 import InspectorPanel from './InspectorPanel';
 import MapRail from './MapRail';
 import RiskBoard from './RiskBoard';
@@ -507,12 +506,6 @@ export default function HomeExperience({
         </div>
       )}
 
-      {/* Texas locator — only the graph needs telling where it is */}
-      {mode === 'graph' && !shown && (
-        <div className="pointer-events-none absolute bottom-20 right-4 z-40 hidden lg:block">
-          <TexasLocator />
-        </div>
-      )}
 
       {/* Desktop tools + hint (bottom centre) */}
       <div

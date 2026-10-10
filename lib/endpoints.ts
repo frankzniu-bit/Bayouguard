@@ -19,7 +19,6 @@ import {
   type Reservoir,
   type RoadCollection,
   type Shelter,
-  type SubscribeRequest,
 } from './contract';
 import { BASE, HAS_BACKEND, WARM_TIMEOUT_MS, backendGet } from './api';
 import { getHcfws } from './hcfws';
@@ -66,7 +65,7 @@ export async function getReports(): Promise<Sourced<CommunityReport[]>> {
   return { data: demoReports(), source: 'demo' };
 }
 
-/* POST helpers: true when the backend accepted it. In demo mode nothing is
+/* POST helper: true when the backend accepted it. In demo mode nothing is
  * stored or sent anywhere, and the UI says so. */
 async function backendPost(path: string, body: unknown): Promise<boolean> {
   if (!HAS_BACKEND) return false;
@@ -85,7 +84,6 @@ async function backendPost(path: string, body: unknown): Promise<boolean> {
 }
 
 export const postReport = (report: CommunityReport) => backendPost('/reports', report);
-export const postSubscribe = (req: SubscribeRequest) => backendPost('/subscribe', req);
 
 /* Addicks and Barker. Backend first; then the HCFWS dam gauges, which carry
  * the real pool elevation and trend (but no outflow or capacity); then demo. */

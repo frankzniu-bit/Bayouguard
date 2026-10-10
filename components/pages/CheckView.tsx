@@ -140,7 +140,10 @@ export default function CheckView({
         </section>
 
         <nav aria-label={t('check.next.steps')} className="flex flex-col gap-3">
-          <Link href={`/alerts?address=${encodeURIComponent(snap.risk.address)}`} className={`${big} bg-ob-accent text-ob-onaccent`}>
+          <Link
+            href={`/alerts?${new URLSearchParams({ address: snap.risk.address, ...(view.center ? { lat: String(view.center.lat), lng: String(view.center.lng) } : {}) }).toString()}`}
+            className={`${big} bg-ob-accent text-ob-onaccent`}
+          >
             {t('check.alerts')}
             <Arrow />
           </Link>

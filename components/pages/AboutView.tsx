@@ -10,7 +10,6 @@ import { MODEL_CARD } from '@/lib/modelCard';
 
 const SOURCES: Array<{ name: MsgKey; href: string; use: MsgKey }> = [
   { name: 'about.src.hcfws', href: 'https://www.harriscountyfws.org', use: 'about.src.hcfws.use' },
-  { name: 'about.src.usgs', href: 'https://waterdata.usgs.gov', use: 'about.src.usgs.use' },
   { name: 'about.src.meteo', href: 'https://open-meteo.com', use: 'about.src.meteo.use' },
   { name: 'about.src.fema', href: 'https://www.fema.gov/about/openfema', use: 'about.src.fema.use' },
   { name: 'about.src.census', href: 'https://geocoding.geo.census.gov', use: 'about.src.census.use' },

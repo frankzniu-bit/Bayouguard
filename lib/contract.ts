@@ -24,6 +24,9 @@
  *   - GET / reports {"model_status":"Active (ML)"}; /health is 404.
  *   - Render's free tier sleeps after 15 min idle; the first call can take ~1 min. */
 
+/** Demo fixtures reuse real HCFWS site ids offset by this, so live extras never attach to them. */
+export const DEMO_ID_BASE = 900_000;
+
 export type RawTier = 'SAFE' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 // LIVE — GET /risk?address&lat&lng&lang

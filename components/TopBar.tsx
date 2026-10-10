@@ -73,7 +73,7 @@ export default function TopBar({
         >
           <BrandMark className="h-6 w-6" />
           {/* On the map the search needs the room; the wordmark waits for very wide screens. */}
-          <span className={`hidden font-display text-[19px] text-ob-text ${search ? '2xl:inline' : 'inline'}`}>BayouGuard</span>
+          <span className={`font-display text-[19px] text-ob-text ${search ? 'hidden 2xl:inline' : ''}`}>BayouGuard</span>
         </Link>
 
         <NavLinks className="pointer-events-auto hidden shrink-0 lg:block" />

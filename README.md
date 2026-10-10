@@ -65,7 +65,7 @@ do.
 | `GET /reservoirs` | PLANNED | Addicks and Barker card: pool, % capacity, outflow, trend | Pool elevation and trend from the HCFWS dam gauges; capacity and outflow shown as unavailable |
 | `GET /roads` | PLANNED | Red dashed closures on the map | Four sample segments, labelled demo in the legend |
 | `GET /flood-history?zip` | PLANNED | "Flood memory" line on the address card | Real NFIP claims straight from OpenFEMA (free, keyless) |
-| `POST /subscribe` | PLANNED | `/alerts` sign-up form | Nothing is stored; the form says alerts aren't active yet |
+| `POST /subscribe` | PLANNED | Not used yet — `/alerts` sends people to free official alerts (HCFWS gauge subscriptions, ReadyHarris, phone emergency alerts) | — |
 | `GET` / `POST /reports` | PLANNED | Community flood pins and "Report flooding here" | Two sample pins; a new report stays on the reporter's device and says it isn't shared |
 | `GET /health` | PLANNED | Health probe at `/api/health` | A successful `/gauges` counts as healthy |
 

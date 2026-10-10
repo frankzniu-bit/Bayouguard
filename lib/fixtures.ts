@@ -8,6 +8,7 @@
  * afternoon with mostly calm water, a few gauges rising, one over its banks. */
 
 import {
+  DEMO_ID_BASE,
   tierForBuffer,
   type BackendGauge,
   type CommunityReport,
@@ -17,8 +18,6 @@ import {
   type Shelter,
 } from './contract';
 
-// Ids well above any real HCFWS site id, so live extras never attach to them.
-export const DEMO_ID_BASE = 900_000;
 
 export interface DemoGauge extends BackendGauge {
   name: string;

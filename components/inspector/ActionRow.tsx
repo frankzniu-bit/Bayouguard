@@ -60,7 +60,7 @@ export default function ActionRow({
       </div>
       {showAlerts && (
       <Link
-        href={`/alerts?address=${encodeURIComponent(address)}`}
+        href={`/alerts?${new URLSearchParams({ address, ...(center ? { lat: String(center.lat), lng: String(center.lng) } : {}) }).toString()}`}
         className="mt-2 flex h-11 w-full items-center justify-center rounded-lg bg-ob-accent px-3 text-[14px] font-semibold text-ob-onaccent transition hover:brightness-110"
       >
         {t('action.alerts')}

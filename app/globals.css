@@ -207,6 +207,14 @@ body {
 [data-theme='dark'] .tiles-base {
   filter: sepia(1) hue-rotate(180deg) saturate(1.8) brightness(0.62) contrast(1.05);
 }
+.leaflet-labels-pane {
+  pointer-events: none;
+  transition: opacity 0.2s ease-out;
+}
+.labels-hidden .leaflet-labels-pane {
+  opacity: 0;
+  transition-duration: 0s;
+}
 .leaflet-control-attribution {
   background: rgb(var(--ob-surface-rgb) / 0.85) !important;
   color: rgb(var(--ob-muted-rgb)) !important;

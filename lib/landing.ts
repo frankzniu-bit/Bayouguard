@@ -37,7 +37,7 @@ const HOUSTON = { lat: 29.7604, lng: -95.3698 };
 export async function getLandingData(): Promise<LandingData> {
   const [usgs, harris, rain] = await Promise.all([
     getUsgsGauges(),
-    loadGauges(),
+    loadGauges(4000),
     getRainForecast(HOUSTON.lat, HOUSTON.lng),
   ]);
 
@@ -67,7 +67,7 @@ export async function getLandingData(): Promise<LandingData> {
     {
       value: String(nearFlood),
       label: 'Near flood stage',
-      detail: harris.sample ? 'Sample data · backend offline' : 'Within 2.5 ft of flooding',
+      detail: harris.source === 'demo' ? 'Sample data · backend offline' : 'Within 2 ft of flooding',
     },
     {
       value: rainIn === null ? '—' : `${rainIn.toFixed(2)}″`,
@@ -85,6 +85,6 @@ export async function getLandingData(): Promise<LandingData> {
     dots: [...statewideDots, ...harrisDots],
     stats,
     latestReading,
-    sample: harris.sample,
+    sample: harris.source === 'demo',
   };
 }

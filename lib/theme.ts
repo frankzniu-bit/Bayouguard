@@ -19,6 +19,24 @@ export const OB = {
 
 export type Mode = 'dark' | 'light';
 
+/* Basemap tiles, all keyless Esri. CARTO's free basemaps now stamp "API KEY
+ * REQUIRED" over every tile. Base and labels are separate layers so the
+ * gauges sit between them and street names stay on top. */
+const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services';
+export const BASEMAP = {
+  light: {
+    base: `${ESRI}/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}`,
+    labels: `${ESRI}/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}`,
+  },
+  dark: {
+    base: `${ESRI}/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}`,
+    labels: `${ESRI}/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`,
+  },
+  satellite: `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`,
+  attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> — Esri, HERE, Garmin, &copy; OpenStreetMap contributors',
+  satelliteAttribution: '&copy; <a href="https://www.esri.com/">Esri</a> — Source: Esri, Maxar, Earthstar Geographics',
+} as const;
+
 /* Canvas-only palette (the canvas can't read CSS variables). One entry per
  * theme: clear/background, edges, node label chips, geographic reference. */
 export const PALETTE: Record<

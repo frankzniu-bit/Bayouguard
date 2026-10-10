@@ -13,7 +13,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type L from 'leaflet';
 import dynamic from 'next/dynamic';
 import { AnimatePresence, motion } from 'framer-motion';
-import TopBar, { type Lang, type ViewMode } from './TopBar';
+import TopBar, { type ViewMode } from './TopBar';
 import WatershedGraph, { type GraphSelection } from './WatershedGraph';
 import AddressSearch from './AddressSearch';
 import NetworkStats from './NetworkStats';
@@ -24,8 +24,9 @@ import RiskBoard from './RiskBoard';
 import Tour from './Tour';
 import MapIntro from './MapIntro';
 import { DEFAULT_LAYERS, type MapLayers } from './LayerControl';
-import { fetchFloodView } from '@/lib/client';
 import { useTheme } from '@/lib/useTheme';
+import { useFloodData } from '@/lib/useFloodData';
+import { useI18n } from '@/lib/i18n';
 import type { FloodView, GaugePoint, Tier } from '@/lib/types';
 import { readHandoff, type Handoff } from '@/lib/dotField';
 
@@ -45,24 +46,24 @@ const ADDRESS_SELECTION: GraphSelection = { id: 'address', kind: 'address' };
 export default function HomeExperience({
   initial,
   initialAddress,
+  initialCoords,
 }: {
   initial: FloodView;
   /** Set when arriving from the landing page's address box. */
   initialAddress?: string;
+  initialCoords?: { lat: number; lng: number };
 }) {
-  const [view, setView] = useState<FloodView>(initial);
+  const { t } = useI18n();
+  const { view, loading, wake, notice, search } = useFloodData(initial, initialAddress, initialCoords);
   const [mode, setMode] = useState<ViewMode>('map');
-  const [lang, setLang] = useState<Lang>('EN');
   const { mode: theme, toggle: toggleTheme } = useTheme();
   const [selection, setSelection] = useState<GraphSelection | null>(
-    initialAddress && initial.center ? ADDRESS_SELECTION : null,
+    initialAddress && initial.snapshot ? ADDRESS_SELECTION : null,
   );
   const [focus, setFocus] = useState<GaugePoint | null>(null);
   const [layers, setLayers] = useState<MapLayers>(DEFAULT_LAYERS);
   const [hiddenTiers, setHiddenTiers] = useState<ReadonlySet<Tier>>(new Set());
   const [searched, setSearched] = useState(Boolean(initialAddress && initial.center));
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [handoff, setHandoff] = useState<Handoff | null>(null);
   const [intro, setIntro] = useState<IntroState>('checking');
   const [liveMap, setLiveMap] = useState<L.Map | null>(null);
@@ -99,25 +100,23 @@ export default function HomeExperience({
       return next;
     });
 
+  const lastSearch = useRef<{ address: string; coords?: { lat: number; lng: number } } | null>(null);
   const onSearch = async (
     address: string,
     submitted: boolean,
     coords?: { lat: number; lng: number },
   ) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const next = await fetchFloodView(address, coords);
-      setView(next);
-      if (submitted) {
-        setSelection(ADDRESS_SELECTION);
-        setSearched(true);
-      }
-    } catch {
-      setError('Could not reach the flood service. Try again.');
-    } finally {
-      setLoading(false);
+    lastSearch.current = { address, coords };
+    const next = await search(address, coords);
+    if (submitted && next?.center) {
+      setSearched(true);
+      if (next.snapshot) setSelection(ADDRESS_SELECTION);
     }
+  };
+  const retry = () => {
+    const last = lastSearch.current;
+    if (last) void onSearch(last.address, true, last.coords);
+    else void search(undefined, undefined);
   };
 
   const pickGauge = (g: GaugePoint) => {
@@ -126,7 +125,9 @@ export default function HomeExperience({
   };
 
   const otherMode: ViewMode = mode === 'map' ? 'graph' : 'map';
-  const sample = Boolean(view.sample);
+  const sample = view.dataSource !== 'live';
+  // An address selection needs a scored snapshot to show.
+  const shown = selection?.kind === 'address' && !view.snapshot ? null : selection;
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-ob-bg" data-chrome={intro === 'done' ? 'in' : 'out'}>
@@ -138,7 +139,7 @@ export default function HomeExperience({
           <FloodMap
             center={view.center}
             gauges={visible}
-            address={view.snapshot.risk.address}
+            address={view.address ?? undefined}
             mode={theme}
             zoomToCenter={searched}
             selectedId={selection?.id ?? null}
@@ -152,11 +153,12 @@ export default function HomeExperience({
           <WatershedGraph
             gauges={visible}
             center={view.center}
-            address={view.snapshot.risk.address}
+            address={view.address ?? undefined}
             mode={theme}
             active={mode === 'graph'}
             selectedId={selection?.id ?? null}
             onSelect={setSelection}
+            onSwitchToMap={() => setMode('map')}
           />
         )}
       </div>
@@ -167,8 +169,8 @@ export default function HomeExperience({
         onMode={setMode}
         theme={theme}
         onToggleTheme={toggleTheme}
-        lang={lang}
-        onLang={setLang}
+        dataSource={view.dataSource}
+        waking={wake === 'waking'}
         search={<AddressSearch onSearch={onSearch} initialValue={initialAddress} />}
         className="chrome chrome-top"
       />
@@ -176,14 +178,31 @@ export default function HomeExperience({
       {/* Search status, just under the bar */}
       <div className="pointer-events-none absolute inset-x-0 top-[116px] z-[60] flex justify-center px-4 md:top-[68px]">
         {loading && (
-          <span className="ob-panel ob-float inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs text-ob-muted">
-            <span className="spin h-3 w-3 rounded-full border-2 border-ob-accent border-t-transparent" />
-            Reading gauges…
+          <span
+            role="status"
+            className="ob-panel ob-float inline-flex max-w-md items-center gap-2 rounded-full px-3 py-1.5 text-xs text-ob-muted"
+          >
+            <span className="spin h-3 w-3 shrink-0 rounded-full border-2 border-ob-accent border-t-transparent" />
+            {wake === 'waking' ? t('wake.message') : t('search.reading')}
           </span>
         )}
-        {error && (
-          <span className="rounded-full border border-tier-high/40 bg-ob-surface px-3 py-1 text-xs text-tier-high">
-            {error}
+        {!loading && (notice || wake === 'failed') && (
+          <span
+            role="alert"
+            className="ob-panel ob-float pointer-events-auto inline-flex max-w-md items-center gap-3 rounded-full px-3 py-1.5 text-xs text-ob-text"
+          >
+            {notice === 'notFound'
+              ? t('error.notFound')
+              : notice === 'outOfArea'
+                ? t('error.outOfArea')
+                : notice === 'unreachable'
+                  ? t('error.unreachable')
+                  : t('wake.failed')}
+            {(notice === 'unreachable' || wake === 'failed') && (
+              <button type="button" onClick={retry} className="font-semibold text-ob-accent hover:underline">
+                {t('action.retry')}
+              </button>
+            )}
           </span>
         )}
       </div>
@@ -204,14 +223,14 @@ export default function HomeExperience({
       </div>
 
       {/* Network strip (below lg, where the rail doesn't fit) */}
-      {!selection && (
+      {!shown && (
         <div className="chrome chrome-bottom chrome-d2 pointer-events-none absolute bottom-16 left-3 z-40 lg:hidden">
           <NetworkStats gauges={view.gauges} />
         </div>
       )}
 
       {/* Right column: leaderboard until something is picked */}
-      {!selection && (
+      {!shown && (
         <div className="chrome chrome-right chrome-d2 pointer-events-none absolute right-4 top-[76px] z-40 hidden lg:block">
           <div className="pointer-events-auto">
             <RiskBoard gauges={visible} sample={sample} onPick={pickGauge} />
@@ -220,14 +239,14 @@ export default function HomeExperience({
       )}
 
       {/* Texas locator — only the graph needs telling where it is */}
-      {mode === 'graph' && !selection && (
+      {mode === 'graph' && !shown && (
         <div className="pointer-events-none absolute bottom-4 right-4 z-40 hidden md:block">
           <TexasLocator />
         </div>
       )}
 
       {/* Hint (bottom-center) */}
-      {!selection && (
+      {!shown && (
         <div className="chrome chrome-bottom chrome-d3 pointer-events-none absolute inset-x-0 bottom-4 z-30 flex justify-center px-4">
           <p className="ob-panel rounded-full px-4 py-1.5 text-center text-[11px] text-ob-muted">
             {mode === 'map'
@@ -239,7 +258,7 @@ export default function HomeExperience({
 
       {/* Inspector (right column desktop / bottom sheet mobile) */}
       <AnimatePresence>
-        {selection && intro === 'done' && (
+        {shown && intro === 'done' && (
           <motion.aside
             key="inspector"
             aria-label="Gauge inspector"
@@ -251,8 +270,9 @@ export default function HomeExperience({
                        md:inset-x-auto md:bottom-4 md:right-4 md:top-[76px] md:max-h-none md:w-[360px]"
           >
             <InspectorPanel
-              selection={selection}
+              selection={shown}
               snapshot={view.snapshot}
+              dataSource={view.dataSource}
               center={view.center}
               switchLabel={otherMode === 'map' ? 'View on map' : 'View as graph'}
               onSwitch={() => setMode(otherMode)}

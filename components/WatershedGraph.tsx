@@ -16,6 +16,7 @@ import { buildGraph, ForceSim, projectGeo, type Graph } from '@/lib/graph';
 import { TIER_COLOR, TIER_PULSE, PALETTE, type Mode } from '@/lib/theme';
 import { HOUSTON_CITIES, HOUSTON_OUTLINE } from '@/lib/geoFeatures';
 import type { GaugePoint } from '@/lib/types';
+import { useI18n } from '@/lib/i18n';
 
 export interface GraphSelection {
   id: string;
@@ -31,6 +32,7 @@ interface Props {
   active: boolean; // false when another view (e.g. the map) is on top
   selectedId: string | null;
   onSelect: (sel: GraphSelection | null) => void;
+  onSwitchToMap?: () => void;
 }
 
 interface Camera {
@@ -77,7 +79,9 @@ export default function WatershedGraph({
   active,
   selectedId,
   onSelect,
+  onSwitchToMap,
 }: Props) {
+  const { t } = useI18n();
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -527,6 +531,23 @@ export default function WatershedGraph({
         aria-label="Houston watershed flood network. Drag to pan, scroll to zoom, arrow keys to cycle gauges, Enter to inspect."
         className="block h-full w-full outline-none focus-visible:ring-2 focus-visible:ring-ob-accent/60"
       />
+      {gauges.length === 0 && (
+        <div className="absolute inset-0 flex items-center justify-center p-6">
+          <div className="ob-panel ob-float max-w-xs rounded-xl p-5 text-center">
+            <p className="text-[15px] font-semibold text-ob-text">{t('graph.empty.title')}</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-ob-muted">{t('graph.empty.body')}</p>
+            {onSwitchToMap && (
+              <button
+                type="button"
+                onClick={onSwitchToMap}
+                className="mt-4 h-11 rounded-lg bg-ob-accent px-4 text-[14px] font-semibold text-white"
+              >
+                {t('graph.empty.action')}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

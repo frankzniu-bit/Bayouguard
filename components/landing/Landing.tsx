@@ -14,7 +14,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { LandingData } from '@/lib/landing';
 import { fitTexas, packDots, writeHandoff, type Camera } from '@/lib/dotField';
-import { fetchSuggestions } from '@/lib/client';
+import { fetchSuggestions, warmBackend } from '@/lib/client';
 import TexasField from './TexasField';
 import ZoomTransition from './ZoomTransition';
 import BrandMark from './BrandMark';
@@ -48,8 +48,10 @@ export default function Landing({
   const stage = useRef<HTMLDivElement>(null);
 
   // Warm the map route (its loading frame and JS) before anyone clicks.
+  // and wake the backend while the visitor reads the page.
   useEffect(() => {
     router.prefetch('/map');
+    warmBackend();
   }, [router]);
 
   const flyTo = (target: { lat: number; lng: number }, zoom: number, href: string) => {

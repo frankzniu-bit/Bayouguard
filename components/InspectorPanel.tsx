@@ -6,16 +6,13 @@
 
 import { useEffect, useState } from 'react';
 import type { GraphSelection } from './WatershedGraph';
-import type { HomeSnapshot, Tier, DriveVerdict, Outlook, RainForecast } from '@/lib/types';
+import type { DataSource, HomeSnapshot, Tier, DriveVerdict, Outlook, RainForecast } from '@/lib/types';
 import type { GaugeHistory } from '@/lib/history';
 import { TIER_COLOR, TIER_TINT, TIER_LABEL } from '@/lib/theme';
-import { classifyTrend } from '@/lib/hcfws';
+import { classifyTrend } from '@/lib/trend';
+import { useI18n } from '@/lib/i18n';
+import { outlookDetail, riskSentence, weatherLabel } from '@/lib/describe';
 
-const DRIVE_LABEL: Record<DriveVerdict['state'], string> = {
-  YES: 'Safe to drive',
-  CAUTION: 'Drive with caution',
-  NO: 'Do not drive',
-};
 const DRIVE_COLOR: Record<DriveVerdict['state'], string> = {
   YES: TIER_COLOR.LOW,
   CAUTION: TIER_COLOR.MEDIUM,
@@ -105,6 +102,7 @@ function Metric({
 
 /* 6-hour outlook banner: where the water is heading, not just where it is. */
 function OutlookCard({ outlook }: { outlook: Outlook }) {
+  const { t, num } = useI18n();
   const color = OUTLOOK_COLOR[outlook.level];
   return (
     <div
@@ -113,19 +111,20 @@ function OutlookCard({ outlook }: { outlook: Outlook }) {
     >
       <div className="flex items-center justify-between">
         <p className="text-[10px] uppercase tracking-[0.16em] text-ob-faint">
-          Next 6 hours
+          {t('outlook.title')}
         </p>
         <span
           className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
           style={{ backgroundColor: OUTLOOK_TINT[outlook.level], color }}
         >
-          {outlook.level}
+          {t(`outlook.level.${outlook.level}`)}
         </span>
       </div>
       <p className="mt-0.5 font-semibold" style={{ color }}>
-        {outlook.headline}
+        {t(`outlook.${outlook.kind}`)}
       </p>
-      <p className="mt-0.5 text-xs leading-relaxed text-ob-muted">{outlook.detail}</p>
+      <p className="mt-0.5 text-xs leading-relaxed text-ob-muted">{outlookDetail(outlook, t, num)}</p>
+      <p className="mt-1 text-[11px] text-ob-faint">{t('outlook.note')}</p>
     </div>
   );
 }
@@ -282,7 +281,8 @@ function FillBar({ pct, color }: { pct: number; color: string }) {
 
 interface Props {
   selection: GraphSelection | null;
-  snapshot: HomeSnapshot;
+  snapshot: HomeSnapshot | null;
+  dataSource: DataSource;
   center: { lat: number; lng: number } | null;
   switchLabel: string;
   onSwitch: () => void;
@@ -292,11 +292,13 @@ interface Props {
 export default function InspectorPanel({
   selection,
   snapshot,
+  dataSource,
   center,
   switchLabel,
   onSwitch,
   onClose,
 }: Props) {
+  const { t, num } = useI18n();
   // ── Gauge node ───────────────────────────────────────────────────────────
   if (selection?.kind === 'gauge' && selection.gauge) {
     const g = selection.gauge;
@@ -311,7 +313,7 @@ export default function InspectorPanel({
             <p className="text-[11px] uppercase tracking-[0.18em] text-ob-faint">
               Flood gauge{g.county ? ` · ${g.county} network` : ''}
             </p>
-            <h2 className="font-mono text-2xl text-ob-text">#{g.id}</h2>
+            <h2 className="text-lg font-semibold leading-snug text-ob-text">{g.name}</h2>
             {g.trend != null && (
               <div className="mt-1">
                 <TrendArrow trend={g.trend} />
@@ -355,7 +357,8 @@ export default function InspectorPanel({
     );
   }
 
-  // ── Address node (or default summary) ─────────────────────────────────────
+  // ── Address node ──────────────────────────────────────────────────────────
+  if (!snapshot) return null;
   const { risk, weather, drive, bayous, rain, outlook } = snapshot;
   return (
     <PanelShell onClose={onClose} onSwitch={onSwitch} switchLabel={switchLabel}>
@@ -380,16 +383,21 @@ export default function InspectorPanel({
         </span>
         <span className="pb-1 text-sm text-ob-muted">/ 100 risk score</span>
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-ob-muted">{risk.message}</p>
+      <p className="mt-1 text-[12px] font-medium text-ob-muted">{t(`riskSource.${risk.source}`)}</p>
+      <p className="mt-3 text-sm leading-relaxed text-ob-muted" title={risk.backendMessage}>
+        {riskSentence(risk, t, num)}
+      </p>
 
       {outlook && <OutlookCard outlook={outlook} />}
 
-      <div className="mt-4 grid grid-cols-2 gap-2.5">
-        <Metric label="Temp" value={weather.tempF} unit="°F" />
-        <Metric label="Conditions" value={weather.conditions} />
-        <Metric label="Wind" value={weather.windMph} unit="mph" />
-        <Metric label="Humidity" value={weather.humidity} unit="%" />
-      </div>
+      {weather && (
+        <div className="mt-4 grid grid-cols-2 gap-2.5">
+          <Metric label="Temp" value={weather.tempF} unit="°F" />
+          <Metric label="Conditions" value={weatherLabel(weather.code, t)} />
+          <Metric label="Wind" value={weather.windMph} unit="mph" />
+          <Metric label="Humidity" value={weather.humidity} unit="%" />
+        </div>
+      )}
 
       <div
         className="mt-3 rounded-xl border p-3"
@@ -397,9 +405,9 @@ export default function InspectorPanel({
       >
         <p className="text-[10px] uppercase tracking-[0.16em] text-ob-faint">Roads</p>
         <p className="mt-0.5 font-semibold" style={{ color: DRIVE_COLOR[drive.state] }}>
-          {DRIVE_LABEL[drive.state]}
+          {t(`drive.${drive.state}`)}
         </p>
-        <p className="mt-0.5 text-xs text-ob-muted">{drive.message}</p>
+        <p className="mt-0.5 text-xs text-ob-muted">{t(`drive.${drive.state}.msg`)}</p>
       </div>
 
       {rain && <RainBars rain={rain} />}
@@ -414,7 +422,7 @@ export default function InspectorPanel({
             const color =
               pct >= 90 ? TIER_COLOR.CRITICAL : pct >= 70 ? TIER_COLOR.HIGH : pct >= 45 ? TIER_COLOR.MEDIUM : TIER_COLOR.LOW;
             return (
-              <li key={b.name}>
+              <li key={b.id}>
                 <div className="mb-1 flex items-center justify-between gap-2 text-xs">
                   <span className="truncate text-ob-text">{b.name}</span>
                   <span className="flex shrink-0 items-center gap-2">
@@ -432,8 +440,7 @@ export default function InspectorPanel({
       </div>
 
       <p className="mt-4 text-[11px] leading-snug text-ob-faint">
-        Live data from the Harris County Flood Warning System. Not a substitute for
-        official alerts from Harris County or the National Weather Service.
+        {t(`footer.${dataSource}`)} {t('footer.disclaimer')}
       </p>
     </PanelShell>
   );

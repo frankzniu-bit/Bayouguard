@@ -6,10 +6,11 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import type { Mode } from '@/lib/theme';
+import type { DataSource } from '@/lib/types';
+import { LANGS, useI18n } from '@/lib/i18n';
 import BrandMark from './landing/BrandMark';
+import DataStatus from './DataStatus';
 
-const LANGS = ['EN', 'ES', 'VI'] as const;
-export type Lang = (typeof LANGS)[number];
 export type ViewMode = 'graph' | 'map';
 
 interface Props {
@@ -17,14 +18,15 @@ interface Props {
   onMode: (m: ViewMode) => void;
   theme: Mode;
   onToggleTheme: () => void;
-  lang: Lang;
-  onLang: (l: Lang) => void;
+  dataSource: DataSource;
+  waking?: boolean;
   /** The search box, centred between the brand and the controls on wide screens. */
   search: ReactNode;
   className?: string;
 }
 
-export default function TopBar({ mode, onMode, theme, onToggleTheme, lang, onLang, search, className = '' }: Props) {
+export default function TopBar({ mode, onMode, theme, onToggleTheme, dataSource, waking, search, className = '' }: Props) {
+  const { lang, setLang } = useI18n();
   return (
     <header className={`pointer-events-none absolute inset-x-0 top-0 z-[70] ${className}`}>
       {/* One search instance: its own row on phones, centred in the bar from md up. */}
@@ -45,6 +47,7 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, lang, onLan
         </div>
 
         <div className="pointer-events-auto ml-auto flex items-center gap-2 md:ml-0">
+          <DataStatus source={dataSource} waking={waking} />
           <div
             role="group"
             aria-label="View mode"
@@ -84,13 +87,13 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, lang, onLan
               <button
                 key={l}
                 type="button"
-                onClick={() => onLang(l)}
+                onClick={() => setLang(l)}
                 aria-pressed={lang === l}
                 className={`h-9 rounded-full px-2.5 text-[12px] font-semibold transition-colors ${
                   lang === l ? 'bg-ob-text/10 text-ob-text' : 'text-ob-faint hover:text-ob-muted'
                 }`}
               >
-                {l}
+                {l.toUpperCase()}
               </button>
             ))}
           </div>

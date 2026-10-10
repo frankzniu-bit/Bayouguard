@@ -26,7 +26,7 @@ export default function RiskBoard({
         <h2 id="risk-board-title" className="text-[15px] font-semibold tracking-[-0.01em]">
           Closest to flooding
         </h2>
-        <span className="text-[11px] text-ob-faint">{sample ? 'sample' : 'live'} · ft to flood stage</span>
+        <span className="text-[11px] text-ob-faint">{sample ? 'not live' : 'live'} · ft to flood stage</span>
       </div>
 
       {ranked.length === 0 ? (
@@ -42,13 +42,12 @@ export default function RiskBoard({
                   type="button"
                   onClick={() => onPick(g)}
                   className="group -mx-2 flex w-[calc(100%+16px)] flex-col gap-1.5 rounded-xl px-2 py-2 text-left transition-colors hover:bg-ob-bg2"
-                  aria-label={`Gauge ${g.id}, ${TIER_LABEL[g.tier]} risk, ${g.buffer.toFixed(1)} feet to flood stage`}
+                  aria-label={`${g.name}, ${TIER_LABEL[g.tier]} risk, ${g.buffer.toFixed(1)} feet to flood stage`}
                 >
                   <span className="flex items-center gap-2 text-[13px]">
                     <span className="w-4 font-mono text-[11px] text-ob-faint tabular">{i + 1}</span>
                     <span className="h-2 w-2 rounded-[3px]" style={{ backgroundColor: TIER_COLOR[g.tier] }} />
-                    <span className="truncate font-medium">Gauge {g.id}</span>
-                    {g.county && <span className="truncate text-[11px] text-ob-faint">{g.county}</span>}
+                    <span className="truncate font-medium" title={g.name}>{g.name}</span>
                     <span
                       className="ml-auto font-mono text-[12px] font-semibold tabular"
                       style={{ color: over || g.tier !== 'LOW' ? TIER_COLOR[g.tier] : undefined }}

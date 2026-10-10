@@ -24,7 +24,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { GaugePoint, Tier } from '@/lib/types';
 import type { UsgsGauge } from '@/lib/usgs';
-import { TIER_COLOR, OB, type Mode } from '@/lib/theme';
+import { TIER_COLOR, TIER_LABEL, OB, BASEMAP, type Mode } from '@/lib/theme';
 import { TEXAS_RINGS } from '@/lib/geoDots';
 import type { MapLayers } from './LayerControl';
 import WindLayer from './WindLayer';
@@ -46,14 +46,12 @@ const REGION_BOUNDS: [[number, number], [number, number]] = [
 // The grey canvas basemap has tiles to 16. Past that Leaflet stretches them
 // and the labels turn into blurred giants, so the map stops here.
 const MAX_ZOOM = 16;
-const ESRI_CANVAS = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas';
 const CANVAS_NATIVE_ZOOM = MAX_ZOOM;
 
 const TEXAS_LINES = TEXAS_RINGS.map((ring) => ring.map(([lat, lng]) => [lat, lng] as [number, number]));
 // How far past the viewport the mask's outer edge reaches, in viewports — enough
 // that a pan or a one-level zoom-out never shows its edge before it's redrawn.
 const MASK_PAD = 1.5;
-const ESRI_ATTRIBUTION = 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> — Esri, HERE, Garmin, &copy; OpenStreetMap contributors';
 
 // Regional zoom shows the gauge cluster in statewide Texas context; street zoom
 // is reserved for an explicit address search.
@@ -271,11 +269,7 @@ export default function FloodMap({
       : REGION_ZOOM;
   const maskColor = mode === 'light' ? OB.bg : '#0f0f11';
   const borderColor = mode === 'light' ? 'rgba(27,24,20,0.55)' : 'rgba(242,238,230,0.5)';
-  // Esri's keyless grey canvas, base and labels as two layers. CARTO's free
-  // basemaps now stamp "API KEY REQUIRED" over every tile.
-  const canvas = mode === 'light' ? 'World_Light_Gray' : 'World_Dark_Gray';
-  const tileBase = `${ESRI_CANVAS}/${canvas}_Base/MapServer/tile/{z}/{y}/{x}`;
-  const tileLabels = `${ESRI_CANVAS}/${canvas}_Reference/MapServer/tile/{z}/{y}/{x}`;
+  const { base: tileBase, labels: tileLabels } = BASEMAP[mode];
   // A white keyline lifts the tier fill off cream tiles; ink marks the selection.
   const strokeColor = mode === 'light' ? '#ffffff' : '#0f0f11';
   const selectedStroke = mode === 'light' ? OB.text : '#ffffff';
@@ -326,12 +320,12 @@ export default function FloodMap({
     >
       {layers.satellite ? (
         <TileLayer
-          attribution='&copy; <a href="https://www.esri.com/">Esri</a> — Source: Esri, Maxar, Earthstar Geographics'
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          attribution={BASEMAP.satelliteAttribution}
+          url={BASEMAP.satellite}
         />
       ) : (
         <>
-          <TileLayer key={tileBase} attribution={ESRI_ATTRIBUTION} url={tileBase} maxNativeZoom={CANVAS_NATIVE_ZOOM} />
+          <TileLayer key={tileBase} attribution={BASEMAP.attribution} url={tileBase} maxNativeZoom={CANVAS_NATIVE_ZOOM} />
           <TileLayer key={tileLabels} url={tileLabels} maxNativeZoom={CANVAS_NATIVE_ZOOM} />
         </>
       )}
@@ -391,7 +385,7 @@ export default function FloodMap({
               }}
             >
               <Tooltip direction="top" offset={[0, -4]}>
-                Gauge {g.id} · {g.tier}
+                {g.name} · {TIER_LABEL[g.tier]}
               </Tooltip>
             </CircleMarker>
           );

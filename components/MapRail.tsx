@@ -14,9 +14,9 @@ export const TIER_ORDER: Tier[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
 
 const TIER_HINT: Record<Tier, string> = {
   CRITICAL: 'At or over flood stage',
-  HIGH: 'Within 2.5 ft',
-  MEDIUM: 'Within 6 ft',
-  LOW: 'Plenty of room',
+  HIGH: 'Within 2 ft',
+  MEDIUM: 'Within 5 ft',
+  LOW: '5 ft or more',
 };
 
 export function countTiers(gauges: GaugePoint[]): Record<Tier, number> {
@@ -55,7 +55,7 @@ export default function MapRail({
         </p>
         {sample && (
           <p className="mt-2 rounded-lg bg-tier-med/10 px-2 py-1.5 text-[11px] leading-snug text-ob-muted">
-            Sample data — the BayouGuard backend isn&rsquo;t connected yet.
+            Not live — the BayouGuard backend isn&rsquo;t answering, so these come from a fallback.
           </p>
         )}
 

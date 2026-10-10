@@ -5,7 +5,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
-import { NAV_ITEMS } from './navItems';
+import { NAV_ITEMS, isActive } from './navItems';
 
 export default function NavLinks({ className = '' }: { className?: string }) {
   const path = usePathname();
@@ -14,7 +14,7 @@ export default function NavLinks({ className = '' }: { className?: string }) {
     <nav aria-label={t('nav.label')} className={className}>
       <ul className="ob-panel ob-float flex h-11 items-center gap-0.5 rounded-full px-1">
         {NAV_ITEMS.map(({ href, label }) => {
-          const active = path === href || (href !== '/map' && path.startsWith(href));
+          const active = isActive(href, path);
           return (
             <li key={href}>
               <Link

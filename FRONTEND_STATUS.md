@@ -16,6 +16,21 @@ against the live Render backend.
 | 7. Share + PWA | 1200×630 share card (html2canvas) with native share or PNG download; Open Graph cards for shared links; manifest, generated icons; small service worker with an offline banner. |
 | 8. Polish | Skeletons, retry on every failed fetch, motion audit, contrast audit (both themes), lazy map/graph/chart, responsive pass at 375 / 768 / 1024 / 1280 / 1600. |
 
+## Round 2 (2026-10-10): speed and the grandpa test
+
+**Speed.** Measured in headless Chrome with the CPU slowed 6× (an older phone):
+
+| Screen | Before | After |
+| --- | --- | --- |
+| Map, idle main thread | 100% busy | 4% |
+| Map, page elements | 2,142 | 443 |
+| Front page, idle main thread | 31% (animated dot field) | 1% |
+| Result page, idle main thread | — | 1% |
+
+What did it: ripples only on HIGH and CRITICAL gauges (about 14, not 338); wind layer off by default (still a layer); gauge dots, roads and the Texas mask drawn on one canvas (`preferCanvas`) instead of hundreds of SVG nodes; the mask recomputed after a pan ends rather than every frame; the animated landing page and its map hand-off removed; the graph view loaded only when opened.
+
+**Answer-first design.** `/` is now one question, one address box and two big buttons (Check my address, Use my location), plus "check your saved address again" and neighborhood chips. `/check?address=` gives the answer in order: Is it safe to drive? (largest), the risk score, the next 6 hours in one sentence, what to do now (by risk level; Call 911 at CRITICAL), then three big buttons: Text me if this changes, See it on the map, Find a shelter. Sensors, charts, rain, flood history and reservoirs are folded under "More details". Type is 17–32px and buttons are 56px tall on these screens. The full map stays at `/map` for people who want to explore. Home is a fifth tab.
+
 ## Running on fallbacks, and what turns each one live
 
 Nothing below needs a frontend change. Once the backend ships the endpoint with the shape in `lib/contract.ts`, the feature goes live on the next request.
@@ -42,6 +57,5 @@ When `/gauges` itself is down, the map uses the Harris County feed's own reading
 - **No `.env.local` or `.env.example`.** My setup isn't allowed to create `.env*` files. For local dev, put `NEXT_PUBLIC_API_BASE_URL=https://bayouguard-backend-qibd.onrender.com` in `.env.local`. For production, set it in Vercel and redeploy (see README).
 - **`{{SCHOOL}}`** placeholder on `/about` (`components/pages/AboutView.tsx`).
 - **Design direction.** Clear Sky replaces the "paper and ink" redesign picked from `docs/boards/2026-10-08-redesign-board.jpg` a day earlier. Worth a quick check with Matthew.
-- **Landing motion kept.** The motion audit list didn't mention the landing page's dot-field assembly and zoom hand-off, so I kept them (they respect reduced motion) and removed only the infinite stat-card bob.
 - **Harvey peak pools** on the reservoir card (Addicks 109.1 ft, Barker 101.6 ft) are the USACE-reported records as I know them; confirm before the video.
 - **Share on a real phone** hasn't been tried. The card renders and captures correctly in headless Chrome, but the native share sheet only exists on devices.

@@ -12,9 +12,11 @@ import { shareRisk } from '@/lib/share';
 export default function ActionRow({
   snapshot,
   center,
+  showAlerts = true,
 }: {
   snapshot: HomeSnapshot;
   center: { lat: number; lng: number } | null;
+  showAlerts?: boolean;
 }) {
   const { t, lang } = useI18n();
   const address = snapshot.risk.address;
@@ -56,12 +58,14 @@ export default function ActionRow({
           {saved ? t('search.saved') : t('action.save')}
         </button>
       </div>
+      {showAlerts && (
       <Link
         href={`/alerts?address=${encodeURIComponent(address)}`}
         className="mt-2 flex h-11 w-full items-center justify-center rounded-lg bg-ob-accent px-3 text-[14px] font-semibold text-ob-onaccent transition hover:brightness-110"
       >
         {t('action.alerts')}
       </Link>
+      )}
       <p role="status" aria-live="polite" className="mt-1 min-h-[16px] text-center text-[12px] text-ob-muted">
         {note}
       </p>

@@ -185,10 +185,12 @@ function TexasMask({ fill }: { fill: string }) {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => setOuter(viewRing(map)));
     };
-    map.on('move zoomend resize', update);
+    // After a pan or zoom settles, not on every frame of it: the ring already
+    // reaches 1.5 viewports past the edge, so mid-pan nothing shows through.
+    map.on('moveend zoomend resize', update);
     return () => {
       cancelAnimationFrame(raf);
-      map.off('move zoomend resize', update);
+      map.off('moveend zoomend resize', update);
     };
   }, [map]);
   return (
@@ -216,30 +218,6 @@ function MapHandle({ onMap }: { onMap?: (map: L.Map) => void }) {
   useEffect(() => {
     onMap?.(map);
   }, [map, onMap]);
-  return null;
-}
-
-function ReadyProbe({ onReady }: { onReady?: (map: L.Map) => void }) {
-  const map = useMap();
-  useEffect(() => {
-    if (!onReady) return;
-    let fired = false;
-    const fire = () => {
-      if (fired) return;
-      fired = true;
-      onReady(map);
-    };
-    const timer = window.setTimeout(fire, 1400);
-    map.whenReady(() => {
-      let tiles: L.TileLayer | null = null;
-      map.eachLayer((layer) => {
-        if (!tiles && layer instanceof L.TileLayer) tiles = layer;
-      });
-      if (tiles) (tiles as L.TileLayer).once('load', fire);
-      else fire();
-    });
-    return () => window.clearTimeout(timer);
-  }, [map, onReady]);
   return null;
 }
 
@@ -302,8 +280,6 @@ export default function FloodMap({
   onSelect,
   layers,
   focusGauge = null,
-  initialView,
-  onReady,
   overlays = {},
   onMap,
   inset = { right: 0, bottom: 0 },
@@ -318,10 +294,6 @@ export default function FloodMap({
   layers: MapLayers;
   /** A gauge chosen outside the map, to fly to. */
   focusGauge?: GaugePoint | null;
-  /** Where to open — set when arriving from the landing's zoom. */
-  initialView?: { lat: number; lng: number; zoom: number } | null;
-  /** Called once the map is laid out and its first tiles have loaded. */
-  onReady?: (map: L.Map) => void;
   overlays?: MapOverlays;
   /** The Leaflet map, once created (for the map-centre report location). */
   onMap?: (map: L.Map) => void;
@@ -330,16 +302,8 @@ export default function FloodMap({
 }) {
   const { t } = useI18n();
   const yourAddress = t('map.yourAddress');
-  const start: [number, number] = initialView
-    ? [initialView.lat, initialView.lng]
-    : center
-      ? [center.lat, center.lng]
-      : HOUSTON;
-  const startZoom = initialView
-    ? initialView.zoom
-    : zoomToCenter && center
-      ? ADDRESS_ZOOM
-      : REGION_ZOOM;
+  const start: [number, number] = center ? [center.lat, center.lng] : HOUSTON;
+  const startZoom = zoomToCenter && center ? ADDRESS_ZOOM : REGION_ZOOM;
   const tok = OB[mode];
   const tierHex = TIER_HEX[mode];
   const maskColor = tok.bg;
@@ -366,9 +330,12 @@ export default function FloodMap({
   );
   // Per-gauge icons (not per-tier) so every gauge pulses on its own phase;
   // memoized on the gauge list so selection clicks don't restart animations.
+  // Ripples only where the water is dangerous: a pulse means "look here",
+  // and a few dozen animated markers stay cheap where 338 did not.
+  const rippling = useMemo(() => gauges.filter((g) => g.tier === 'HIGH' || g.tier === 'CRITICAL'), [gauges]);
   const rippleIcons = useMemo(
-    () => new Map(gauges.map((g) => [g.id, makeRippleIcon(g.tier, tierHex[g.tier])])),
-    [gauges, tierHex],
+    () => new Map(rippling.map((g) => [g.id, makeRippleIcon(g.tier, tierHex[g.tier])])),
+    [rippling, tierHex],
   );
 
   // Statewide USGS context layer — fetched once on demand, kept for the session.
@@ -396,6 +363,9 @@ export default function FloodMap({
       maxZoom={MAX_ZOOM}
       maxBounds={REGION_BOUNDS}
       maxBoundsViscosity={1}
+      // One canvas for the gauge dots, roads and mask instead of hundreds of
+      // SVG nodes: the difference between smooth and stuttering on old phones.
+      preferCanvas
       scrollWheelZoom
       className="h-full w-full"
       zoomControl={false}
@@ -434,7 +404,7 @@ export default function FloodMap({
 
       {/* Ripple pulses under the dots — the "tsunami" layer. */}
       {layers.ripples &&
-        gauges.map((g) => {
+        rippling.map((g) => {
           const icon = rippleIcons.get(g.id);
           if (!icon) return null;
           return (
@@ -544,8 +514,7 @@ export default function FloodMap({
         />
       </Pane>
 
-      <ClampToRegion fitOnStart={!initialView && !(zoomToCenter && center)} />
-      <ReadyProbe onReady={onReady} />
+      <ClampToRegion fitOnStart={!(zoomToCenter && center)} />
       <MapHandle onMap={onMap} />
       <FocusGauge gauge={focusGauge} />
       <Recenter

@@ -11,7 +11,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import type { Mode } from '@/lib/theme';
 import type { DataSource } from '@/lib/types';
 import { LANGS, useI18n } from '@/lib/i18n';
-import BrandMark from './landing/BrandMark';
+import BrandMark from './BrandMark';
 import DataStatus from './DataStatus';
 import SettingsMenu, { LANG_NAME } from './SettingsMenu';
 import NavLinks from './nav/NavLinks';
@@ -69,11 +69,11 @@ export default function TopBar({
         <Link
           href="/"
           aria-label={t('brand.home')}
-          className={`ob-panel ob-float pointer-events-auto flex h-11 shrink-0 items-center gap-2 rounded-full px-2.5 text-ob-accent ${search ? '2xl:pr-4' : 'sm:pr-4'}`}
+          className={`ob-panel ob-float pointer-events-auto flex h-11 shrink-0 items-center gap-2 rounded-full px-2.5 text-ob-accent ${search ? '2xl:pr-4' : 'pr-4'}`}
         >
           <BrandMark className="h-6 w-6" />
           {/* On the map the search needs the room; the wordmark waits for very wide screens. */}
-          <span className={`hidden font-display text-[19px] text-ob-text ${search ? '2xl:inline' : 'sm:inline'}`}>BayouGuard</span>
+          <span className={`hidden font-display text-[19px] text-ob-text ${search ? '2xl:inline' : 'inline'}`}>BayouGuard</span>
         </Link>
 
         <NavLinks className="pointer-events-auto hidden shrink-0 lg:block" />

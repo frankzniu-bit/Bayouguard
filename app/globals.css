@@ -244,73 +244,6 @@ body {
   }
 }
 
-/* ── Landing ──────────────────────────────────────────────────────────────── */
-.landing-canvas {
-  position: absolute;
-  inset: 0;
-}
-.landing-canvas canvas {
-  display: block;
-}
-
-/* Pieces assemble rather than wipe in: a short rise from a visible-enough
- * start, staggered by inline animation-delay. */
-@keyframes land-in {
-  from {
-    opacity: 0;
-    transform: translateY(14px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-.land-in {
-  animation: land-in 0.9s var(--ease-out-expo) both;
-}
-
-/* Stat cards rise in once. */
-.stat-float {
-  animation: land-in 0.8s var(--ease-out-expo) both;
-}
-
-/* Leaving the landing: everything but the dots steps aside while the field
- * zooms (ZoomTransition draws the dots on its own canvas). Keyframes, not
- * transitions — the entrance animations hold their end state with fill-mode
- * both, which would override a transition. */
-@keyframes leave-up {
-  to {
-    opacity: 0;
-    transform: translateY(-24px);
-  }
-}
-@keyframes leave-down {
-  to {
-    opacity: 0;
-    transform: translateY(32px);
-  }
-}
-@keyframes leave-out {
-  to {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-}
-.is-leaving .leave-up,
-.is-leaving .leave-down,
-.is-leaving .leave-out {
-  pointer-events: none;
-}
-.is-leaving .leave-up {
-  animation: leave-up 0.5s var(--ease-out-quart) forwards;
-}
-.is-leaving .leave-down {
-  animation: leave-down 0.5s var(--ease-out-quart) forwards;
-}
-.is-leaving .leave-out {
-  animation: leave-out 0.45s var(--ease-out-quart) forwards;
-}
-
 /* Only say "loading" if it's actually taking a while. */
 @keyframes fade-in {
   from {
@@ -322,37 +255,4 @@ body {
 }
 .fade-in-late {
   animation: fade-in 0.4s ease 0.7s both;
-}
-
-/* Map chrome entrance: held off-stage while the intro plays (and for the
- * first frame of a direct visit), then each group slides in from its edge. */
-.chrome {
-  transition:
-    opacity 0.25s ease-out,
-    transform 0.25s ease-out;
-}
-.chrome-d1 {
-  transition-delay: 40ms;
-}
-.chrome-d2 {
-  transition-delay: 80ms;
-}
-.chrome-d3 {
-  transition-delay: 120ms;
-}
-[data-chrome='out'] .chrome {
-  opacity: 0;
-  pointer-events: none;
-}
-[data-chrome='out'] .chrome-top {
-  transform: translateY(-18px);
-}
-[data-chrome='out'] .chrome-left {
-  transform: translateX(-28px);
-}
-[data-chrome='out'] .chrome-right {
-  transform: translateX(28px);
-}
-[data-chrome='out'] .chrome-bottom {
-  transform: translateY(18px);
 }

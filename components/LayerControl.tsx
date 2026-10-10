@@ -23,7 +23,8 @@ export interface MapLayers {
 export const DEFAULT_LAYERS: MapLayers = {
   dots: true,
   ripples: true,
-  wind: true,
+  // Decorative and the costliest layer on slow phones; opt in.
+  wind: false,
   satellite: false,
   // ~1.2 MB upstream; only fetched when someone turns it on.
   usgs: false,

@@ -24,12 +24,15 @@ export default function AddressSearch({
   busy = false,
   waking = false,
   variant = 'pill',
+  large = false,
   label,
   onValue,
   id,
 }: {
   /** 'field' is a plain form input: no submit button, no save star. */
   variant?: 'pill' | 'field';
+  /** Bigger field for the home page. */
+  large?: boolean;
   /** Visible label for the field variant. */
   label?: string;
   /** Every change to the text, and every picked suggestion. */
@@ -210,11 +213,15 @@ export default function AddressSearch({
       {variant === 'field' ? (
         <div className="flex flex-col gap-1">
           {label && (
-            <label htmlFor={inputId} className="text-[13px] font-medium text-ob-text">
+            <label htmlFor={inputId} className={`font-medium text-ob-text ${large ? 'text-[17px]' : 'text-[13px]'}`}>
               {label}
             </label>
           )}
-          {input('h-11 rounded-lg border border-ob-border bg-ob-surface px-3 focus:border-ob-water')}
+          {input(
+            large
+              ? 'h-14 rounded-xl border-2 border-ob-border bg-ob-surface px-4 !text-[18px] focus:border-ob-water'
+              : 'h-11 rounded-lg border border-ob-border bg-ob-surface px-3 focus:border-ob-water',
+          )}
         </div>
       ) : (
         <form
@@ -262,7 +269,7 @@ export default function AddressSearch({
                 type="button"
                 onMouseEnter={() => setActive(i)}
                 onClick={() => pick(s)}
-                className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition ${
+                className={`flex min-h-[48px] w-full items-center gap-3 px-4 py-2.5 text-left transition ${large ? 'text-[17px]' : 'text-sm'} ${
                   i === active ? 'bg-ob-accent/10 text-ob-accent' : 'text-ob-muted hover:bg-ob-bg'
                 }`}
               >

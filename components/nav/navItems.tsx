@@ -10,7 +10,22 @@ export interface NavItem {
 
 const stroke = { stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none' };
 
+/** Home covers the result screen too. */
+export function isActive(href: string, path: string): boolean {
+  if (href === '/') return path === '/' || path.startsWith('/check');
+  return path === href || path.startsWith(`${href}/`);
+}
+
 export const NAV_ITEMS: NavItem[] = [
+  {
+    href: '/',
+    label: 'nav.home',
+    icon: ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} aria-hidden>
+        <path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4v-9.5z" {...stroke} />
+      </svg>
+    ),
+  },
   {
     href: '/map',
     label: 'nav.map',

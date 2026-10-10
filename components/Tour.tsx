@@ -6,7 +6,7 @@
  * (the rail and board are desktop-only) are dropped, not shown floating. */
 
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import BrandMark from './landing/BrandMark';
+import BrandMark from './BrandMark';
 import { useI18n, type MsgKey } from '@/lib/i18n';
 
 const STORAGE_KEY = 'bayouguard_tour_v1';

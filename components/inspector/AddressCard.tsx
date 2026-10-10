@@ -43,10 +43,13 @@ export default function AddressCard({
   snapshot,
   center,
   dataSource,
+  detailsOnly = false,
 }: {
   snapshot: HomeSnapshot;
   center: { lat: number; lng: number } | null;
   dataSource: DataSource;
+  /** Just the supporting detail (the result page shows the answer itself). */
+  detailsOnly?: boolean;
 }) {
   const { t, num } = useI18n();
   const { risk, weather, drive, bayous, rain, outlook } = snapshot;
@@ -62,14 +65,16 @@ export default function AddressCard({
 
   return (
     <div>
-      <p className="text-[12px] font-medium text-ob-muted">{t('insp.yourLocation')}</p>
-      <h2 className="mb-3 text-[18px] font-semibold leading-snug text-ob-text">{risk.address}</h2>
-
-      <DriveCard drive={drive} />
-
-      <div className="mt-5">
-        <RiskArc risk={risk} />
-      </div>
+      {!detailsOnly && (
+        <>
+          <p className="text-[12px] font-medium text-ob-muted">{t('insp.yourLocation')}</p>
+          <h2 className="mb-3 text-[18px] font-semibold leading-snug text-ob-text">{risk.address}</h2>
+          <DriveCard drive={drive} />
+          <div className="mt-5">
+            <RiskArc risk={risk} />
+          </div>
+        </>
+      )}
 
       {outlook && (
         <Section title={t('outlook.title')}>
@@ -159,13 +164,16 @@ export default function AddressCard({
         </Section>
       )}
 
-      <div className="mt-5">
-        <ActionRow snapshot={snapshot} center={center} />
-      </div>
-
-      <p className="mt-3 text-[12px] leading-snug text-ob-muted">
-        {t(`footer.${dataSource}`)} {t('footer.disclaimer')}
-      </p>
+      {!detailsOnly && (
+        <>
+          <div className="mt-5">
+            <ActionRow snapshot={snapshot} center={center} />
+          </div>
+          <p className="mt-3 text-[12px] leading-snug text-ob-muted">
+            {t(`footer.${dataSource}`)} {t('footer.disclaimer')}
+          </p>
+        </>
+      )}
     </div>
   );
 }

@@ -12,7 +12,7 @@ import { TierBadge } from './parts';
 
 const ARC = 'M 12 64 A 52 52 0 0 1 116 64';
 
-export default function RiskArc({ risk }: { risk: RiskSnapshot }) {
+export default function RiskArc({ risk, large = false }: { risk: RiskSnapshot; large?: boolean }) {
   const { t, num } = useI18n();
   const sentence = riskSentence(risk, t, num);
   return (
@@ -49,8 +49,8 @@ export default function RiskArc({ risk }: { risk: RiskSnapshot }) {
           <p className="mt-1.5 text-[13px] text-ob-muted">{t('insp.scoreOf')}</p>
         </div>
       </div>
-      <p className="mt-2 text-[12px] font-medium text-ob-muted">{t(`riskSource.${risk.source}`)}</p>
-      <p className="mt-2 text-[14px] leading-relaxed text-ob-text" title={risk.backendMessage}>
+      <p className={`mt-2 font-medium text-ob-muted ${large ? 'text-[15px]' : 'text-[12px]'}`}>{t(`riskSource.${risk.source}`)}</p>
+      <p className={`mt-2 leading-relaxed text-ob-text ${large ? 'text-[17px]' : 'text-[14px]'}`} title={risk.backendMessage}>
         {sentence}
       </p>
     </section>

@@ -10,7 +10,7 @@
  * and a first-visit welcome card and tour. On phones the inspector, layers
  * and report form are bottom sheets above the tab bar. */
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type L from 'leaflet';
 import dynamic from 'next/dynamic';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -23,7 +23,6 @@ import MapRail from './MapRail';
 import RiskBoard from './RiskBoard';
 import Tour from './Tour';
 import StaleBanner from './StaleBanner';
-import MapIntro from './MapIntro';
 import MapLegend from './MapLegend';
 import BottomSheet from './BottomSheet';
 import BottomTabs from './nav/BottomTabs';
@@ -39,7 +38,6 @@ import { useI18n, type MsgKey } from '@/lib/i18n';
 import { writeLastSearch } from '@/lib/savedAddress';
 import type { FloodView, GaugePoint, Tier } from '@/lib/types';
 import type { CommunityReport, Reservoir, RoadCollection, Shelter } from '@/lib/contract';
-import { readHandoff, type Handoff } from '@/lib/dotField';
 
 // Leaflet touches window — load the map background client-only.
 const FloodMap = dynamic(() => import('./FloodMap'), {
@@ -53,10 +51,6 @@ const WatershedGraph = dynamic(() => import('./WatershedGraph'), {
   loading: () => <div className="h-full w-full bg-ob-bg" />,
 });
 
-/* checking — deciding (first client frame) whether we came from the landing
- * playing   — MapIntro is melting the landing's dots into the map
- * done      — chrome slides in; normal use */
-type IntroState = 'checking' | 'playing' | 'done';
 type LocalNotice = 'locationDenied' | 'locationUnavailable' | 'reportShared' | 'reportLocal' | null;
 
 const ADDRESS_SELECTION: GraphSelection = { id: 'address', kind: 'address' };
@@ -84,9 +78,6 @@ export default function HomeExperience({
   const [layers, setLayers] = useState<MapLayers>(DEFAULT_LAYERS);
   const [hiddenTiers, setHiddenTiers] = useState<ReadonlySet<Tier>>(new Set());
   const [searched, setSearched] = useState(Boolean(initialAddress && initial.center));
-  const [handoff, setHandoff] = useState<Handoff | null>(null);
-  const [intro, setIntro] = useState<IntroState>('checking');
-  const [liveMap, setLiveMap] = useState<L.Map | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const onMap = useCallback((m: L.Map) => {
     mapRef.current = m;
@@ -102,24 +93,6 @@ export default function HomeExperience({
   const [localNotice, setLocalNotice] = useState<LocalNotice>(null);
   const [localReports, setLocalReports] = useState<CommunityReport[]>([]);
   const [pendingAddress, setPendingAddress] = useState(false);
-
-  // Before paint, so the landing's last frame is covered from the first frame.
-  // Once only: reading consumes the hand-off, and React's dev double-run of
-  // effects would otherwise find it gone and skip the intro.
-  const checked = useRef(false);
-  useLayoutEffect(() => {
-    if (checked.current) return;
-    checked.current = true;
-    const h = readHandoff(true);
-    if (h) {
-      setHandoff(h);
-      setIntro('playing');
-      return;
-    }
-    // A direct visit: let one frame paint with the chrome off-stage, so its
-    // slide-in actually transitions.
-    requestAnimationFrame(() => setIntro('done'));
-  }, []);
 
   // Memoized so the map's per-gauge ripple icons survive unrelated re-renders.
   const visible = useMemo(
@@ -266,7 +239,7 @@ export default function HomeExperience({
   const sample = view.dataSource !== 'live';
   // An address selection needs a scored snapshot to show.
   const shown = selection?.kind === 'address' && !view.snapshot ? null : selection;
-  const showWelcome = intro === 'done' && !view.address && !loading && !shown;
+  const showWelcome = !view.address && !loading && !shown;
   const vh = typeof window === 'undefined' ? 800 : window.innerHeight;
   const inspectorInset = useMemo(
     () =>
@@ -328,13 +301,13 @@ export default function HomeExperience({
     'ob-panel ob-float flex h-11 items-center justify-center gap-2 rounded-full text-[13px] font-semibold text-ob-accent transition-colors hover:bg-ob-bg';
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-ob-bg" data-chrome={intro === 'done' ? 'in' : 'out'}>
+    <div className="fixed inset-0 overflow-hidden bg-ob-bg">
       {/* ── BACKGROUND (swappable) ──
           z-0 establishes a stacking context so Leaflet's internal panes
           (z-index 400-700) stay trapped below the chrome layers above. On
           phones it stops at the tab bar. */}
       <div className="absolute inset-x-0 top-0 z-0 bottom-[calc(56px+env(safe-area-inset-bottom))] lg:bottom-0">
-        {intro === 'checking' ? null : mode === 'map' ? (
+        {mode === 'map' ? (
           <FloodMap
             center={view.center}
             gauges={visible}
@@ -345,8 +318,6 @@ export default function HomeExperience({
             onSelect={setSelection}
             layers={layers}
             focusGauge={focus}
-            initialView={handoff ? { lat: handoff.lat, lng: handoff.lng, zoom: handoff.zoom } : null}
-            onReady={intro === 'playing' ? setLiveMap : undefined}
             overlays={overlays}
             onMap={onMap}
             inset={inspectorInset}
@@ -383,7 +354,6 @@ export default function HomeExperience({
             waking={wake === 'waking'}
           />
         }
-        className="chrome chrome-top"
       />
 
       {/* Search status, data warnings and the welcome card, under the bar */}
@@ -454,7 +424,7 @@ export default function HomeExperience({
       </div>
 
       {/* Left column (desktop): network, filters, layers, reservoirs; legend below */}
-      <div className="chrome chrome-left chrome-d1 pointer-events-none absolute bottom-4 left-4 top-[76px] z-40 hidden flex-col justify-between gap-3 lg:flex">
+      <div className="pointer-events-none absolute bottom-4 left-4 top-[76px] z-40 hidden flex-col justify-between gap-3 lg:flex">
         <div className="pointer-events-auto min-h-0 shrink">
           <MapRail
             gauges={view.gauges}
@@ -476,7 +446,7 @@ export default function HomeExperience({
       {/* Legend (below lg), collapsed so it doesn't cover the map */}
       {!shown && !isDesktop && (
         <div
-          className="chrome chrome-bottom chrome-d2 pointer-events-none absolute left-3 z-40"
+          className="pointer-events-none absolute left-3 z-40"
           style={{ bottom: ABOVE_TABS, maxWidth: 'calc(100vw - 136px)' }}
         >
           <div className="pointer-events-auto">
@@ -493,7 +463,7 @@ export default function HomeExperience({
       {/* Map tools (below lg): layers, locate me, report flooding */}
       {!shown && !reportOpen && (
         <div
-          className="chrome chrome-bottom chrome-d2 pointer-events-none absolute right-3 z-40 flex flex-col gap-2 lg:hidden"
+          className="pointer-events-none absolute right-3 z-40 flex flex-col gap-2 lg:hidden"
           style={{ bottom: ABOVE_TABS }}
         >
           {mode === 'map' && (
@@ -528,7 +498,7 @@ export default function HomeExperience({
 
       {/* Right column: leaderboard until something is picked */}
       {!shown && (
-        <div className="chrome chrome-right chrome-d2 pointer-events-none absolute right-4 top-[76px] z-40 hidden lg:block">
+        <div className="pointer-events-none absolute right-4 top-[76px] z-40 hidden lg:block">
           <div className="pointer-events-auto">
             <RiskBoard gauges={visible} onPick={pickGauge} />
           </div>
@@ -544,7 +514,7 @@ export default function HomeExperience({
 
       {/* Desktop tools + hint (bottom centre) */}
       <div
-        className="chrome chrome-bottom chrome-d3 pointer-events-none absolute bottom-4 z-30 hidden flex-col items-center gap-2 px-4 lg:flex"
+        className="pointer-events-none absolute bottom-4 z-30 hidden flex-col items-center gap-2 px-4 lg:flex"
         style={{ left: 264, right: shown ? 400 : 16 }}
       >
         {reportOpen && isDesktop && (
@@ -569,7 +539,7 @@ export default function HomeExperience({
       </div>
 
       {/* Inspector: right column from md up, a bottom sheet on phones */}
-      {pendingAddress && !shown && isWide && intro === 'done' && (
+      {pendingAddress && !shown && isWide && (
         <aside
           aria-hidden
           className="ob-panel ob-float absolute right-4 top-[76px] z-[80] flex w-[380px] flex-col gap-3 rounded-xl p-5"
@@ -582,7 +552,7 @@ export default function HomeExperience({
         </aside>
       )}
       <AnimatePresence>
-        {shown && intro === 'done' && isWide && (
+        {shown && isWide && (
           <motion.aside
             key="inspector"
             aria-label={t('map.inspector')}
@@ -596,7 +566,7 @@ export default function HomeExperience({
             {inspector}
           </motion.aside>
         )}
-        {shown && intro === 'done' && !isWide && (
+        {shown && !isWide && (
           <BottomSheet key={`sheet-${shown.id}`} label={t('map.inspector')} onClose={closeInspector}>
             {inspector}
           </BottomSheet>
@@ -617,13 +587,7 @@ export default function HomeExperience({
 
       <BottomTabs />
 
-      {/* Covers the first client frame while we decide; then the intro or nothing. */}
-      {intro === 'checking' && <div className="fixed inset-0 z-[90] bg-ob-bg" aria-hidden="true" />}
-      {intro === 'playing' && handoff && (
-        <MapIntro handoff={handoff} map={liveMap} mode={theme} onDone={() => setIntro('done')} />
-      )}
-
-      <Tour ready={intro === 'done'} />
+      <Tour ready />
     </div>
   );
 }

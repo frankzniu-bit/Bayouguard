@@ -5,7 +5,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
-import { NAV_ITEMS } from './navItems';
+import { NAV_ITEMS, isActive } from './navItems';
 
 export default function BottomTabs() {
   const path = usePathname();
@@ -16,9 +16,9 @@ export default function BottomTabs() {
       className="fixed inset-x-0 bottom-0 z-[85] border-t border-ob-border bg-ob-surface lg:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      <ul className="mx-auto grid h-14 max-w-lg grid-cols-4">
+      <ul className="mx-auto grid h-14 max-w-lg grid-cols-5">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-          const active = path === href || (href !== '/map' && path.startsWith(href));
+          const active = isActive(href, path);
           return (
             <li key={href}>
               <Link

@@ -39,7 +39,7 @@ export default function LayerControl({
 }) {
   return (
     <div>
-      <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-ob-faint">
+      <p className="mb-1 px-2 text-[12px] font-medium text-ob-muted">
         Map layers
       </p>
       <ul className="flex flex-col gap-1">
@@ -81,7 +81,7 @@ export default function LayerControl({
                   }`}
                 >
                   {label}
-                  <span className="text-[11px] text-ob-faint">{hint}</span>
+                  <span className="text-[11px] text-ob-muted">{hint}</span>
                 </span>
               </button>
             </li>

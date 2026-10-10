@@ -19,12 +19,12 @@ export default function NetworkStats({ gauges }: { gauges: GaugePoint[] }) {
   for (const g of gauges) counts[g.tier] = (counts[g.tier] ?? 0) + 1;
 
   return (
-    <div className="ob-panel ob-float pointer-events-auto flex items-center gap-1 rounded-2xl px-2 py-2 sm:gap-2 sm:px-3">
+    <div className="ob-panel ob-float pointer-events-auto flex items-center gap-1 rounded-xl px-2 py-2 sm:gap-2 sm:px-3">
       <div className="flex flex-col px-2">
         <span className="font-mono text-lg leading-none tabular text-ob-text">
           {gauges.length}
         </span>
-        <span className="text-[10px] uppercase tracking-[0.16em] text-ob-faint">
+        <span className="text-[12px] text-ob-muted font-medium">
           gauges live
         </span>
       </div>

@@ -9,7 +9,7 @@
  * picked), and a first-visit tour. Searching an address refreshes the flood
  * view and focuses it; picking any gauge opens the inspector. */
 
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type L from 'leaflet';
 import dynamic from 'next/dynamic';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -99,6 +99,18 @@ export default function HomeExperience({
       else next.add(t);
       return next;
     });
+
+  // When the server render couldn't wait for the backend, the client's first
+  // live view is the answer to the address the visitor came in with.
+  const awaitingInitial = useRef(Boolean(initialAddress && (initial.pending || !initial.center)));
+  useEffect(() => {
+    if (!awaitingInitial.current || view.pending || loading) return;
+    awaitingInitial.current = false;
+    if (view.center) {
+      setSearched(true);
+      if (view.snapshot) setSelection(ADDRESS_SELECTION);
+    }
+  }, [view, loading]);
 
   const lastSearch = useRef<{ address: string; coords?: { lat: number; lng: number } } | null>(null);
   const onSearch = async (

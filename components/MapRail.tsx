@@ -46,9 +46,9 @@ export default function MapRail({
   const max = Math.max(1, ...TIER_ORDER.map((t) => counts[t]));
 
   return (
-    <div className="ob-panel ob-float thin-scroll flex max-h-full w-[248px] flex-col overflow-y-auto rounded-2xl">
+    <div className="ob-panel ob-float thin-scroll flex max-h-full w-[248px] flex-col overflow-y-auto rounded-xl">
       <section className="px-4 pb-3 pt-4" data-tour="filters">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ob-faint">Houston-area network</p>
+        <p className="text-[12px] font-medium text-ob-muted">Houston-area network</p>
         <p className="mt-1 flex items-baseline gap-1.5">
           <span className="text-[28px] font-bold leading-none tracking-[-0.03em] tabular">{gauges.length}</span>
           <span className="text-[13px] text-ob-muted">gauges live</span>

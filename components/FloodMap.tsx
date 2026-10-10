@@ -24,7 +24,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { GaugePoint, Tier } from '@/lib/types';
 import type { UsgsGauge } from '@/lib/usgs';
-import { TIER_COLOR, TIER_LABEL, OB, BASEMAP, type Mode } from '@/lib/theme';
+import { TIER_HEX, TIER_LABEL, OB, BASEMAP, type Mode } from '@/lib/theme';
 import { TEXAS_RINGS } from '@/lib/geoDots';
 import type { MapLayers } from './LayerControl';
 import WindLayer from './WindLayer';
@@ -74,14 +74,13 @@ const RIPPLE_SIZE: Record<Tier, number> = {
 };
 
 // Teardrop pin for the searched address, built as a DivIcon so we ship no image
-// assets. `accent` and the inner hole adapt to the active theme.
+// assets. Water-coloured (it marks where you are relative to the water), with
+// a hole in the surface colour.
 function makeAddressIcon(accent: string, hole: string) {
   return L.divIcon({
     className: '',
     html:
-      '<div style="position:relative;width:26px;height:34px;filter:drop-shadow(0 0 6px ' +
-      accent +
-      ');">' +
+      '<div style="position:relative;width:26px;height:34px;filter:drop-shadow(0 2px 3px rgba(26,26,46,0.35));">' +
       '<svg width="26" height="34" viewBox="0 0 26 34" xmlns="http://www.w3.org/2000/svg">' +
       '<path d="M13 0C5.8 0 0 5.8 0 13c0 9 13 21 13 21s13-12 13-21C26 5.8 20.2 0 13 0z" fill="' +
       accent +
@@ -95,7 +94,7 @@ function makeAddressIcon(accent: string, hole: string) {
   });
 }
 
-function makeRippleIcon(tier: Tier) {
+function makeRippleIcon(tier: Tier, color: string) {
   const size = RIPPLE_SIZE[tier];
   // Random negative delay desynchronizes the pulses across gauges.
   const delay = `-${(Math.random() * 4).toFixed(2)}s`;
@@ -103,7 +102,7 @@ function makeRippleIcon(tier: Tier) {
     className: '',
     html:
       `<div class="gauge-ripple" style="position:absolute;inset:0;` +
-      `--ripple-color:${TIER_COLOR[tier]};--ripple-duration:${RIPPLE_DURATION[tier]};` +
+      `--ripple-color:${color};--ripple-duration:${RIPPLE_DURATION[tier]};` +
       `--ripple-delay:${delay};">` +
       '<span></span><span></span></div>',
     iconSize: [size, size],
@@ -267,26 +266,22 @@ export default function FloodMap({
     : zoomToCenter && center
       ? ADDRESS_ZOOM
       : REGION_ZOOM;
-  const maskColor = mode === 'light' ? OB.bg : '#0f0f11';
-  const borderColor = mode === 'light' ? 'rgba(27,24,20,0.55)' : 'rgba(242,238,230,0.5)';
+  const tok = OB[mode];
+  const tierHex = TIER_HEX[mode];
+  const maskColor = tok.bg;
+  const borderColor = mode === 'light' ? 'rgba(26,68,128,0.5)' : 'rgba(157,178,214,0.5)';
   const { base: tileBase, labels: tileLabels } = BASEMAP[mode];
-  // A white keyline lifts the tier fill off cream tiles; ink marks the selection.
-  const strokeColor = mode === 'light' ? '#ffffff' : '#0f0f11';
-  const selectedStroke = mode === 'light' ? OB.text : '#ffffff';
-  const windColor = mode === 'light' ? 'rgba(26,92,255,0.7)' : 'rgba(150,180,255,0.85)';
-  const usgsColor = mode === 'light' ? '#8c8274' : '#9a9286';
-  const addressIcon = useMemo(
-    () =>
-      mode === 'light'
-        ? makeAddressIcon(OB.accent, OB.bg)
-        : makeAddressIcon('#6894ff', '#0f0f11'),
-    [mode],
-  );
+  // A white keyline lifts the tier fill off grey tiles; ink marks the selection.
+  const strokeColor = mode === 'light' ? '#ffffff' : tok.bg;
+  const selectedStroke = tok.text;
+  const windColor = mode === 'light' ? 'rgba(26,68,128,0.55)' : 'rgba(157,190,255,0.8)';
+  const usgsColor = mode === 'light' ? '#8099BC' : '#6B82A8';
+  const addressIcon = useMemo(() => makeAddressIcon(tok.water, tok.surface), [tok]);
   // Per-gauge icons (not per-tier) so every gauge pulses on its own phase;
   // memoized on the gauge list so selection clicks don't restart animations.
   const rippleIcons = useMemo(
-    () => new Map(gauges.map((g) => [g.id, makeRippleIcon(g.tier)])),
-    [gauges],
+    () => new Map(gauges.map((g) => [g.id, makeRippleIcon(g.tier, tierHex[g.tier])])),
+    [gauges, tierHex],
   );
 
   // Statewide USGS context layer — fetched once on demand, kept for the session.
@@ -325,7 +320,7 @@ export default function FloodMap({
         />
       ) : (
         <>
-          <TileLayer key={tileBase} attribution={BASEMAP.attribution} url={tileBase} maxNativeZoom={CANVAS_NATIVE_ZOOM} />
+          <TileLayer key={tileBase} className="tiles-base" attribution={BASEMAP.attribution} url={tileBase} maxNativeZoom={CANVAS_NATIVE_ZOOM} />
           <TileLayer key={tileLabels} url={tileLabels} maxNativeZoom={CANVAS_NATIVE_ZOOM} />
         </>
       )}
@@ -376,7 +371,7 @@ export default function FloodMap({
               pathOptions={{
                 color: isSel ? selectedStroke : strokeColor,
                 weight: isSel ? 2.5 : 1.5,
-                fillColor: TIER_COLOR[g.tier],
+                fillColor: tierHex[g.tier],
                 fillOpacity: 0.9,
               }}
               eventHandlers={{

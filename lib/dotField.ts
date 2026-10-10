@@ -9,7 +9,6 @@
  * flying into the field. */
 
 import { TEXAS_OUTLINE } from './geoDots';
-import { TIER_COLOR } from './theme';
 import type { Tier } from './types';
 
 export type RGB = readonly [number, number, number];
@@ -99,9 +98,21 @@ export interface FieldDot {
   tier: Tier | null;
 }
 
-export const TIER_RGB = Object.fromEntries(
-  Object.entries(TIER_COLOR).map(([k, v]) => [k, hexToRgb(v)]),
-) as Record<Tier, RGB>;
+/* Tier colours for the current theme, read from the CSS variables at draw
+ * time so the canvas follows light/dark like the DOM does. */
+export function tierRgb(): Record<Tier, RGB> {
+  const s = getComputedStyle(document.documentElement);
+  const read = (name: string, fallback: RGB): RGB => {
+    const parts = s.getPropertyValue(name).trim().split(/\s+/).map(Number);
+    return parts.length === 3 && parts.every(Number.isFinite) ? (parts as unknown as RGB) : fallback;
+  };
+  return {
+    LOW: read('--tier-low-rgb', [27, 94, 32]),
+    MEDIUM: read('--tier-med-rgb', [230, 81, 0]),
+    HIGH: read('--tier-high-rgb', [183, 28, 28]),
+    CRITICAL: read('--tier-crit-rgb', [74, 20, 140]),
+  };
+}
 
 export function hexToRgb(hex: string): RGB {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -244,9 +255,9 @@ export function themeColours(): { ink: RGB; accent: RGB; bg: RGB } {
     return [r, g, b];
   };
   return {
-    ink: read('--ob-text-rgb', '27 24 20'),
-    accent: read('--ob-accent-rgb', '26 92 255'),
-    bg: read('--ob-bg-rgb', '251 246 239'),
+    ink: read('--ob-text-rgb', '26 26 46'),
+    accent: read('--ob-accent-rgb', '26 68 128'),
+    bg: read('--ob-bg-rgb', '240 245 255'),
   };
 }
 

@@ -13,7 +13,7 @@
 
 import { useEffect, useRef } from 'react';
 import { buildGraph, ForceSim, projectGeo, type Graph } from '@/lib/graph';
-import { TIER_COLOR, TIER_PULSE, PALETTE, type Mode } from '@/lib/theme';
+import { TIER_HEX, TIER_PULSE, PALETTE, type Mode } from '@/lib/theme';
 import { HOUSTON_CITIES, HOUSTON_OUTLINE } from '@/lib/geoFeatures';
 import type { GaugePoint } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
@@ -291,7 +291,7 @@ export default function WatershedGraph({
         const node = nodes[i];
         const p = worldToScreen(node.x, node.y);
         const isAddr = node.kind === 'address';
-        const color = isAddr ? pal.edgeAccent : TIER_COLOR[node.tier];
+        const color = isAddr ? pal.edgeAccent : TIER_HEX[modeRef.current][node.tier];
         const isSel = sel === node.id;
         const isHover = hover === i;
 
@@ -305,11 +305,14 @@ export default function WatershedGraph({
         const baseR = node.r * cam.scale;
         const r = Math.max(2, baseR + pulse * baseR * 0.35);
 
-        const glow = glowFor(color);
-        const glowR = r * (isAddr ? 7 : 5) * (1 + pulse * 0.25);
-        ctx.globalAlpha = (isAddr ? 0.5 : 0.32) + pulse * 0.18 + (isSel ? 0.2 : 0);
-        ctx.drawImage(glow, p.x - glowR, p.y - glowR, glowR * 2, glowR * 2);
-        ctx.globalAlpha = 1;
+        // Clear Sky is flat; the halo only helps legibility on the dark ground.
+        if (modeRef.current === 'dark') {
+          const glow = glowFor(color);
+          const glowR = r * (isAddr ? 7 : 5) * (1 + pulse * 0.25);
+          ctx.globalAlpha = (isAddr ? 0.5 : 0.32) + pulse * 0.18 + (isSel ? 0.2 : 0);
+          ctx.drawImage(glow, p.x - glowR, p.y - glowR, glowR * 2, glowR * 2);
+          ctx.globalAlpha = 1;
+        }
 
         ctx.beginPath();
         ctx.fillStyle = color;

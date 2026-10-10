@@ -5,7 +5,7 @@
  * ranking and the reason for it read in one glance. Tap a row to fly there. */
 
 import type { GaugePoint } from '@/lib/types';
-import { TIER_COLOR, TIER_LABEL } from '@/lib/theme';
+import { TIER_COLOR, TIER_INK, TIER_LABEL } from '@/lib/theme';
 
 const ROWS = 7;
 
@@ -21,12 +21,12 @@ export default function RiskBoard({
   const ranked = [...gauges].sort((a, b) => a.buffer - b.buffer).slice(0, ROWS);
 
   return (
-    <section className="ob-panel ob-float w-[320px] rounded-2xl p-4" data-tour="board" aria-labelledby="risk-board-title">
+    <section className="ob-panel ob-float w-[320px] rounded-xl p-4" data-tour="board" aria-labelledby="risk-board-title">
       <div className="flex items-baseline justify-between">
         <h2 id="risk-board-title" className="text-[15px] font-semibold tracking-[-0.01em]">
           Closest to flooding
         </h2>
-        <span className="text-[11px] text-ob-faint">{sample ? 'not live' : 'live'} · ft to flood stage</span>
+        <span className="text-[11px] text-ob-muted">{sample ? 'not live' : 'live'} · ft to flood stage</span>
       </div>
 
       {ranked.length === 0 ? (
@@ -45,12 +45,12 @@ export default function RiskBoard({
                   aria-label={`${g.name}, ${TIER_LABEL[g.tier]} risk, ${g.buffer.toFixed(1)} feet to flood stage`}
                 >
                   <span className="flex items-center gap-2 text-[13px]">
-                    <span className="w-4 font-mono text-[11px] text-ob-faint tabular">{i + 1}</span>
+                    <span className="w-4 font-mono text-[11px] text-ob-muted tabular">{i + 1}</span>
                     <span className="h-2 w-2 rounded-[3px]" style={{ backgroundColor: TIER_COLOR[g.tier] }} />
                     <span className="truncate font-medium" title={g.name}>{g.name}</span>
                     <span
                       className="ml-auto font-mono text-[12px] font-semibold tabular"
-                      style={{ color: over || g.tier !== 'LOW' ? TIER_COLOR[g.tier] : undefined }}
+                      style={{ color: over || g.tier !== 'LOW' ? TIER_INK[g.tier] : undefined }}
                     >
                       {over ? `+${Math.abs(g.buffer).toFixed(1)} over` : g.buffer.toFixed(1)}
                     </span>

@@ -9,7 +9,7 @@ const DEBOUNCE_MS = 220;
 
 function SearchIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden className="shrink-0 text-ob-faint">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden className="shrink-0 text-ob-muted">
       <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
       <path d="m16 16 4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
@@ -143,7 +143,7 @@ export default function AddressSearch({
     <div ref={boxRef} className="relative mx-auto w-full max-w-2xl">
       <form
         onSubmit={submit}
-        className="ob-panel ob-float flex h-11 w-full items-center gap-1.5 rounded-full p-1 pl-4 focus-within:border-ob-accent/60 focus-within:shadow-glow"
+        className="ob-panel ob-float flex h-11 w-full items-center gap-1.5 rounded-full p-1 pl-4 focus-within:border-ob-water"
       >
         <SearchIcon />
         <input
@@ -164,14 +164,14 @@ export default function AddressSearch({
             open && active >= 0 ? `address-option-${active}` : undefined
           }
           autoComplete="off"
-          className="min-w-0 flex-1 bg-transparent py-2 text-[14px] text-ob-text outline-none placeholder:text-ob-faint"
+          className="min-w-0 flex-1 bg-transparent py-2 text-[14px] text-ob-text outline-none placeholder:text-ob-muted"
         />
         <button
           type="button"
           onClick={save}
           title={saved === value && value ? 'Saved' : 'Save address'}
           aria-label="Save address"
-          className="hidden h-9 w-9 items-center justify-center rounded-full text-ob-faint transition hover:bg-ob-bg2 hover:text-ob-accent sm:flex"
+          className="hidden h-9 w-9 items-center justify-center rounded-full text-ob-muted transition hover:bg-ob-bg2 hover:text-ob-accent sm:flex"
         >
           {saved === value && value ? '★' : '☆'}
         </button>
@@ -188,7 +188,7 @@ export default function AddressSearch({
           id="address-listbox"
           role="listbox"
           aria-label="Address suggestions"
-          className="ob-panel ob-float absolute z-50 mt-2 w-full overflow-hidden rounded-2xl py-1 text-left"
+          className="ob-panel ob-float absolute z-50 mt-2 w-full overflow-hidden rounded-xl py-1 text-left"
         >
           {suggestions.map((s, i) => (
             <li
@@ -205,7 +205,7 @@ export default function AddressSearch({
                   i === active ? 'bg-ob-accent/10 text-ob-accent' : 'text-ob-muted hover:bg-ob-bg2'
                 }`}
               >
-                <span className="text-ob-faint" aria-hidden>
+                <span className="text-ob-muted" aria-hidden>
                   ⌖
                 </span>
                 <span className="truncate">{s.label}</span>

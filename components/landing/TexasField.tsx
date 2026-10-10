@@ -19,7 +19,7 @@ import {
   mix,
   project,
   rgba,
-  TIER_RGB,
+  tierRgb,
   type FieldDot,
 } from '@/lib/dotField';
 import { useDotCanvas } from './useDotCanvas';
@@ -47,6 +47,7 @@ export default function TexasField({ dots, hidden = false }: { dots: FieldDot[];
 
   useDotCanvas(host, canvas, ({ ctx, w, h, t, reduced, pointer, ink, accent }) => {
     const cam = fitTexas(0, 0, w, h);
+    const tiers = tierRgb();
     if (Math.abs(grid.current.scale - cam.scale) > 0.01) {
       grid.current = { scale: cam.scale, pts: buildGrid(gridStepFor(cam.scale)) };
     }
@@ -77,7 +78,7 @@ export default function TexasField({ dots, hidden = false }: { dots: FieldDot[];
       const a = appear(x, y, GAUGES_AFTER_MS);
       if (a <= 0) continue;
       const l = lens(x, y, pointer);
-      const lit = g.tier ? TIER_RGB[g.tier] : accent;
+      const lit = g.tier ? tiers[g.tier] : accent;
       // Overshoot a touch on arrival so each gauge lands with a little pop.
       const pop = a < 1 ? 1 + Math.sin(a * Math.PI) * 0.6 : 1;
       const size = (2.4 + l.e * 3.2) * a * pop;

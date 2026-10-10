@@ -8,22 +8,22 @@ import { useEffect, useState } from 'react';
 import type { GraphSelection } from './WatershedGraph';
 import type { DataSource, HomeSnapshot, Tier, DriveVerdict, Outlook, RainForecast } from '@/lib/types';
 import type { GaugeHistory } from '@/lib/history';
-import { TIER_COLOR, TIER_TINT, TIER_LABEL } from '@/lib/theme';
+import { TIER_COLOR, TIER_INK, TIER_TINT, TIER_LABEL } from '@/lib/theme';
 import { classifyTrend } from '@/lib/trend';
 import { useI18n } from '@/lib/i18n';
 import { outlookDetail, riskSentence, weatherLabel } from '@/lib/describe';
 
 const DRIVE_COLOR: Record<DriveVerdict['state'], string> = {
-  YES: TIER_COLOR.LOW,
-  CAUTION: TIER_COLOR.MEDIUM,
-  NO: TIER_COLOR.HIGH,
+  YES: TIER_INK.LOW,
+  CAUTION: TIER_INK.MEDIUM,
+  NO: TIER_INK.HIGH,
 };
 
 // Outlook levels reuse the tier palette so the panel stays one color system.
 const OUTLOOK_COLOR: Record<Outlook['level'], string> = {
-  CLEAR: TIER_COLOR.LOW,
-  WATCH: TIER_COLOR.MEDIUM,
-  WARNING: TIER_COLOR.HIGH,
+  CLEAR: TIER_INK.LOW,
+  WATCH: TIER_INK.MEDIUM,
+  WARNING: TIER_INK.HIGH,
 };
 const OUTLOOK_TINT: Record<Outlook['level'], string> = {
   CLEAR: TIER_TINT.LOW,
@@ -35,13 +35,13 @@ const OUTLOOK_TINT: Record<Outlook['level'], string> = {
 function TrendArrow({ trend }: { trend: number }) {
   const state = classifyTrend(trend);
   if (state === 'steady') {
-    return <span className="font-mono text-xs text-ob-faint">→ steady</span>;
+    return <span className="font-mono text-xs text-ob-muted">→ steady</span>;
   }
   const rising = state === 'rising';
   return (
     <span
       className="font-mono text-xs"
-      style={{ color: rising ? TIER_COLOR.HIGH : TIER_COLOR.LOW }}
+      style={{ color: rising ? TIER_INK.HIGH : TIER_INK.LOW }}
       title={`${rising ? 'Rising' : 'Falling'} ${Math.abs(trend).toFixed(2)} ft/hr`}
     >
       {rising ? '↑' : '↓'} {Math.abs(trend).toFixed(2)} ft/hr
@@ -68,8 +68,8 @@ function haversineMiles(
 function TierBadge({ tier }: { tier: Tier }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wider"
-      style={{ backgroundColor: TIER_TINT[tier], color: TIER_COLOR[tier] }}
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold"
+      style={{ backgroundColor: TIER_TINT[tier], color: TIER_INK[tier] }}
     >
       <span
         className="h-2 w-2 rounded-full"
@@ -90,8 +90,8 @@ function Metric({
   unit?: string;
 }) {
   return (
-    <div className="rounded-xl border border-ob-border bg-ob-bg2/60 p-3">
-      <p className="text-[10px] uppercase tracking-[0.16em] text-ob-faint">{label}</p>
+    <div className="rounded-lg border border-ob-border bg-ob-surface2 p-3">
+      <p className="text-[12px] text-ob-muted font-medium">{label}</p>
       <p className="mt-1 font-mono text-xl tabular text-ob-text">
         {value}
         {unit && <span className="ml-1 text-xs text-ob-muted">{unit}</span>}
@@ -110,11 +110,11 @@ function OutlookCard({ outlook }: { outlook: Outlook }) {
       style={{ borderColor: color, backgroundColor: OUTLOOK_TINT[outlook.level] }}
     >
       <div className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-[0.16em] text-ob-faint">
+        <p className="text-[12px] text-ob-muted font-medium">
           {t('outlook.title')}
         </p>
         <span
-          className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
+          className="rounded-full px-2 py-0.5 text-[12px] font-semibold"
           style={{ backgroundColor: OUTLOOK_TINT[outlook.level], color }}
         >
           {t(`outlook.level.${outlook.level}`)}
@@ -124,7 +124,7 @@ function OutlookCard({ outlook }: { outlook: Outlook }) {
         {t(`outlook.${outlook.kind}`)}
       </p>
       <p className="mt-0.5 text-xs leading-relaxed text-ob-muted">{outlookDetail(outlook, t, num)}</p>
-      <p className="mt-1 text-[11px] text-ob-faint">{t('outlook.note')}</p>
+      <p className="mt-1 text-[11px] text-ob-muted">{t('outlook.note')}</p>
     </div>
   );
 }
@@ -136,7 +136,7 @@ function RainBars({ rain }: { rain: RainForecast }) {
   return (
     <div className="mt-4">
       <div className="mb-1.5 flex items-baseline justify-between text-xs">
-        <span className="text-[11px] uppercase tracking-[0.18em] text-ob-faint">
+        <span className="text-[12px] text-ob-muted font-medium">
           Rain · next 12h
         </span>
         <span className="font-mono tabular text-ob-muted">
@@ -147,7 +147,7 @@ function RainBars({ rain }: { rain: RainForecast }) {
         {rain.inches.map((v, i) => (
           <div
             key={rain.hours[i] ?? i}
-            className="flex-1 rounded-t-sm bg-ob-accent/70 transition-all"
+            className="flex-1 rounded-t-sm bg-ob-water"
             style={{
               height: `${Math.max(4, (v / max) * 100)}%`,
               opacity: v > 0 ? 1 : 0.18,
@@ -156,7 +156,7 @@ function RainBars({ rain }: { rain: RainForecast }) {
           />
         ))}
       </div>
-      <div className="mt-1 flex justify-between font-mono text-[10px] text-ob-faint">
+      <div className="mt-1 flex justify-between font-mono text-[10px] text-ob-muted">
         <span>now</span>
         <span>+6h</span>
         <span>+12h</span>
@@ -186,7 +186,7 @@ function HistorySparkline({ gaugeId, color }: { gaugeId: number; color: string }
   if (loading) {
     return (
       <div className="mt-4">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-ob-faint">
+        <p className="text-[12px] text-ob-muted font-medium">
           Level · last 48h
         </p>
         <div className="mt-1.5 h-14 animate-pulse rounded-lg bg-ob-bg2/60" />
@@ -221,7 +221,7 @@ function HistorySparkline({ gaugeId, color }: { gaugeId: number; color: string }
   return (
     <div className="mt-4">
       <div className="mb-1.5 flex items-baseline justify-between text-xs">
-        <span className="text-[11px] uppercase tracking-[0.18em] text-ob-faint">
+        <span className="text-[12px] text-ob-muted font-medium">
           Level · last 48h
         </span>
         <span className="font-mono tabular text-ob-muted">
@@ -251,10 +251,10 @@ function HistorySparkline({ gaugeId, color }: { gaugeId: number; color: string }
         <path d={path} fill="none" stroke={color} strokeWidth={1.5} />
         <circle cx={x(points.length - 1)} cy={y(last.level)} r={2.5} fill={color} />
       </svg>
-      <div className="mt-1 flex justify-between font-mono text-[10px] text-ob-faint">
+      <div className="mt-1 flex justify-between font-mono text-[10px] text-ob-muted">
         <span>-48h</span>
         {floodInRange && floodLevel != null && (
-          <span style={{ color: TIER_COLOR.CRITICAL }}>
+          <span style={{ color: TIER_INK.CRITICAL }}>
             flood {floodLevel.toFixed(1)} ft
           </span>
         )}
@@ -272,7 +272,6 @@ function FillBar({ pct, color }: { pct: number; color: string }) {
         style={{
           width: `${Math.min(100, Math.max(0, pct))}%`,
           backgroundColor: color,
-          boxShadow: `0 0 12px ${color}`,
         }}
       />
     </div>
@@ -310,7 +309,7 @@ export default function InspectorPanel({
       <PanelShell onClose={onClose} onSwitch={onSwitch} switchLabel={switchLabel}>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-ob-faint">
+            <p className="text-[12px] text-ob-muted font-medium">
               Flood gauge{g.county ? ` · ${g.county} network` : ''}
             </p>
             <h2 className="text-lg font-semibold leading-snug text-ob-text">{g.name}</h2>
@@ -333,7 +332,7 @@ export default function InspectorPanel({
           <FillBar pct={fillPct} color={TIER_COLOR[g.tier]} />
         </div>
 
-        <HistorySparkline gaugeId={g.id} color={TIER_COLOR[g.tier]} />
+        <HistorySparkline gaugeId={g.id} color="rgb(var(--ob-water-rgb))" />
 
         <div className="mt-4 grid grid-cols-2 gap-2.5">
           <Metric label="Current" value={g.current.toFixed(1)} unit="ft" />
@@ -349,7 +348,7 @@ export default function InspectorPanel({
           )}
         </div>
 
-        <p className="mt-4 font-mono text-[11px] leading-relaxed text-ob-faint">
+        <p className="mt-4 font-mono text-[11px] leading-relaxed text-ob-muted">
           {g.lat.toFixed(4)}, {g.lng.toFixed(4)}
           {g.readAt ? ` · read ${new Date(g.readAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : ''}
         </p>
@@ -364,7 +363,7 @@ export default function InspectorPanel({
     <PanelShell onClose={onClose} onSwitch={onSwitch} switchLabel={switchLabel}>
       <div className="flex items-center justify-between">
         <div className="min-w-0">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-ob-faint">
+          <p className="text-[12px] text-ob-muted font-medium">
             Your location
           </p>
           <h2 className="truncate text-xl font-semibold tracking-tight text-ob-text" title={risk.address}>
@@ -377,7 +376,7 @@ export default function InspectorPanel({
       <div className="mt-4 flex items-end gap-3">
         <span
           className="font-mono text-5xl leading-none tabular"
-          style={{ color: TIER_COLOR[risk.tier] }}
+          style={{ color: TIER_INK[risk.tier], transition: 'color 600ms ease-out' }}
         >
           {risk.score}
         </span>
@@ -403,7 +402,7 @@ export default function InspectorPanel({
         className="mt-3 rounded-xl border p-3"
         style={{ borderColor: DRIVE_COLOR[drive.state], backgroundColor: TIER_TINT[risk.tier] }}
       >
-        <p className="text-[10px] uppercase tracking-[0.16em] text-ob-faint">Roads</p>
+        <p className="text-[12px] text-ob-muted font-medium">Roads</p>
         <p className="mt-0.5 font-semibold" style={{ color: DRIVE_COLOR[drive.state] }}>
           {t(`drive.${drive.state}`)}
         </p>
@@ -413,7 +412,7 @@ export default function InspectorPanel({
       {rain && <RainBars rain={rain} />}
 
       <div className="mt-4">
-        <p className="mb-2 text-[11px] uppercase tracking-[0.18em] text-ob-faint">
+        <p className="mb-2 text-[12px] text-ob-muted font-medium">
           Nearest gauges
         </p>
         <ul className="flex flex-col gap-2.5">
@@ -439,7 +438,7 @@ export default function InspectorPanel({
         </ul>
       </div>
 
-      <p className="mt-4 text-[11px] leading-snug text-ob-faint">
+      <p className="mt-4 text-[11px] leading-snug text-ob-muted">
         {t(`footer.${dataSource}`)} {t('footer.disclaimer')}
       </p>
     </PanelShell>
@@ -458,13 +457,13 @@ function PanelShell({
   switchLabel: string;
 }) {
   return (
-    <div className="ob-panel ob-float reveal flex max-h-full flex-col rounded-2xl">
+    <div className="ob-panel ob-float reveal flex max-h-full flex-col rounded-xl">
       <div className="thin-scroll overflow-y-auto p-5">{children}</div>
       <div className="flex items-center gap-2 border-t border-ob-border p-3">
         <button
           type="button"
           onClick={onSwitch}
-          className="flex-1 rounded-xl bg-ob-accent/15 px-3 py-2 text-sm font-semibold text-ob-accent transition hover:bg-ob-accent/25"
+          className="h-11 flex-1 rounded-lg border border-ob-border bg-ob-surface px-3 text-sm font-semibold text-ob-accent transition-colors hover:bg-ob-bg"
         >
           {switchLabel}
         </button>
@@ -472,7 +471,7 @@ function PanelShell({
           type="button"
           onClick={onClose}
           aria-label="Close inspector"
-          className="rounded-xl border border-ob-border px-3 py-2 text-sm text-ob-muted transition hover:text-ob-text"
+          className="h-11 rounded-lg border border-ob-border px-4 text-sm text-ob-muted transition-colors hover:text-ob-text"
         >
           Close
         </button>

@@ -77,7 +77,7 @@ const [hx, hy] = project(HOUSTON[0], HOUSTON[1]);
 
 export default function TexasLocator() {
   return (
-    <div className="ob-panel pointer-events-none flex flex-col items-center gap-1 rounded-2xl p-3 shadow-panel">
+    <div className="ob-panel pointer-events-none flex flex-col items-center gap-1 rounded-xl p-3 ob-float">
       <svg
         width={W}
         height={H}
@@ -106,7 +106,7 @@ export default function TexasLocator() {
           Houston
         </text>
       </svg>
-      <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-ob-faint">
+      <span className="font-mono text-[12px] text-ob-muted font-medium">
         Texas · TX-07
       </span>
     </div>

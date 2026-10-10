@@ -111,9 +111,9 @@ export default function Landing({
       <header className="land-in leave-up mt-8 flex flex-col items-center gap-1.5 sm:mt-10" style={{ animationDelay: '80ms' }}>
         <div className="flex items-center gap-2 text-ob-accent">
           <BrandMark className="h-7 w-7" />
-          <span className="text-[26px] font-semibold tracking-[-0.02em]">BayouGuard</span>
+          <span className="font-display text-[30px] text-ob-text">BayouGuard</span>
         </div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ob-accent">
+        <p className="text-[12px] font-medium text-ob-accent">
           Texas floodwater, mapped
         </p>
       </header>
@@ -133,16 +133,16 @@ export default function Landing({
         {data.stats.map((s, i) => (
           <figure
             key={s.label}
-            className={`stat-float leave-out ob-float pointer-events-none absolute hidden w-[176px] rounded-2xl bg-ob-surface px-4 py-3 lg:block ${CARD_SPOTS[i]}`}
+            className={`stat-float leave-out ob-float pointer-events-none absolute hidden w-[176px] rounded-xl bg-ob-surface px-4 py-3 lg:block ${CARD_SPOTS[i]}`}
             style={{ animationDelay: `${420 + i * 90}ms, ${i * -1.7}s` }}
           >
             <span className="block text-[22px] font-bold leading-none tracking-[-0.02em] text-ob-accent/80 tabular">
               <CountUp value={s.value} delayMs={520 + i * 90} />
             </span>
-            <figcaption className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-ob-muted">
+            <figcaption className="mt-1.5 text-[12px] font-medium text-ob-muted">
               {s.label}
             </figcaption>
-            <p className="mt-1 text-[11px] leading-snug text-ob-faint">{s.detail}</p>
+            <p className="mt-1 text-[11px] leading-snug text-ob-muted">{s.detail}</p>
           </figure>
         ))}
       </section>
@@ -158,7 +158,7 @@ export default function Landing({
         <Link
           href="/map"
           onClick={enter}
-          className="mt-3 flex h-12 w-full items-center justify-center rounded-xl bg-ob-accent text-[15px] font-semibold text-white shadow-[0_10px_24px_-12px_rgb(var(--ob-accent-rgb)/0.9)] transition-transform duration-150 hover:brightness-110 active:scale-[0.98]"
+          className="mt-3 flex h-12 w-full items-center justify-center rounded-xl bg-ob-accent text-[15px] font-semibold text-white transition-transform duration-150 hover:brightness-110 active:scale-[0.98]"
         >
           Enter the map
         </Link>
@@ -173,7 +173,7 @@ export default function Landing({
             onChange={(e) => setAddress(e.target.value)}
             placeholder="Your Texas address"
             autoComplete="street-address"
-            className="h-11 min-w-0 flex-1 rounded-xl border border-ob-border bg-ob-surface px-3.5 text-[14px] text-ob-text outline-none transition placeholder:text-ob-faint focus:border-ob-accent/60 focus:shadow-glow"
+            className="h-11 min-w-0 flex-1 rounded-xl border border-ob-border bg-ob-surface px-3.5 text-[14px] text-ob-text outline-none transition placeholder:text-ob-muted focus:border-ob-water"
           />
           <button
             type="submit"
@@ -187,8 +187,8 @@ export default function Landing({
         {/* The floating cards need width; small screens get the two that matter. */}
         <dl className="mt-6 grid w-full grid-cols-2 gap-2 lg:hidden">
           {data.stats.slice(0, 2).map((s) => (
-            <div key={s.label} className="ob-float rounded-2xl bg-ob-surface px-3.5 py-3 text-left">
-              <dt className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ob-muted">{s.label}</dt>
+            <div key={s.label} className="ob-float rounded-xl bg-ob-surface px-3.5 py-3 text-left">
+              <dt className="text-[12px] font-medium text-ob-muted">{s.label}</dt>
               <dd className="mt-1 text-[20px] font-bold leading-none text-ob-accent/80 tabular">
                 <CountUp value={s.value} delayMs={500} />
               </dd>
@@ -197,7 +197,7 @@ export default function Landing({
         </dl>
       </section>
 
-      <footer className="leave-down mt-auto flex flex-col items-center gap-1 pt-10 text-center text-[11px] text-ob-faint">
+      <footer className="leave-down mt-auto flex flex-col items-center gap-1 pt-10 text-center text-[11px] text-ob-muted">
         {data.sample && (
           <p className="rounded-full border border-ob-border bg-ob-surface px-3 py-1 text-ob-muted">
             Harris County gauges are sample data until the BayouGuard backend is connected

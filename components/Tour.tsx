@@ -124,7 +124,7 @@ export default function Tour({ ready = true }: { ready?: boolean }) {
     <div className="fixed inset-0 z-[200]" role="dialog" aria-modal="true" aria-labelledby="tour-title">
       {rect ? (
         <div
-          className="pointer-events-none absolute rounded-2xl transition-all duration-300 ease-out"
+          className="pointer-events-none absolute rounded-xl transition-all duration-300 ease-out"
           style={{
             left: rect.left - PAD,
             top: rect.top - PAD,
@@ -139,12 +139,12 @@ export default function Tour({ ready = true }: { ready?: boolean }) {
 
       <div
         key={i}
-        className="ob-float reveal absolute rounded-2xl bg-ob-surface p-4 text-ob-text"
+        className="ob-float reveal absolute rounded-xl bg-ob-surface p-4 text-ob-text"
         style={{ left, top, width }}
       >
         <div className="flex items-center gap-1.5 text-ob-accent">
           <BrandMark className="h-4 w-4" />
-          <span className="text-[12px] font-semibold">BayouGuard</span>
+          <span className="font-display text-[14px] text-ob-text">BayouGuard</span>
         </div>
         <h2 id="tour-title" className="mt-2 text-[16px] font-semibold tracking-[-0.01em]">
           {step.title}

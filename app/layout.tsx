@@ -1,11 +1,19 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { DM_Serif_Display, Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { LanguageProvider } from '@/lib/i18n';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
   variable: '--font-inter',
+  display: 'swap',
+});
+
+// The wordmark only.
+const display = DM_Serif_Display({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -22,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#fbf6ef',
+  themeColor: '#F0F5FF',
   width: 'device-width',
   initialScale: 1,
 };
@@ -36,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       data-theme="light"
       suppressHydrationWarning
-      className={`${inter.variable} ${jbMono.variable} h-full`}
+      className={`${inter.variable} ${jbMono.variable} ${display.variable} h-full`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH }} />

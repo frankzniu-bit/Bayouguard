@@ -27,7 +27,7 @@ import {
   scaleForZoom,
   sizeToViewport,
   themeColours,
-  TIER_RGB,
+  tierRgb,
   unpackDots,
   type Handoff,
 } from '@/lib/dotField';
@@ -72,6 +72,7 @@ export default function MapIntro({
     }
 
     const { ink, accent, bg } = themeColours();
+    const TIER_RGB = tierRgb();
     const grid = buildGrid(gridStepFor(handoff.baseScale));
     const dots = unpackDots(handoff.dots);
     const ratio = scaleForZoom(handoff.zoom) / handoff.baseScale;

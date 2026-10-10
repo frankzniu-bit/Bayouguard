@@ -37,7 +37,7 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, dataSource,
           className="ob-panel ob-float pointer-events-auto flex h-11 shrink-0 items-center gap-2 rounded-full px-2.5 text-ob-accent sm:pr-4"
         >
           <BrandMark className="h-6 w-6" />
-          <span className="hidden text-[17px] font-semibold tracking-[-0.02em] sm:inline">BayouGuard</span>
+          <span className="hidden font-display text-[19px] text-ob-text sm:inline">BayouGuard</span>
         </Link>
 
         <div className="pointer-events-auto order-last flex min-w-0 basis-full justify-center md:order-none md:basis-auto md:flex-1">
@@ -60,7 +60,7 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, dataSource,
                 onClick={() => onMode(m)}
                 aria-pressed={mode === m}
                 className={`h-9 rounded-full px-3.5 text-[13px] font-semibold capitalize transition-colors ${
-                  mode === m ? 'bg-ob-text text-ob-bg' : 'text-ob-muted hover:text-ob-text'
+                  mode === m ? 'bg-ob-accent text-white' : 'text-ob-muted hover:text-ob-text'
                 }`}
               >
                 {m}
@@ -90,7 +90,7 @@ export default function TopBar({ mode, onMode, theme, onToggleTheme, dataSource,
                 onClick={() => setLang(l)}
                 aria-pressed={lang === l}
                 className={`h-9 rounded-full px-2.5 text-[12px] font-semibold transition-colors ${
-                  lang === l ? 'bg-ob-text/10 text-ob-text' : 'text-ob-faint hover:text-ob-muted'
+                  lang === l ? 'bg-ob-accent text-white' : 'text-ob-muted hover:text-ob-text'
                 }`}
               >
                 {l.toUpperCase()}
